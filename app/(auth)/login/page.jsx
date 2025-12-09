@@ -31,7 +31,7 @@ export default function Login() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="hidden lg:flex flex-col items-center justify-center"
         >
-          <Mascot mood="happy" size="xl" className="w-44 h-44 mb-6" />
+          <Mascot mood="happy" size="xxxl" className="mb-6" />
           <h2 className="text-4xl font-black text-accent mb-2">Elingo</h2>
           <p className="text-xl text-muted-foreground text-center max-w-md">
             Learn languages whenever and wherever you want

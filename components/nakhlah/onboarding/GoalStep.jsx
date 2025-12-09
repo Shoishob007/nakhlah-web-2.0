@@ -42,7 +42,7 @@ export function GoalStep({ selectedGoal, onSelect }) {
         animate={{ opacity: 1, y: 0 }}
         className="mb-10 flex items-center gap-8 justify-center"
       >
-        <Mascot mood="curious" size="md" className="w-20 h-20" />
+        <Mascot mood="sleeping" size="md" className="" />
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
             Set your daily goal

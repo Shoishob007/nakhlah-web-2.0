@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
-  { path: "/learn", label: "Learn", icon: BookOpen },
+  { path: "/challenge", label: "Challenges", icon: BookOpen },
   { path: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { path: "/stats", label: "Stats", icon: BarChart3 },
   { path: "/profile", label: "Profile", icon: User },

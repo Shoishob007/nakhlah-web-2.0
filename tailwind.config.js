@@ -29,6 +29,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          glow: "hsl(var(--primary-glow))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -45,6 +46,7 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          glow: "hsl(var(--accent-glow))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -78,6 +80,21 @@ export default {
           DEFAULT: "hsl(var(--violet))",
           dark: "hsl(var(--violet-dark))",
           light: "hsl(var(--violet-light))",
+        },
+        // Pathway node colors
+        node: {
+          gold: "hsl(var(--node-gold))",
+          "gold-border": "hsl(var(--node-gold-border))",
+          "gold-shadow": "hsl(var(--node-gold-shadow))",
+          completed: "hsl(var(--node-completed))",
+          "completed-border": "hsl(var(--node-completed-border))",
+          locked: "hsl(var(--node-locked))",
+          "locked-border": "hsl(var(--node-locked-border))",
+        },
+        section: {
+          green: "hsl(var(--section-green))",
+          purple: "hsl(var(--section-purple))",
+          orange: "hsl(var(--section-orange))",
         },
       },
       borderRadius: {

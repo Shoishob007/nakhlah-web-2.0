@@ -12,7 +12,7 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function CreatePasswordPage() {
-    const router = useRouter()
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -21,7 +21,7 @@ export default function CreatePasswordPage() {
 
   const handleContinue = () => {
     // Handle create password logic
-    router.push("/welcome-back")
+    router.push("/welcome-back");
   };
 
   return (
@@ -34,7 +34,7 @@ export default function CreatePasswordPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="hidden lg:flex flex-col items-center justify-center"
         >
-          <Mascot mood="happy" size="xl" className="w-44 h-44 mb-6" />
+          <Mascot mood="happy" size="xxxl" className="mb-6" />
           <h2 className="text-2xl font-bold text-foreground text-center max-w-md">
             Create a strong password to keep your account secure!
           </h2>
@@ -67,7 +67,8 @@ export default function CreatePasswordPage() {
                   Create new password 🔒
                 </h1>
                 <p className="text-muted-foreground">
-                  Save the new password in a safe place, if you forget it then you have to do a forgot password
+                  Save the new password in a safe place, if you forget it then
+                  you have to do a forgot password
                 </p>
               </motion.div>
             </div>
@@ -76,7 +77,10 @@ export default function CreatePasswordPage() {
             <div className="space-y-6">
               {/* Create Password */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground font-semibold">
+                <Label
+                  htmlFor="password"
+                  className="text-foreground font-semibold"
+                >
                   Create a new password
                 </Label>
                 <div className="relative">
@@ -104,7 +108,10 @@ export default function CreatePasswordPage() {
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground font-semibold">
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-foreground font-semibold"
+                >
                   Confirm new password
                 </Label>
                 <div className="relative">

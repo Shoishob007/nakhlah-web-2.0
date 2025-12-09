@@ -34,10 +34,7 @@ const proficiencyLevels = [
   },
 ];
 
-export function ProficiencyStep({
-  selectedLevel,
-  onSelect,
-}) {
+export function ProficiencyStep({ selectedLevel, onSelect }) {
   return (
     <div className="w-full max-w-xl mx-auto">
       <motion.div
@@ -45,7 +42,7 @@ export function ProficiencyStep({
         animate={{ opacity: 1, y: 0 }}
         className="mb-10 flex items-center gap-8 justify-center"
       >
-        <Mascot mood="curious" size="md" className="w-20 h-20" />
+        <Mascot mood="excited" size="md" className="w-20 h-20" />
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
             How much do you know?

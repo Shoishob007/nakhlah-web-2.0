@@ -193,7 +193,7 @@ export default function Profile() {
               <CardContent className="flex flex-col items-center p-6">
                 <Mascot
                   mood="happy"
-                  size="lg"
+                  size="xl"
                   message="Keep up the great work! 🌟"
                 />
               </CardContent>

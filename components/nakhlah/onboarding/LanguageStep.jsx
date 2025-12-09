@@ -11,11 +11,7 @@ const languages = [
   { value: "urdu", label: "Urdu", native: "اردو", icon: "🇵🇰" },
 ];
 
-
-export function LanguageStep({
-  selectedLanguage,
-  onSelect,
-}) {
+export function LanguageStep({ selectedLanguage, onSelect }) {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <motion.div
@@ -23,7 +19,7 @@ export function LanguageStep({
         animate={{ opacity: 1, y: 0 }}
         className="mb-10 flex items-center gap-8 justify-center"
       >
-        <Mascot mood="curious" size="md" className="w-20 h-20" />
+        <Mascot mood="proud" size="md" className="w-20 h-20" />
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
             What you want to learn?

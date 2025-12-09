@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Mascot } from "../Mascot";
 
-
 const quizQuestions = [
   {
     id: 1,
     question: "How do you say 'Hello' in Arabic?",
-    options: ["مرحبا (Marhaba)", "شكرا (Shukran)", "مع السلامة (Ma'a Salama)", "نعم (Na'am)"],
+    options: [
+      "مرحبا (Marhaba)",
+      "شكرا (Shukran)",
+      "مع السلامة (Ma'a Salama)",
+      "نعم (Na'am)",
+    ],
     correct: 0,
     explanation: "مرحبا (Marhaba) means 'Hello' - a common greeting in Arabic!",
   },
@@ -19,7 +23,8 @@ const quizQuestions = [
     question: "Which word means 'Thank you'?",
     options: ["لا (La)", "شكرا (Shukran)", "أهلا (Ahlan)", "كيف (Kayf)"],
     correct: 1,
-    explanation: "شكرا (Shukran) means 'Thank you' - very useful in daily conversations!",
+    explanation:
+      "شكرا (Shukran) means 'Thank you' - very useful in daily conversations!",
   },
   {
     id: 3,
@@ -29,7 +34,6 @@ const quizQuestions = [
     explanation: "كتاب (Kitab) means 'Book' - an essential word for learners!",
   },
 ];
-
 
 export function QuizStep({ onComplete }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -46,7 +50,7 @@ export function QuizStep({ onComplete }) {
     if (showResult) return;
     setSelectedAnswer(index);
     setShowResult(true);
-    
+
     if (index === question.correct) {
       setScore(score + 1);
       setAnswers([...answers, true]);
@@ -57,7 +61,7 @@ export function QuizStep({ onComplete }) {
 
   const handleNext = () => {
     if (isLastQuestion) {
-      onComplete(score + (isCorrect ? 0 : 0)); // Score already updated
+      onComplete(score + (isCorrect ? 0 : 0));
     } else {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -76,14 +80,14 @@ export function QuizStep({ onComplete }) {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8 flex items-center gap-8 justify-center"
       >
-        <Mascot mood="curious" size="md" className="w-20 h-20" />
+        <Mascot mood="thinking" size="md" className="w-20 h-20" />
         <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-          Quick Assessment
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Let&apos;s see where you stand (optional)
-        </p>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
+            Quick Assessment
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Let&apos;s see where you stand (optional)
+          </p>
         </div>
       </motion.div>
 
@@ -138,23 +142,29 @@ export function QuizStep({ onComplete }) {
                     : "border-border bg-card hover:border-primary hover:bg-primary/5"
                 )}
               >
-                <span className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
-                  showResult && index === question.correct
-                    ? "bg-secondary text-secondary-foreground"
-                    : showResult && index === selectedAnswer
-                    ? "bg-destructive text-destructive-foreground"
-                    : "bg-muted text-muted-foreground"
-                )}>
+                <span
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
+                    showResult && index === question.correct
+                      ? "bg-secondary text-secondary-foreground"
+                      : showResult && index === selectedAnswer
+                      ? "bg-destructive text-destructive-foreground"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
                   {String.fromCharCode(65 + index)}
                 </span>
-                <span className="font-medium text-foreground flex-1">{option}</span>
+                <span className="font-medium text-foreground flex-1">
+                  {option}
+                </span>
                 {showResult && index === question.correct && (
                   <CheckCircle2 className="w-5 h-5 text-secondary" />
                 )}
-                {showResult && index === selectedAnswer && index !== question.correct && (
-                  <XCircle className="w-5 h-5 text-destructive" />
-                )}
+                {showResult &&
+                  index === selectedAnswer &&
+                  index !== question.correct && (
+                    <XCircle className="w-5 h-5 text-destructive" />
+                  )}
               </button>
             ))}
           </div>
@@ -178,11 +188,15 @@ export function QuizStep({ onComplete }) {
                   ) : (
                     <>
                       <XCircle className="w-5 h-5 text-destructive" />
-                      <span className="font-bold text-destructive">Not quite!</span>
+                      <span className="font-bold text-destructive">
+                        Not quite!
+                      </span>
                     </>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">{question.explanation}</p>
+                <p className="text-sm text-muted-foreground">
+                  {question.explanation}
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -199,7 +213,10 @@ export function QuizStep({ onComplete }) {
         </Button>
         {showResult && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Button onClick={handleNext} className="bg-accent hover:bg-accent/90">
+            <Button
+              onClick={handleNext}
+              className="bg-accent hover:bg-accent/90"
+            >
               {isLastQuestion ? "Continue" : "Next Question"}
             </Button>
           </motion.div>

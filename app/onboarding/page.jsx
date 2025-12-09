@@ -85,7 +85,7 @@ export default function Onboarding() {
         completed: true,
       })
     );
-    router.push("/learn");
+    router.push("/challenge");
   };
 
   const renderStep = () => {

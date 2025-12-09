@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mascot } from "@/components/nakhlah/Mascot";
 import { XPDisplay } from "@/components/nakhlah/XPDisplay";
 import { LessonCard } from "@/components/nakhlah/LessonCard";
-import { ProgressSteps } from "@/components/nakhlah/ProgressSteps";
 import { motion } from "framer-motion";
 import { BookOpen, Target, Zap, Award, ArrowRight, Globe } from "lucide-react";
+import PathwayCarousel from "@/components/pathway/PathwayCarousel";
+import { toast } from "sonner";
 
 const todayLessons = [
   {
@@ -42,11 +43,46 @@ const todayLessons = [
   },
 ];
 
-const learningSteps = [
-  { id: 1, label: "Listen", description: "Hear native pronunciation" },
-  { id: 2, label: "Practice", description: "Repeat and memorize" },
-  { id: 3, label: "Write", description: "Learn the script" },
-  { id: 4, label: "Speak", description: "Build confidence" },
+const chapters = [
+  {
+    id: 1,
+    label: "Getting Started",
+    locked: false,
+    section: {
+      title: "Lesson 27",
+      subtitle: "Describing abstract objects",
+      color: "green",
+    },
+  },
+  { id: 2, label: "Basic Concepts", locked: false },
+  { id: 3, label: "Core Skills", locked: false },
+  { id: 4, label: "Practice Round", locked: false },
+  { id: 5, label: "Review Session", locked: false },
+  {
+    id: 6,
+    label: "Advanced Topics",
+    locked: false,
+    section: {
+      title: "Lesson 26",
+      subtitle: "Forming an infinite path",
+      color: "purple",
+    },
+  },
+  { id: 7, label: "Deep Dive", locked: false },
+  { id: 8, label: "Expert Level", locked: true },
+  { id: 9, label: "Master Class", locked: true },
+  {
+    id: 10,
+    label: "Final Challenge",
+    locked: true,
+    section: {
+      title: "Lesson 25",
+      subtitle: "The ultimate quest",
+      color: "orange",
+    },
+  },
+  { id: 11, label: "Bonus Round", locked: true },
+  { id: 12, label: "Victory Lap", locked: true },
 ];
 
 const stats = [
@@ -67,6 +103,14 @@ const stats = [
 ];
 
 export default function HomeContent() {
+  const currentChapter = 5;
+
+  const handleSelectChapter = (chapter) => {
+    toast.success(`Starting: ${chapter.label}`, {
+      description: `Chapter ${chapter.id} selected`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -128,8 +172,8 @@ export default function HomeContent() {
               className="flex justify-center lg:justify-end"
             >
               <Mascot
-                mood="excited"
-                size="xl"
+                mood="happy"
+                size="xxxl"
                 message="Let's learn some Arabic today! 🌴"
               />
             </motion.div>
@@ -165,26 +209,11 @@ export default function HomeContent() {
 
       {/* Learning Progress */}
       <section className="container px-4 py-8 mx-auto">
-        <Card variant="elevated">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-accent" />
-              Your Learning Path
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ProgressSteps
-              steps={learningSteps}
-              currentStep={2}
-              className="hidden md:flex"
-            />
-            <ProgressSteps
-              steps={learningSteps}
-              currentStep={2}
-              className="md:hidden"
-            />
-          </CardContent>
-        </Card>
+        <PathwayCarousel
+          chapters={chapters}
+          current={currentChapter}
+          onSelect={handleSelectChapter}
+        />
       </section>
 
       {/* Today's Lessons */}

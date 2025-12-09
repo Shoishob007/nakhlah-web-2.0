@@ -29,7 +29,7 @@ export default function WelcomeBackPage() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="mb-6"
           >
-            <Mascot mood="excited" size="xl" className="w-32 h-32 mx-auto" />
+            <Mascot mood="happy" size="xxxl" className="mx-auto" />
           </motion.div>
 
           {/* Message */}

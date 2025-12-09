@@ -9,7 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function OTPVerificationPage() {
-    const router = useRouter()
+  const router = useRouter();
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(120);
   const [canResend, setCanResend] = useState(false);
@@ -46,7 +46,7 @@ export default function OTPVerificationPage() {
 
   const handleChange = (index, value) => {
     if (value.length > 1) return;
-    
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -67,7 +67,7 @@ export default function OTPVerificationPage() {
   const handleConfirm = () => {
     // Handle OTP verification logic
     console.log("OTP:", otp.join(""));
-    router.push("create-new-password")
+    router.push("create-new-password");
   };
 
   return (
@@ -80,7 +80,7 @@ export default function OTPVerificationPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="hidden lg:flex flex-col items-center justify-center"
         >
-          <Mascot mood="excited" size="xl" className="w-44 h-44 mb-6" />
+          <Mascot mood="excited" size="xxxl" className="mb-6" />
           <h2 className="text-2xl font-bold text-foreground text-center max-w-md">
             Check your inbox for the verification code!
           </h2>
@@ -114,7 +114,8 @@ export default function OTPVerificationPage() {
                   You&apos;ve got mail 📬
                 </h1>
                 <p className="text-muted-foreground">
-                  We have sent the OTP verification code to your email address. Check your email and enter the code below
+                  We have sent the OTP verification code to your email address.
+                  Check your email and enter the code below
                 </p>
               </motion.div>
             </div>

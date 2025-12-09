@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-const router = useRouter()
+  const router = useRouter();
   const handleContinue = () => {
     router.push("/otp-verification");
   };
@@ -27,12 +27,12 @@ const router = useRouter()
           transition={{ duration: 0.5, delay: 0.2 }}
           className="hidden lg:flex flex-col items-center justify-center"
         >
-          <Mascot mood="thinking" size="xl" className="w-44 h-44 mb-6" />
+          <Mascot mood="thinking" size="xxxl" className="mb-6" />
           <h2 className="text-2xl font-bold text-foreground text-center max-w-md">
             Don&apos;t worry, we&apos;ll help you reset your password!
           </h2>
         </motion.div>
-                {/* Right Side - Form */}
+        {/* Right Side - Form */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -60,7 +60,8 @@ const router = useRouter()
                   Forgot Password 🔑
                 </h1>
                 <p className="text-muted-foreground">
-                  Enter your email address to get an OTP code to reset your password
+                  Enter your email address to get an OTP code to reset your
+                  password
                 </p>
               </motion.div>
             </div>
@@ -69,7 +70,10 @@ const router = useRouter()
             <div className="space-y-6">
               {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground font-semibold">
+                <Label
+                  htmlFor="email"
+                  className="text-foreground font-semibold"
+                >
                   Email
                 </Label>
                 <Input
@@ -92,7 +96,6 @@ const router = useRouter()
             </div>
           </div>
         </motion.div>
-
       </div>
     </div>
   );

@@ -12,12 +12,7 @@ const languageNames = {
   urdu: "Urdu",
 };
 
-export function CompletionStep({
-  language,
-  dailyGoal,
-  quizScore,
-  onComplete,
-}) {
+export function CompletionStep({ language, dailyGoal, quizScore, onComplete }) {
   return (
     <div className="w-full max-w-[520px] mx-auto text-center">
       <motion.div
@@ -26,7 +21,7 @@ export function CompletionStep({
         transition={{ type: "spring", stiffness: 200, damping: 18 }}
         className="bg-gradient-to-b from-white/60 to-white/40 dark:from-black/40 dark:to-black/30 p-6 rounded-3xl border border-border shadow-lg"
       >
-        <Mascot mood="excited" size="xl" className="mx-auto w-28 h-28" />
+        <Mascot mood="proud" size="xxl" className="mx-auto" />
         <div className="flex flex-col items-center gap-4">
           <div className="text-center">
             <h1 className="text-3xl font-extrabold text-foreground mb-1">
