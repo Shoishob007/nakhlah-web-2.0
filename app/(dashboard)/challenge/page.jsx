@@ -139,7 +139,7 @@ export default function Learn() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-64px)] bg-background">
       <div className="container px-4 py-8 mx-auto">
         {/* Header */}
         <motion.div

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -137,7 +137,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[calc(100vh-64px)] bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

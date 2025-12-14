@@ -112,7 +112,7 @@ export default function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-64px)] bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-sand-light/50 to-transparent dark:from-accent/5" />

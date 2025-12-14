@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function GetStartedPage() {
   return (
-    <div className="min-h-screen w-full bg-background flex items-center justify-center p-8">
+    <div className="min-h-[calc(100vh-64px)] w-full bg-background flex items-center justify-center p-8">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -31,7 +31,12 @@ export default function GetStartedPage() {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3, type: "spring", stiffness: 200, damping: 15 }}
+          transition={{
+            delay: 0.3,
+            type: "spring",
+            stiffness: 200,
+            damping: 15,
+          }}
           className="mb-12 flex justify-center"
         >
           <Mascot mood="happy" size="2xl" className="w-48 h-48" />
@@ -43,11 +48,10 @@ export default function GetStartedPage() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          <h1 className="text-6xl font-black text-accent mb-4">
-            Elingo
-          </h1>
+          <h1 className="text-6xl font-black text-accent mb-4">Elingo</h1>
           <p className="text-xl text-muted-foreground max-w-md mx-auto leading-relaxed">
-            Learn languages whenever and wherever you want. It&apos;s free and forever.
+            Learn languages whenever and wherever you want. It&apos;s free and
+            forever.
           </p>
         </motion.div>
 
@@ -58,14 +62,16 @@ export default function GetStartedPage() {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="flex flex-col gap-4 max-w-md mx-auto mt-10"
         >
-          <Link href="/onboarding"
+          <Link
+            href="/onboarding"
             // size="lg"
             className="w-full bg-accent hover:opacity-90 text-white font-bold text-lg py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200"
           >
             GET STARTED
           </Link>
-          
-          <Link href="/login"
+
+          <Link
+            href="/auth/login"
             // size="lg"
             // variant="ghost"
             className="w-full text-accent font-bold text-lg py-4 rounded-2xl hover:bg-accent/10 transition-all duration-200"

@@ -55,7 +55,7 @@ const achievements = [
 // Generate deterministic activity data (same on server and client)
 const activityData = Array.from({ length: 28 }).map((_, i) => {
   // Use a deterministic pattern instead of Math.random()
-  const pattern = (i * 7 + i % 5) % 10;
+  const pattern = (i * 7 + (i % 5)) % 10;
   return pattern / 10;
 });
 
@@ -68,7 +68,7 @@ export default function Stats() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-64px)] bg-background">
       <div className="container px-4 py-8 mx-auto">
         {/* Header */}
         <motion.div

@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function GetStartedPage() {
   return (
-    <div className="min-h-screen w-full bg-background flex items-center justify-center p-8">
+    <div className="min-h-[calc(100vh-64px)] w-full bg-background flex items-center justify-center p-8">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -71,7 +71,7 @@ export default function GetStartedPage() {
           </Link>
 
           <Link
-            href="/login"
+            href="/auth/login"
             className="w-full text-accent font-bold text-lg py-4 rounded-2xl hover:bg-accent/10 transition-all duration-200 flex items-center justify-center"
           >
             I ALREADY HAVE AN ACCOUNT

@@ -14,11 +14,11 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const router = useRouter();
   const handleContinue = () => {
-    router.push("/otp-verification");
+    router.push("/auth/otp-verification");
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-64px)] bg-background flex items-start sm:items-center justify-center p-4">
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left Side - Mascot */}
         <motion.div
@@ -37,17 +37,20 @@ export default function ForgotPasswordPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md mx-auto"
+          className="w-full max-w-md mx-auto pt-6 lg:pt-0"
         >
-          <div className="bg-card rounded-3xl shadow-lg border border-border p-8">
+          <div className="bg-transparent lg:bg-card rounded-none lg:rounded-3xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-8">
             {/* Back Button */}
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 text-foreground hover:text-accent mb-6 transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              <span className="font-semibold">Back</span>
-            </Link>
+            <div className="mb-6">
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="inline-flex items-center gap-2 text-foreground hover:text-accent transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                <span className="font-semibold">Back</span>
+              </button>
+            </div>
 
             {/* Header */}
             <div className="mb-8">
@@ -87,13 +90,23 @@ export default function ForgotPasswordPage() {
               </div>
 
               {/* Continue Button */}
-              <Button
-                onClick={handleContinue}
-                className="w-full h-12 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl"
-              >
-                Continue
-              </Button>
+              <div className="hidden sm:block">
+                <Button
+                  onClick={handleContinue}
+                  className="w-full h-12 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl"
+                >
+                  Continue
+                </Button>
+              </div>
             </div>
+          </div>
+          <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-background border-t border-border p-4">
+            <Button
+              onClick={handleContinue}
+              className="w-full h-12 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl"
+            >
+              Continue
+            </Button>
           </div>
         </motion.div>
       </div>

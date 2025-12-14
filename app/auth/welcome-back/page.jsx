@@ -14,14 +14,14 @@ export default function WelcomeBackPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-64px)] bg-background flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-lg mx-auto text-center"
       >
-        <div className="bg-card rounded-3xl shadow-lg border border-border p-8 md:p-12">
+        <div className="bg-transparent lg:bg-card rounded-none lg:rounded-3xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-8">
           {/* Mascot */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
