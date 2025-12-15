@@ -7,6 +7,7 @@ import { Home, BookOpen, Trophy, User, BarChart3 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { StreakCounter } from "./StreakCounter";
 import { motion } from "framer-motion";
+import { Flame } from "@/components/icons/Flame";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
@@ -64,6 +65,33 @@ export function Navbar() {
           <ThemeToggle />
         </div>
       </nav>
+
+      {/* Mobile Top Floating Section */}
+      <div className="md:hidden fixed top-16 right-4 z-50 flex flex-col items-center gap-3">
+        {/* <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.1, type: "spring" }}
+          className="relative"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-500/10 blur-xl rounded-full" />
+          <div className="relative w-12 h-12 bg-card/80 backdrop-blur-md border border-orange-500/20 rounded-full flex items-center justify-center shadow-lg">
+            <Flame size="md" className="text-orange-500" />
+          </div>
+        </motion.div> */}
+        
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: "spring" }}
+          className="relative"
+        >
+          <div className="absolute inset-0 bg-accent/10 blur-xl rounded-full" />
+          <div className="relative w-12 h-12 bg-card/80 backdrop-blur-md border border-accent/20 rounded-full flex items-center justify-center shadow-lg">
+            <ThemeToggle variant="icon" />
+          </div>
+        </motion.div>
+      </div>
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md">

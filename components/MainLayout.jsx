@@ -8,7 +8,7 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="min-h-[calc(100vh-64px)]">
-      <main className={hideNavbar ? "" : "pt-16 pb-20 sm:pb-0"}>
+      <main className={hideNavbar ? "" : "md:pt-16 pb-20 sm:pb-0"}>
         {children}
       </main>
     </div>
