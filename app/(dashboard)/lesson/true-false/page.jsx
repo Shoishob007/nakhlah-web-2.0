@@ -3,41 +3,46 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Volume2, X, Check, X as XIcon } from "lucide-react";
+import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { useToast } from "@/components/ui/use-toast";
 
 // Dummy data
 const DUMMY_STATEMENT = "The Earth is the third planet from the Sun.";
-const DUMMY_CORRECT_ANSWER = true; // true = statement is True
+const DUMMY_CORRECT_ANSWER = true;
 
 export default function TrueFalseLesson() {
   const [selectedOption, setSelectedOption] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleOptionClick = (option) => {
-    if (!showResult) {
-      setSelectedOption(option);
-    }
+    setSelectedOption(option);
   };
 
   const handleCheckAnswer = () => {
     if (selectedOption !== null) {
       const correct = selectedOption === DUMMY_CORRECT_ANSWER;
-      setIsCorrect(correct);
-      setShowResult(true);
-    }
-  };
-
-  const handleContinue = () => {
-    if (isCorrect) {
-      // Navigate to completed lesson page
-      router.push("/lesson/completed");
-    } else {
-      setShowResult(false);
-      setSelectedOption(null);
+      
+      if (correct) {
+        toast({
+          title: "Correct! 🎉",
+          description: "Great job! Your answer is correct.",
+          variant: "success",
+        });
+        
+        setTimeout(() => {
+          router.push("/lesson/completed");
+        }, 1500);
+      } else {
+        toast({
+          title: "Wrong answer",
+          description: `The statement is ${DUMMY_CORRECT_ANSWER ? "true" : "false"}`,
+          variant: "error",
+        });
+        setSelectedOption(null);
+      }
     }
   };
 
@@ -104,13 +109,7 @@ export default function TrueFalseLesson() {
                   transition={{ delay: 0.1 }}
                   onClick={() => handleOptionClick(true)}
                   className={`p-6 rounded-2xl border-2 text-center font-bold transition-all ${
-                    showResult
-                      ? DUMMY_CORRECT_ANSWER === true
-                        ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400"
-                        : selectedOption === true
-                        ? "border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400"
-                        : "border-border bg-card text-muted-foreground"
-                      : selectedOption === true
+                    selectedOption === true
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
                   }`}
@@ -121,8 +120,6 @@ export default function TrueFalseLesson() {
                         selectedOption === true
                           ? "bg-accent text-white"
                           : "bg-muted text-muted-foreground"
-                      } ${
-                        showResult && DUMMY_CORRECT_ANSWER === true && "bg-green-500 text-white"
                       }`}
                     >
                       ✓
@@ -138,13 +135,7 @@ export default function TrueFalseLesson() {
                   transition={{ delay: 0.2 }}
                   onClick={() => handleOptionClick(false)}
                   className={`p-6 rounded-2xl border-2 text-center font-bold transition-all ${
-                    showResult
-                      ? DUMMY_CORRECT_ANSWER === false
-                        ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400"
-                        : selectedOption === false
-                        ? "border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400"
-                        : "border-border bg-card text-muted-foreground"
-                      : selectedOption === false
+                    selectedOption === false
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
                   }`}
@@ -155,8 +146,6 @@ export default function TrueFalseLesson() {
                         selectedOption === false
                           ? "bg-accent text-white"
                           : "bg-muted text-muted-foreground"
-                      } ${
-                        showResult && DUMMY_CORRECT_ANSWER === false && "bg-red-500 text-white"
                       }`}
                     >
                       ✗
@@ -171,73 +160,17 @@ export default function TrueFalseLesson() {
       </div>
 
       {/* Bottom Action */}
-      {!showResult ? (
-        <div className="border-t border-border bg-background">
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <Button
-              onClick={handleCheckAnswer}
-              disabled={selectedOption === null}
-              className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-            >
-              Check Answers
-            </Button>
-          </div>
+      <div className="border-t border-border bg-background">
+        <div className="container max-w-4xl mx-auto px-4 py-6">
+          <Button
+            onClick={handleCheckAnswer}
+            disabled={selectedOption === null}
+            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
+          >
+            Check Answers
+          </Button>
         </div>
-      ) : (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className={`border-t-4 ${
-            isCorrect
-              ? "border-green-500 bg-green-50 dark:bg-green-950"
-              : "border-red-500 bg-red-50 dark:bg-red-950"
-          }`}
-        >
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    isCorrect ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {isCorrect ? (
-                    <Check className="w-6 h-6 text-white" />
-                  ) : (
-                    <XIcon className="w-6 h-6 text-white" />
-                  )}
-                </div>
-                <div>
-                  <h3
-                    className={`text-xl font-bold ${
-                      isCorrect
-                        ? "text-green-700 dark:text-green-400"
-                        : "text-red-700 dark:text-red-400"
-                    }`}
-                  >
-                    {isCorrect ? "Correct!" : "Wrong!"}
-                  </h3>
-                  {!isCorrect && (
-                    <p className="text-sm text-muted-foreground">
-                      The statement is {DUMMY_CORRECT_ANSWER ? "true" : "false"}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={handleContinue}
-                className={`w-full md:w-auto md:min-w-[200px] h-14 font-bold text-lg rounded-xl ${
-                  isCorrect
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
-                }`}
-              >
-                {isCorrect ? "CONTINUE" : "TRY AGAIN"}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      </div>
     </div>
   );
 }

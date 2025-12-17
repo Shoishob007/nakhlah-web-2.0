@@ -4,36 +4,42 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Volume2, X, Check, X as XIcon } from "lucide-react";
+import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { useToast } from "@/components/ui/use-toast";
 
 // Dummy data
 const DUMMY_SENTENCE = "The ___ is the largest planet in our solar system.";
 const DUMMY_CORRECT_ANSWER = "Jupiter";
-const DUMMY_BLANK_INDEX = 1;
 
 export default function FillInBlankLesson() {
   const [answer, setAnswer] = useState("");
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleCheckAnswer = () => {
     if (answer.trim()) {
       const correct = answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
-      setIsCorrect(correct);
-      setShowResult(true);
-    }
-  };
-
-  const handleContinue = () => {
-    if (isCorrect) {
-      // Navigate to next lesson type
-      router.push("/lesson/true-false");
-    } else {
-      setShowResult(false);
-      setAnswer("");
+      
+      if (correct) {
+        toast({
+          title: "Correct! 🎉",
+          description: "Great job! Your answer is correct.",
+          variant: "success",
+        });
+        
+        setTimeout(() => {
+          router.push("/lesson/true-false");
+        }, 1500);
+      } else {
+        toast({
+          title: "Wrong answer",
+          description: `The correct answer is "${DUMMY_CORRECT_ANSWER}"`,
+          variant: "error",
+        });
+        setAnswer("");
+      }
     }
   };
 
@@ -93,34 +99,13 @@ export default function FillInBlankLesson() {
                   <div className="relative">
                     <Input
                       value={answer}
-                      onChange={(e) => !showResult && setAnswer(e.target.value)}
-                      disabled={showResult}
-                      className={`w-48 h-14 text-center text-xl font-bold ${
-                        showResult
-                          ? isCorrect
-                            ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400"
-                            : "border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400"
-                          : "border-accent"
-                      }`}
+                      onChange={(e) => setAnswer(e.target.value)}
+                      className="w-48 h-14 text-center text-xl font-bold border-accent"
                       placeholder="Type here"
                     />
                   </div>
                   {parts[1]}
                 </div>
-                
-                {/* Correct Answer (shown when wrong) */}
-                {showResult && !isCorrect && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-6 p-4 bg-muted/50 rounded-xl border border-border"
-                  >
-                    <p className="text-sm text-muted-foreground">
-                      Correct answer:{" "}
-                      <span className="font-bold text-accent">{DUMMY_CORRECT_ANSWER}</span>
-                    </p>
-                  </motion.div>
-                )}
               </div>
             </div>
           </motion.div>
@@ -128,73 +113,17 @@ export default function FillInBlankLesson() {
       </div>
 
       {/* Bottom Action */}
-      {!showResult ? (
-        <div className="border-t border-border bg-background">
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <Button
-              onClick={handleCheckAnswer}
-              disabled={!answer.trim()}
-              className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-            >
-              Check Answers
-            </Button>
-          </div>
+      <div className="border-t border-border bg-background">
+        <div className="container max-w-4xl mx-auto px-4 py-6">
+          <Button
+            onClick={handleCheckAnswer}
+            disabled={!answer.trim()}
+            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
+          >
+            Check Answers
+          </Button>
         </div>
-      ) : (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className={`border-t-4 ${
-            isCorrect
-              ? "border-green-500 bg-green-50 dark:bg-green-950"
-              : "border-red-500 bg-red-50 dark:bg-red-950"
-          }`}
-        >
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    isCorrect ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {isCorrect ? (
-                    <Check className="w-6 h-6 text-white" />
-                  ) : (
-                    <XIcon className="w-6 h-6 text-white" />
-                  )}
-                </div>
-                <div>
-                  <h3
-                    className={`text-xl font-bold ${
-                      isCorrect
-                        ? "text-green-700 dark:text-green-400"
-                        : "text-red-700 dark:text-red-400"
-                    }`}
-                  >
-                    {isCorrect ? "Correct!" : "Wrong!"}
-                  </h3>
-                  {!isCorrect && (
-                    <p className="text-sm text-muted-foreground">
-                      Try again with the correct answer
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={handleContinue}
-                className={`w-full md:w-auto md:min-w-[200px] h-14 font-bold text-lg rounded-xl ${
-                  isCorrect
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
-                }`}
-              >
-                {isCorrect ? "CONTINUE" : "TRY AGAIN"}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      </div>
     </div>
   );
 }

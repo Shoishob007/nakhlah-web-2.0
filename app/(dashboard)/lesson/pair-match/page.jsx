@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { useToast } from "@/components/ui/use-toast";
 
 const leftWords = [
   { id: 1, text: "Anggem", matched: false },
@@ -39,9 +40,8 @@ export default function PairMatchLesson() {
   const [rightState, setRightState] = useState(rightWords);
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [selectedRight, setSelectedRight] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLeftClick = (item) => {
     if (item.matched) return;
@@ -77,15 +77,23 @@ export default function PairMatchLesson() {
   const handleCheckAnswer = () => {
     const allMatched =
       leftState.every((p) => p.matched) && rightState.every((p) => p.matched);
-    setIsCorrect(allMatched);
-    setShowResult(true);
-  };
-
-  const handleContinue = () => {
-    if (isCorrect) {
-      router.push("/lesson/fill-in-the-blanks");
+    
+    if (allMatched) {
+      toast({
+        title: "All pairs matched! 🎉",
+        description: "Great job! All pairs are correctly matched.",
+        variant: "success",
+      });
+      
+      setTimeout(() => {
+        router.push("/lesson/fill-in-the-blanks");
+      }, 1500);
     } else {
-      setShowResult(false);
+      toast({
+        title: "Incomplete",
+        description: "Please match all pairs correctly.",
+        variant: "error",
+      });
       setLeftState(leftWords);
       setRightState(rightWords);
     }
@@ -180,72 +188,16 @@ export default function PairMatchLesson() {
       </div>
 
       {/* Bottom Action */}
-      {!showResult ? (
-        <div className="border-t border-border bg-background">
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <Button
-              onClick={handleCheckAnswer}
-              className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl"
-            >
-              Check Answers
-            </Button>
-          </div>
+      <div className="border-t border-border bg-background">
+        <div className="container max-w-4xl mx-auto px-4 py-6">
+          <Button
+            onClick={handleCheckAnswer}
+            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl"
+          >
+            Check Answers
+          </Button>
         </div>
-      ) : (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className={`border-t-4 ${
-            isCorrect
-              ? "border-green-500 bg-green-50 dark:bg-green-950"
-              : "border-red-500 bg-red-50 dark:bg-red-950"
-          }`}
-        >
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    isCorrect ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {isCorrect ? (
-                    <span className="text-2xl text-white">✓</span>
-                  ) : (
-                    <span className="text-2xl text-white">✗</span>
-                  )}
-                </div>
-                <div>
-                  <h3
-                    className={`text-xl font-bold ${
-                      isCorrect
-                        ? "text-green-700 dark:text-green-400"
-                        : "text-red-700 dark:text-red-400"
-                    }`}
-                  >
-                    {isCorrect ? "Correct!" : "Wrong!"}
-                  </h3>
-                  {!isCorrect && (
-                    <p className="text-sm text-muted-foreground">
-                      Match all pairs correctly
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={handleContinue}
-                className={`w-full md:w-auto md:min-w-[200px] h-14 font-bold text-lg rounded-xl ${
-                  isCorrect
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
-                }`}
-              >
-                {isCorrect ? "CONTINUE" : "OK"}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      </div>
     </div>
   );
 }

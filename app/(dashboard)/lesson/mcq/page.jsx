@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { useToast } from "@/components/ui/use-toast";
 
 const options = [
   { id: 1, text: "The key is eating a burger", correct: true },
@@ -16,26 +17,32 @@ const options = [
 
 export default function MCQLesson() {
   const [selectedOption, setSelectedOption] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleOptionClick = (option) => {
-    if (!showResult) {
-      setSelectedOption(option);
-    }
+    setSelectedOption(option);
   };
 
   const handleCheckAnswer = () => {
-    setIsCorrect(selectedOption?.correct || false);
-    setShowResult(true);
-  };
-
-  const handleContinue = () => {
+    const isCorrect = selectedOption?.correct || false;
+    
     if (isCorrect) {
-      router.push("/lesson/pair-match");
+      toast({
+        title: "Correct! 🎉",
+        description: "Great job! Your answer is correct.",
+        variant: "success",
+      });
+      
+      setTimeout(() => {
+        router.push("/lesson/pair-match");
+      }, 1500);
     } else {
-      setShowResult(false);
+      toast({
+        title: "Wrong answer",
+        description: `Correct answer: "The key is eating a burger"`,
+        variant: "error",
+      });
       setSelectedOption(null);
     }
   };
@@ -96,13 +103,7 @@ export default function MCQLesson() {
                   transition={{ delay: index * 0.1 }}
                   onClick={() => handleOptionClick(option)}
                   className={`p-4 rounded-xl border-2 text-left font-semibold transition-all ${
-                    showResult
-                      ? option.correct
-                        ? "border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400"
-                        : selectedOption?.id === option.id
-                        ? "border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400"
-                        : "border-border bg-card text-muted-foreground"
-                      : selectedOption?.id === option.id
+                    selectedOption?.id === option.id
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
                   }`}
@@ -116,73 +117,17 @@ export default function MCQLesson() {
       </div>
 
       {/* Bottom Action */}
-      {!showResult ? (
-        <div className="border-t border-border bg-background">
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <Button
-              onClick={handleCheckAnswer}
-              disabled={!selectedOption}
-              className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-            >
-              Check Answers
-            </Button>
-          </div>
+      <div className="border-t border-border bg-background">
+        <div className="container max-w-4xl mx-auto px-4 py-6">
+          <Button
+            onClick={handleCheckAnswer}
+            disabled={!selectedOption}
+            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
+          >
+            Check Answers
+          </Button>
         </div>
-      ) : (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className={`border-t-4 ${
-            isCorrect
-              ? "border-green-500 bg-green-50 dark:bg-green-950"
-              : "border-red-500 bg-red-50 dark:bg-red-950"
-          }`}
-        >
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    isCorrect ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {isCorrect ? (
-                    <span className="text-2xl text-white">✓</span>
-                  ) : (
-                    <span className="text-2xl text-white">✗</span>
-                  )}
-                </div>
-                <div>
-                  <h3
-                    className={`text-xl font-bold ${
-                      isCorrect
-                        ? "text-green-700 dark:text-green-400"
-                        : "text-red-700 dark:text-red-400"
-                    }`}
-                  >
-                    {isCorrect ? "Correct!" : "Wrong!"}
-                  </h3>
-                  {!isCorrect && (
-                    <p className="text-sm text-muted-foreground">
-                      Correct answer: The key is eating a burger
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={handleContinue}
-                className={`w-full md:w-auto md:min-w-[200px] h-14 font-bold text-lg rounded-xl ${
-                  isCorrect
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
-                }`}
-              >
-                {isCorrect ? "CONTINUE" : "OK"}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      </div>
     </div>
   );
 }

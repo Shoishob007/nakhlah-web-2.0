@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { useToast } from "@/components/ui/use-toast";
 
 const words = [
   "dia",
@@ -24,9 +25,8 @@ const correctAnswer = ["Saya", "berjalan", "dan", "dia", "berenang"];
 export default function TranslateLesson() {
   const [selectedWords, setSelectedWords] = useState([]);
   const [availableWords, setAvailableWords] = useState(words);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleWordClick = (word) => {
     setSelectedWords([...selectedWords, word]);
@@ -40,19 +40,32 @@ export default function TranslateLesson() {
   };
 
   const handleCheckAnswer = () => {
-    const isAnswerCorrect =
-      JSON.stringify(selectedWords) === JSON.stringify(correctAnswer);
-    setIsCorrect(isAnswerCorrect);
-    setShowResult(true);
-  };
-
-  const handleContinue = () => {
-    if (isCorrect) {
-      router.push("/lesson/mcq");
+    if (selectedWords.length === 0) return;
+    
+    const isAnswerCorrect = JSON.stringify(selectedWords) === JSON.stringify(correctAnswer);
+    
+    if (isAnswerCorrect) {
+      toast({
+        title: "Correct! 🎉",
+        description: "Great job! Your translation is correct.",
+        variant: "success",
+      });
+      
+      setTimeout(() => {
+        router.push("/lesson/mcq");
+      }, 1500);
     } else {
-      setShowResult(false);
-      setSelectedWords([]);
-      setAvailableWords(words);
+      toast({
+        title: "Wrong!",
+        description: "Correct answer: Saya berjalan dan dia berenang.",
+        variant: "error",
+      });
+      
+      // Reset after toast disappears
+      setTimeout(() => {
+        setSelectedWords([]);
+        setAvailableWords(words);
+      }, 3000);
     }
   };
 
@@ -139,73 +152,17 @@ export default function TranslateLesson() {
       </div>
 
       {/* Bottom Action */}
-      {!showResult ? (
-        <div className="border-t border-border bg-background">
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <Button
-              onClick={handleCheckAnswer}
-              disabled={selectedWords.length === 0}
-              className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-            >
-              Check Answers
-            </Button>
-          </div>
+      <div className="border-t border-border bg-background">
+        <div className="container max-w-4xl mx-auto px-4 py-6">
+          <Button
+            onClick={handleCheckAnswer}
+            disabled={selectedWords.length === 0}
+            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
+          >
+            Check Answers
+          </Button>
         </div>
-      ) : (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className={`border-t-4 ${
-            isCorrect
-              ? "border-green-500 bg-green-50 dark:bg-green-950"
-              : "border-red-500 bg-red-50 dark:bg-red-950"
-          }`}
-        >
-          <div className="container max-w-4xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    isCorrect ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {isCorrect ? (
-                    <span className="text-2xl">✓</span>
-                  ) : (
-                    <span className="text-2xl">✗</span>
-                  )}
-                </div>
-                <div>
-                  <h3
-                    className={`text-xl font-bold ${
-                      isCorrect
-                        ? "text-green-700 dark:text-green-400"
-                        : "text-red-700 dark:text-red-400"
-                    }`}
-                  >
-                    {isCorrect ? "Correct!" : "Wrong!"}
-                  </h3>
-                  {!isCorrect && (
-                    <p className="text-sm text-muted-foreground">
-                      Correct answer: Saya berjalan dan dia berenang.
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={handleContinue}
-                className={`w-full md:w-auto md:min-w-[200px] h-14 font-bold text-lg rounded-xl ${
-                  isCorrect
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
-                }`}
-              >
-                {isCorrect ? "CONTINUE" : "OK"}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      </div>
     </div>
   );
 }

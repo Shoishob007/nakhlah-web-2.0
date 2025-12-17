@@ -11,22 +11,25 @@ import { NotoStopwatch } from "@/components/icons/NotoStopwatch";
 
 const stats = [
   {
-    label: "XP Bonus",
-    value: "34",
+    label: "Total XP",
+    value: "24",
     icon: <HighVoltage size="sm" />,
-    color: "text-orange-500",
+    border: "border-amber-400",
+    header: "bg-amber-500",
   },
   {
-    label: "Total time",
-    value: "2:30",
+    label: "Time",
+    value: "1:45",
     icon: <NotoStopwatch size="sm" />,
-    color: "text-blue-500",
+    border: "border-emerald-400",
+    header: "bg-emerald-500",
   },
   {
     label: "Accuracy",
-    value: "92%",
+    value: "87%",
     icon: <Bullseye size="sm" />,
-    color: "text-red-500",
+    border: "border-rose-400",
+    header: "bg-rose-500",
   },
 ];
 
@@ -71,42 +74,52 @@ export default function LessonCompleted() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className="mb-8"
+            className="mb-10 px-4 sm:px-0"
           >
-            <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-2xl p-6 max-w-xs mx-auto">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-3 mb-2">
-                  <GemStone size="md" />
-                  <span className="text-accent font-bold text-4xl">12</span>
+            <div className="max-w-sm mx-auto rounded-2xl overflow-hidden border-2 border-sky-400">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-sky-400 to-sky-500 py-4">
+                <p className="text-white text-xl font-bold text-center">
+                  Diamonds
+                </p>
+              </div>
+
+              {/* Body */}
+              <div className="bg-white py-6">
+                <div className="flex items-center justify-center gap-3">
+                  <GemStone size="md" className="text-sky-500" />
+                  <span className="text-4xl font-extrabold text-slate-800">
+                    12
+                  </span>
                 </div>
-                <p className="text-muted-foreground text-sm">Diamonds earned</p>
               </div>
             </div>
           </motion.div>
 
           {/* Stats Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            className="grid grid-cols-3 gap-4 mb-8"
-          >
-            {stats.map((stat, index) => (
-              <motion.div
+          <div className="grid grid-cols-3 gap-3 mb-8 px-4">
+            {stats.map((stat) => (
+              <div
                 key={stat.label}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-2xl p-4"
+                className={`rounded-2xl overflow-hidden border-2 ${stat.border} bg-white`}
               >
-                <div className="flex justify-center mb-2">{stat.icon}</div>
-                <p className="text-2xl font-bold text-accent">{stat.value}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {stat.label}
-                </p>
-              </motion.div>
+                {/* Header */}
+                <div className={`${stat.header} py-2`}>
+                  <p className="text-white font-bold text-base text-center truncate">
+                    {stat.label}
+                  </p>
+                </div>
+
+                {/* Body */}
+                <div className="flex items-center justify-center gap-2 py-4">
+                  {stat.icon}
+                  <span className="text-xl font-extrabold text-slate-900">
+                    {stat.value}
+                  </span>
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Desktop Continue Button */}
           <motion.div
