@@ -1,8 +1,9 @@
 "use client";
+import { Trophy } from "@/components/icons/Trophy";
 import { motion } from "framer-motion";
-import { Award, Sparkles, CheckCircle } from "lucide-react";
+import { CheckCircle, ChevronRight } from "lucide-react";
 
-export default function AchievementsList() {
+export default function AchievementsList({ onViewAll }) {
   const achievements = [
     {
       title: "Great King",
@@ -11,7 +12,6 @@ export default function AchievementsList() {
       total: 5,
       color: "bg-violet",
       icon: "👑",
-      sparkle: true,
     },
     {
       title: "Einstein's Brain",
@@ -20,7 +20,6 @@ export default function AchievementsList() {
       total: 20,
       color: "bg-palm-green",
       icon: "🧠",
-      sparkle: true,
     },
     {
       title: "Tough Knight",
@@ -29,24 +28,30 @@ export default function AchievementsList() {
       total: 25,
       color: "bg-primary",
       icon: "⚔️",
-      sparkle: false,
     },
   ];
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, duration: 0.5 }}
-      className="space-y-4"
+      className="space-y-4 bg-transparent lg:bg-card rounded-none lg:rounded-2xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-6"
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between lg:p-6 mb-4 lg:mb-6">
         <h3 className="flex items-center gap-2 text-xl font-semibold">
-          <Award className="w-5 h-5 text-accent" />
           Achievements
+          <Trophy size="sm" />
         </h3>
+        <button
+          onClick={onViewAll}
+          className="text-sm text-accent hover:text-accent/80 transition-colors flex items-center gap-1 font-medium"
+        >
+          View All
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
-      
+
       <div className="space-y-4">
         {achievements.map((achievement, index) => (
           <motion.div
@@ -57,24 +62,33 @@ export default function AchievementsList() {
             className="flex items-center gap-3 p-4 bg-muted/30 rounded-xl border border-border/30"
           >
             <div className="relative">
-              <div className={`w-12 h-12 rounded-xl ${achievement.color} flex items-center justify-center text-2xl`}>
+              <div
+                className={`w-12 h-12 rounded-xl ${achievement.color} flex items-center justify-center text-2xl`}
+              >
                 {achievement.icon}
-                {achievement.sparkle && (
-                  <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-yellow-300" />
-                )}
               </div>
             </div>
 
             <div className="flex-1 min-w-0">
               <h4 className="font-bold text-sm">{achievement.title}</h4>
-              <p className="text-xs text-muted-foreground mb-2">{achievement.description}</p>
+              <p className="text-xs text-muted-foreground mb-2">
+                {achievement.description}
+              </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                   <motion.div
                     className={`h-full ${achievement.color}`}
                     initial={{ width: 0 }}
-                    animate={{ width: `${(achievement.progress / achievement.total) * 100}%` }}
-                    transition={{ delay: 0.1 * index + 0.6, duration: 1, ease: "easeOut" }}
+                    animate={{
+                      width: `${
+                        (achievement.progress / achievement.total) * 100
+                      }%`,
+                    }}
+                    transition={{
+                      delay: 0.1 * index + 0.6,
+                      duration: 1,
+                      ease: "easeOut",
+                    }}
                   />
                 </div>
                 <span className="text-xs whitespace-nowrap">

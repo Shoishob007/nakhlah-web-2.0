@@ -1,8 +1,9 @@
+"use client";
 import { motion } from "framer-motion";
-import { Edit, MessageCircle, Settings } from "lucide-react";
+import { Edit, Share2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function HeaderSection({ stats, onNavigateSettings }) {
+export default function HeaderSection({ stats, onNavigateSettings, onNavigateEdit, onShare }) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -38,13 +39,20 @@ export default function HeaderSection({ stats, onNavigateSettings }) {
 
             {/* Action Buttons - Only on Desktop */}
             <div className="hidden lg:flex flex-wrap gap-3 mt-6">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button 
+                onClick={onNavigateEdit}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Profile
               </Button>
-              <Button variant="outline" className="border-border hover:bg-muted">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Message
+              <Button 
+                onClick={onShare}
+                variant="outline" 
+                className="border-border hover:bg-muted"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
               </Button>
               <Button
                 onClick={onNavigateSettings}
@@ -60,27 +68,38 @@ export default function HeaderSection({ stats, onNavigateSettings }) {
           {/* Stats */}
           <div className="flex justify-center gap-6 lg:gap-12 w-full lg:w-auto">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <button
+                key={index}
+                onClick={stat.onClick}
+                className={`text-center ${stat.onClick ? 'hover:scale-105 transition-transform cursor-pointer' : 'cursor-default'}`}
+              >
                 <div className="text-xl lg:text-2xl font-bold text-accent mb-1">
                   {stat.value}
                 </div>
                 <div className="text-xs lg:text-sm text-muted-foreground">
                   {stat.label}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
         {/* Mobile Action Buttons */}
         <div className="flex lg:hidden gap-3 mt-6">
-          <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button 
+            onClick={onNavigateEdit}
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             <Edit className="w-4 h-4 mr-2" />
             Edit
           </Button>
-          <Button variant="outline" className="flex-1 border-border hover:bg-muted">
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Message
+          <Button 
+            onClick={onShare}
+            variant="outline" 
+            className="flex-1 border-border hover:bg-muted"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Share
           </Button>
           <Button
             onClick={onNavigateSettings}

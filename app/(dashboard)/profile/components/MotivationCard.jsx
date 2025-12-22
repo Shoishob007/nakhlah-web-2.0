@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { GlowingStar } from "@/components/icons/GlowingStar";
 
 export default function MotivationCard() {
   return (
@@ -11,7 +12,7 @@ export default function MotivationCard() {
     >
       <div className="p-6">
         <div className="text-center mb-4">
-          <div className="text-6xl mb-3">🌟</div>
+          <GlowingStar size="lg" className="text-center mx-auto pb-2"/>
           <h3 className="text-xl font-bold mb-2">Keep Going!</h3>
           <p className="text-accent-foreground/80 text-sm">
             You&apos;re doing amazing! Keep up the great work and reach new heights.

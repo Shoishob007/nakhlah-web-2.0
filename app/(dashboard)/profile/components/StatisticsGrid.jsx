@@ -1,16 +1,58 @@
 "use client";
+import { BarChart } from "@/components/icons/BarChart";
+import { Bullseye } from "@/components/icons/BullsEye";
+import { Calendar } from "@/components/icons/Calendar";
+import { Flame } from "@/components/icons/Flame";
+import { GemStone } from "@/components/icons/Gem";
+import { HighVoltage } from "@/components/icons/High-Voltage";
+import { Medal } from "@/components/icons/Medal";
+import { Trophy } from "@/components/icons/Trophy";
 import { motion } from "framer-motion";
-import { Flame, BookOpen, Zap, Crown, Target, Award } from "lucide-react";
-import { TrendingUp } from "lucide-react";
 
 export default function StatisticsGrid() {
   const userStats = [
-    { icon: Flame, value: "127", label: "Subscribers", color: "text-primary", bg: "bg-primary/10" },
-    { icon: BookOpen, value: "448", label: "Lesson Passed", color: "text-secondary", bg: "bg-secondary/10" },
-    { icon: Zap, value: "957", label: "Total Lessons", color: "text-accent", bg: "bg-accent/10" },
-    { icon: Crown, value: "15,274", label: "Total XP Gained", color: "text-amber-500", bg: "bg-amber-500/10" },
-    { icon: Target, value: "289", label: "Current Practice", color: "text-palm-green", bg: "bg-palm-green/10" },
-    { icon: Award, value: "36", label: "Top 10 Position", color: "text-violet", bg: "bg-violet/10" },
+    { 
+      icon: Flame, 
+      value: "127", 
+      label: "Challenges", 
+      color: "text-primary", 
+      bg: "bg-primary/10" 
+    },
+    { 
+      icon: Calendar, 
+      value: "448", 
+      label: "Lesson Passed", 
+      color: "text-primary", 
+      bg: "bg-primary/10" 
+    },
+    { 
+      icon: GemStone, 
+      value: "957", 
+      label: "Total Diamonds", 
+      color: "text-primary", 
+      bg: "bg-primary/10" 
+    },
+    { 
+      icon: HighVoltage, 
+      value: "15,274", 
+      label: "Total XP Gained", 
+      color: "text-primary", 
+      bg: "bg-primary/10" 
+    },
+    { 
+      icon: Bullseye, 
+      value: "289", 
+      label: "Correct Practice", 
+      color: "text-primary", 
+      bg: "bg-primary/10" 
+    },
+    { 
+      icon: Medal, 
+      value: "16", 
+      label: "Top 3 Position", 
+      color: "text-primary", 
+      bg: "bg-primary/10" 
+    },
   ];
 
   return (
@@ -22,8 +64,8 @@ export default function StatisticsGrid() {
     >
       <div className="lg:p-6 mb-4 lg:mb-6">
         <h3 className="flex items-center gap-2 text-xl font-semibold">
-          <TrendingUp className="w-5 h-5 text-accent" />
           Your Statistics
+          <BarChart size="sm" className="text-foreground" />
         </h3>
       </div>
       <div className="lg:px-6 lg:pb-6">
@@ -38,7 +80,10 @@ export default function StatisticsGrid() {
                 transition={{ delay: 0.1 * index, duration: 0.3 }}
                 className={`${stat.bg} rounded-xl lg:rounded-2xl p-4 lg:p-6 hover:shadow-sm lg:hover:shadow-md transition-all cursor-pointer border border-border/30`}
               >
-                <IconComponent className={`w-6 h-6 lg:w-8 lg:h-8 ${stat.color} mb-2 lg:mb-3`} />
+                <IconComponent 
+                  size="sm" 
+                  className={`${stat.color} mb-2 lg:mb-3`} 
+                />
                 <div className="text-xl lg:text-2xl font-bold text-foreground mb-1">
                   {stat.value}
                 </div>

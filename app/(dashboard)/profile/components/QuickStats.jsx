@@ -1,3 +1,5 @@
+"use client";
+import { motion } from "framer-motion";
 import { Flame, Target, Zap, BookOpen, Award } from "lucide-react";
 
 export default function QuickStats() {
@@ -10,17 +12,26 @@ export default function QuickStats() {
   ];
 
   return (
-    <div className="rounded-2xl bg-card shadow-lg border border-border overflow-hidden">
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-6">Quick Stats</h3>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2, duration: 0.5 }}
+      className="bg-transparent lg:bg-card rounded-none lg:rounded-2xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-6"
+    >
+      <div className="mb-4 lg:mb-6">
+        <h3 className="text-xl font-semibold">Quick Stats</h3>
       </div>
-      <div className="px-6 pb-6 space-y-3">
+      
+      <div className="space-y-3">
         {quickStats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <div
+            <motion.div
               key={index}
-              className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-all cursor-pointer border border-border/30"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 * index + 0.3, duration: 0.5 }}
+              className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/30 hover:bg-muted/50 transition-all cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <IconComponent className={`w-5 h-5 ${stat.color}`} />
@@ -29,10 +40,10 @@ export default function QuickStats() {
               <span className="font-bold text-foreground">
                 {stat.value}
               </span>
-            </div>
+            </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }
