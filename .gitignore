@@ -18,6 +18,8 @@
 /out/
 
 /.git
+/git
+/.gitignore
 
 # production
 /build
