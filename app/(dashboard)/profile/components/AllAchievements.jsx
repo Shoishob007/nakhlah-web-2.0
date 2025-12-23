@@ -17,7 +17,7 @@ export default function AllAchievementsPage({ onBack }) {
       description: "Completed 80% in solo lesson to earn this",
       progress: 12,
       total: 20,
-      color: "bg-palm-green",
+      color: "bg-secondary",
       icon: "🧠",
       unlocked: true
     },
@@ -53,7 +53,7 @@ export default function AllAchievementsPage({ onBack }) {
       description: "Read 500 pages without breaks",
       progress: 0,
       total: 500,
-      color: "bg-palm-green",
+      color: "bg-secondary",
       icon: "🐛",
       unlocked: false
     },
@@ -126,7 +126,7 @@ export default function AllAchievementsPage({ onBack }) {
                   </div>
                   {achievement.unlocked && (
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-palm-green border-2 border-card flex items-center justify-center">
-                      <CheckCircle className="w-4 h-4 text-white" />
+                      <CheckCircle className="w-4 h-4 text-card" />
                     </div>
                   )}
                 </div>

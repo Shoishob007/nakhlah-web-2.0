@@ -33,22 +33,35 @@ export default function ShareProfileDrawer({ open, onClose }) {
             className="fixed inset-0 bg-black/50 z-40"
           />
 
-          {/* Drawer */}
+          {/* Mobile: Bottom drawer, Desktop: Right sidebar */}
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            initial={{ 
+              y: "100%",
+              x: "0%" 
+            }}
+            animate={{ 
+              y: 0,
+              x: 0 
+            }}
+            exit={{ 
+              y: "100%",
+              x: "0%" 
+            }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-card rounded-t-3xl shadow-2xl z-50 max-h-[85vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 lg:left-auto lg:right-0 lg:top-0 lg:bottom-0 
+                      lg:translate-x-full
+                      bg-card rounded-t-3xl lg:rounded-t-none lg:rounded-l-3xl 
+                      shadow-2xl z-50 max-h-[85vh] lg:max-h-none lg:h-screen
+                      lg:w-[400px] overflow-hidden"
           >
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-2">
+            {/* Mobile Handle */}
+            <div className="lg:hidden flex justify-center pt-3 pb-2">
               <div className="w-12 h-1.5 bg-muted rounded-full" />
             </div>
 
-            <div className="p-6 pb-8">
+            <div className="p-6 pb-8 lg:p-8 lg:pb-10 lg:h-full lg:overflow-y-auto">
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-6 lg:mb-8">
                 <h2 className="text-2xl font-bold text-foreground">Share Profile</h2>
                 <button
                   onClick={onClose}
@@ -59,9 +72,9 @@ export default function ShareProfileDrawer({ open, onClose }) {
               </div>
 
               {/* Share Options */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Share via</h3>
-                <div className="grid grid-cols-4 gap-4">
+              <div className="mb-6 lg:mb-8">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3 lg:mb-4">Share via</h3>
+                <div className="grid grid-cols-4 lg:grid-cols-2 gap-4 lg:gap-6">
                   {shareOptions.map((option, index) => {
                     const IconComponent = option.icon;
                     return (
@@ -70,10 +83,10 @@ export default function ShareProfileDrawer({ open, onClose }) {
                         onClick={option.action}
                         className="flex flex-col items-center gap-2 group"
                       >
-                        <div className={`w-14 h-14 rounded-2xl ${option.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <IconComponent className="w-6 h-6 text-white" />
+                        <div className={`w-14 h-14 lg:w-16 lg:h-16 rounded-2xl ${option.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <IconComponent className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
                         </div>
-                        <span className="text-xs font-medium">{option.label}</span>
+                        <span className="text-xs lg:text-sm font-medium">{option.label}</span>
                       </button>
                     );
                   })}
@@ -81,15 +94,15 @@ export default function ShareProfileDrawer({ open, onClose }) {
               </div>
 
               {/* Copy Link */}
-              <div className="space-y-3">
+              <div className="space-y-3 lg:space-y-4">
                 <h3 className="text-sm font-semibold text-muted-foreground">Profile Link</h3>
-                <div className="flex gap-2">
+                <div className="flex flex-col lg:flex-row gap-2 lg:gap-3">
                   <div className="flex-1 px-4 py-3 bg-muted/30 rounded-xl border border-border text-sm text-muted-foreground truncate">
                     https://app.com/profile/andrew.ainsley
                   </div>
                   <Button
                     onClick={handleCopyLink}
-                    className={`px-4 ${
+                    className={`px-4 lg:px-6 whitespace-nowrap ${
                       copied
                         ? "bg-palm-green hover:bg-palm-green/90"
                         : "bg-gradient-accent hover:bg-gradient-accent/90"

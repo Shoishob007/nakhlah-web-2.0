@@ -1,13 +1,21 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import NotificationSettingsPage from "./components/NotificationSettings";
+import AccessibilitySettingsPage from "./components/AccessibilitySettings";
+import SecuritySettingsPage from "./components/SecuritySettings";
+import FindFriendsPage from "./components/FindFriends";
+import HelpCenterPage from "./components/HelpCenter";
+import ContactUsPage from "./components/ContactUs";
+import AllAchievementsPage from "./components/AllAchievements";
 import ProfilePage from "./ProfilePage";
 import SettingsPage from "./SettingsPage";
 import EditProfilePage from "./components/EditProfile";
 import FollowersPage from "./components/Followers";
 import FollowingPage from "./components/Following";
-import AllAchievementsPage from "./components/AllAchievements";
 import ShareProfileDrawer from "./components/ShareProfileDrawer";
+import GeneralSettingsPage from "./components/GeneralSettings";
+import AboutNakhlahPage from "./components/AboutNakhlah";
 
 export default function ProfileAndSettings() {
   const [activeView, setActiveView] = useState("profile");
@@ -26,7 +34,7 @@ export default function ProfileAndSettings() {
       case "profile":
         return <ProfilePage onNavigate={handleNavigate} />;
       case "settings":
-        return <SettingsPage onBack={() => setActiveView("profile")} />;
+        return <SettingsPage onBack={() => setActiveView("profile")} onNavigate={handleNavigate} />;
       case "edit-profile":
         return <EditProfilePage onBack={() => setActiveView("profile")} />;
       case "followers":
@@ -35,6 +43,22 @@ export default function ProfileAndSettings() {
         return <FollowingPage onBack={() => setActiveView("profile")} />;
       case "all-achievements":
         return <AllAchievementsPage onBack={() => setActiveView("profile")} />;
+      case "notification":
+        return <NotificationSettingsPage onBack={() => setActiveView("settings")} />;
+      case "accessibility":
+        return <AccessibilitySettingsPage onBack={() => setActiveView("settings")} />;
+      case "security":
+        return <SecuritySettingsPage onBack={() => setActiveView("settings")} />;
+      case "find-friends":
+        return <FindFriendsPage onBack={() => setActiveView("settings")} />;
+      case "help-center":
+        return <HelpCenterPage onBack={() => setActiveView("settings")} onNavigateContact={() => setActiveView("contact-us")} />;
+      case "contact-us":
+        return <ContactUsPage onBack={() => setActiveView("help-center")} />;
+      case "general":
+        return <GeneralSettingsPage onBack={() => setActiveView("settings")} />;
+      case "about-nakhlah":
+        return <AboutNakhlahPage onBack={() => setActiveView("settings")} />;
       default:
         return <ProfilePage onNavigate={handleNavigate} />;
     }
@@ -43,10 +67,10 @@ export default function ProfileAndSettings() {
   return (
     <div className="min-h-[calc(100vh-64px)] bg-background overflow-x-hidden">
       <AnimatePresence mode="wait">
-        <motion.div 
+        <motion.div
           key={activeView}
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="container px-4 py-8 mx-auto"
         >
@@ -54,9 +78,9 @@ export default function ProfileAndSettings() {
         </motion.div>
       </AnimatePresence>
 
-      <ShareProfileDrawer 
-        open={showShareDrawer} 
-        onClose={() => setShowShareDrawer(false)} 
+      <ShareProfileDrawer
+        open={showShareDrawer}
+        onClose={() => setShowShareDrawer(false)}
       />
     </div>
   );
