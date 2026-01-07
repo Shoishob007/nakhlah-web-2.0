@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConditionalNavbar from "@/components/nakhlah/ConditionalNavbar";
 import MainLayout from "@/components/MainLayout";
-import { ThemeProvider } from "next-themes"; // Add this import
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

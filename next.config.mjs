@@ -1,15 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/onboarding',
-        permanent: false,
-      },
-    ]
-  },
-}
+  /* config options here */
+};
 
-export default nextConfig
+export default nextConfig;
