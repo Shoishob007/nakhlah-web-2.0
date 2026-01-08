@@ -33,7 +33,7 @@ export function DailyQuests() {
                   {quest.label}
                 </span>
               </div>
-              {completed && <CheckCircle2 className="text-primary" />}
+              {completed && <CheckCircle2 className="text-accent" />}
             </li>
           );
         })}

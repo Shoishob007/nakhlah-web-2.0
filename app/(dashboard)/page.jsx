@@ -52,11 +52,11 @@ export default function LearnPage() {
 
   return (
     <div className="bg-background text-foreground">
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6">
         <div className="flex flex-col lg:flex-row gap-12">
 
           {/* Left side: Scrollable pathway */}
-          <div className="lg:w-2/3 lg:h-[calc(100vh-96px)] lg:overflow-y-auto no-scrollbar">
+          <div className="lg:w-2/3 lg:h-[calc(100vh-120px)] lg:overflow-y-auto no-scrollbar">
             <ZigzagPath lessons={lessons} levels={levels} mascots={mascots} />
           </div>
 

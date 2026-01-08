@@ -11,12 +11,7 @@ export function StreakCounter({ count, className }) {
         className
       )}
     >
-      <motion.div
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-      >
         <Flame size="sm" className="text-yellow-200" />
-      </motion.div>
       <span className="font-bold text-muted-foreground">{count}</span>
     </motion.div>
   );

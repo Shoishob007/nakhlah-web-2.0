@@ -77,7 +77,7 @@ export function ZigzagPath({ lessons, levels, mascots }) {
   return (
     <div className="relative max-w-md mx-auto">
       {/* Sticky level header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-4">
         <div
           className={`text-center bg-gradient-to-r ${getLevelColor(levels.find(l => l.name === currentLevelName)?.id || 1)} text-white py-3 rounded-lg shadow-lg transition-all duration-500 ease-in-out`}
         >
