@@ -61,7 +61,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <StreakCounter count={7} />
+          <StreakCounter count={0} />
           <ThemeToggle />
         </div>
       </nav>
