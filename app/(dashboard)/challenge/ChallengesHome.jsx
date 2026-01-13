@@ -10,7 +10,7 @@ export default function ChallengesHome() {
   const [activeTab, setActiveTab] = useState("target");
 
   return (
-    <div className="mx-auto px-4 py-6 max-w-7xl">
+    <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <h1 className="text-3xl font-bold text-foreground md:text-4xl">

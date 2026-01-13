@@ -150,7 +150,7 @@ export default function Onboarding() {
       </header>
 
       {/* Progress */}
-      <div className="container mx-auto px-4 py-6">
+      <div className=" container mx-auto px-4 py-6">
         <div className="max-w-[520px] mx-auto">
           <ProgressSteps steps={steps} currentStep={currentStep} />
         </div>

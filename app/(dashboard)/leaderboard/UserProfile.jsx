@@ -30,8 +30,8 @@ export default function UserProfilePage({ user, onBack }) {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-md lg:max-w-4xl">
+    <div className="min-h-screen bg-background">
+      <div className=" container mx-auto px-4 py-6 max-w-md lg:max-w-4xl">
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

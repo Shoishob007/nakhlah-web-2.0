@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background flex items-start sm:items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-start sm:items-center justify-center p-4">
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left Side - Mascot */}
         <motion.div
