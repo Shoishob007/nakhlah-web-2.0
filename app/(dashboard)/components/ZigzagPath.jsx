@@ -170,14 +170,15 @@ export function ZigzagPath({ lessons, levels, mascots }) {
                             className="absolute"
                             style={{
                               left: mascotPosition.left,
-                              top: `50%`,
+                              top: mascotPosition.left === '85%' ? '90%' : '50%',
                               transform: `${mascotPosition.transform} translateY(-50%)`,
                             }}
                           >
                             <Mascot
                               mood={mascot.mood}
+                              size={mascot.size}
                               message={mascot.message}
-                              className="max-w-[250px]"
+                              className=""
                             />
                           </div>
                         )
