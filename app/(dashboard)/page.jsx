@@ -50,10 +50,12 @@ export default function LearnPage() {
 
   return (
     <div className="bg-background text-foreground">
-      <main className="container mx-auto px-4 py-6">
-        <div className="block lg:hidden">
-            <UserStats />
-        </div>
+      {/* Mobile sticky header */}
+      <div className="lg:hidden sticky top-0 z-20 bg-primary shadow-md">
+        <UserStats />
+      </div>
+      
+      <main className="container lg:mx-auto lg:py-6">
         <div className="flex flex-col lg:flex-row gap-12">
 
           {/* Left side: Scrollable pathway */}
