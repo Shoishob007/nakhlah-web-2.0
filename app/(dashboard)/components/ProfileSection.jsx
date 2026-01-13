@@ -17,7 +17,7 @@ const navLinks = [
 ];
 
 export function ProfileSection() {
-  const isSignedIn = false;
+  const isSignedIn = true;
 
   return (
     <div className="bg-card border border-border rounded-xl p-6 space-y-4">
@@ -34,7 +34,7 @@ export function ProfileSection() {
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-4">Achievements</h3>
+            <h3 className="text-md font-semibold">Achievements</h3>
             <div className="flex space-x-2 mt-2">
               <span className="text-2xl">🏆</span>
               <span className="text-2xl">🏅</span>
@@ -43,14 +43,14 @@ export function ProfileSection() {
         </div>
       ) : (
         <div className="text-center space-y-4">
-          <h3 className="text-lg font-semibold mb-4">Create a profile to save your progress!</h3>
+          <h3 className="text-lg font-bold">Create a profile to save your progress!</h3>
           <div className="flex flex-col gap-2">
           <Button size="lg" className="w-full">Create a Profile</Button>
           <Button size="lg" variant="outline" className="w-full">Sign In</Button>
           </div>
         </div>
       )}
-      <div className="!mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2">
+      <div className="!mt-8 hidden lg:flex flex-wrap justify-center gap-x-4 gap-y-2">
             {navLinks.map((link) => (
                 <Link
                 key={link.href}

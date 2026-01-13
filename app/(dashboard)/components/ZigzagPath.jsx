@@ -2,10 +2,12 @@
 import { Circle } from "./Circle";
 import { Mascot } from "@/components/nakhlah/Mascot";
 import { useEffect, useState } from "react";
-import { Lock } from "lucide-react";
+import { Lock, FileText } from "lucide-react";
 
 export function ZigzagPath({ lessons, levels, mascots }) {
   const [currentLevelName, setCurrentLevelName] = useState("");
+
+  const currentLevel = levels.find(l => l.name === currentLevelName);
 
   const groupedLessons = lessons.reduce((acc, lesson) => {
     if (!acc[lesson.level]) acc[lesson.level] = [];
@@ -79,9 +81,19 @@ export function ZigzagPath({ lessons, levels, mascots }) {
       {/* Sticky level header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-4">
         <div
-          className={`text-center bg-gradient-to-r ${getLevelColor(levels.find(l => l.name === currentLevelName)?.id || 1)} text-white py-3 rounded-lg shadow-lg transition-all duration-500 ease-in-out`}
+          className={`flex items-center justify-between px-4 py-3 rounded-lg shadow-lg transition-all duration-500 ease-in-out bg-gradient-to-r ${getLevelColor(currentLevel?.id || 1)} text-white`}
         >
-          <h2 className="text-2xl font-bold">{currentLevelName}</h2>
+          <div>
+            <div className="text-2xl font-bold">
+              {currentLevel ? `Lesson ${currentLevel.id}` : ''}
+            </div>
+            <div>
+              {currentLevel ? currentLevel.name : ''}
+            </div>
+          </div>
+          <button className="text-white hover:bg-white/20 p-2 rounded-full">
+            <FileText className="w-6 h-6" />
+          </button>
         </div>
       </div>
 
