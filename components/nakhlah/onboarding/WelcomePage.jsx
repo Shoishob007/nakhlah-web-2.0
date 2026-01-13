@@ -3,7 +3,7 @@
 
 // export default function WelcomePage({ onStart }: { onStart: () => void }) {
 //   return (
-//     <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-between py-10 px-6 max-w-md mx-auto">
+//     <div className="min-h-screen flex flex-col items-center justify-between py-10 px-6 max-w-md mx-auto">
 //       {/* Mascot */}
 //       <div className="flex flex-col items-center">
 //         <div className="relative">

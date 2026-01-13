@@ -24,7 +24,7 @@ export function UserStats() {
             <span>0</span>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80 space-y-4">
+        <HoverCardContent className="w-80 space-y-4" align="center">
           <div className="space-y-2">
             <h4 className="font-medium leading-none text-lg">0 day streak</h4>
             <p className="text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ export function UserStats() {
             <span>500</span>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80 space-y-4">
+        <HoverCardContent className="w-80 space-y-4" align="center">
           <div className="flex space-x-4 items-center">
             <TreasureChest size="xxl"/>
             <div className="space-y-1">
@@ -102,7 +102,7 @@ export function UserStats() {
             <span>5</span>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80 space-y-4">
+        <HoverCardContent className="w-80 space-y-4" align="end">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Hearts</h4>
             <div className="flex space-x-1">

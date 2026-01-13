@@ -46,7 +46,7 @@ export default function FillInBlankLesson() {
   const parts = DUMMY_SENTENCE.split("___");
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-8">
@@ -114,7 +114,7 @@ export default function FillInBlankLesson() {
 
       {/* Bottom Action */}
       <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
+        <div className="container max-w-4xl container mx-auto px-4 py-6">
           <Button
             onClick={handleCheckAnswer}
             disabled={!answer.trim()}

@@ -9,8 +9,8 @@ export default function MainLayout({ children }) {
     pathname === "/onboarding" || pathname.startsWith("/auth/");
 
   return (
-    <div className="min-h-[calc(100vh-64px)]">
-      <main className={hideNavbar ? "" : "md:pt-16 pb-20 sm:pb-0"}>
+    <div className="min-h-screen">
+      <main className={hideNavbar ? "" : "min-h-screen md:pl-64 pb-20 md:pb-0"}>
         <ToastProvider />
         {children}
       </main>

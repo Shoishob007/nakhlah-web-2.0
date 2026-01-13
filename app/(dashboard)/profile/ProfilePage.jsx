@@ -14,7 +14,7 @@ export default function ProfilePage({ onNavigate }) {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto min-h-[calc(100vh-64px)] overflow-hidden">
+    <div className="max-w-7xl mx-auto min-h-screen overflow-hidden">
       <HeaderSection 
         stats={stats} 
         onNavigateSettings={() => onNavigate("settings")}

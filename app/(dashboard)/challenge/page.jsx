@@ -6,7 +6,7 @@ import ChallengesHome from "./ChallengesHome";
 
 export default function ChallengesMain() {
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background overflow-hidden">
+    <div className="min-h-screen bg-background overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           key="challenge"

@@ -7,7 +7,6 @@ import { Home, BookOpen, Trophy, User, BarChart3 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { StreakCounter } from "./StreakCounter";
 import { motion } from "framer-motion";
-import { Flame } from "@/components/icons/Flame";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
@@ -22,16 +21,16 @@ export function Navbar() {
 
   return (
     <>
-      {/* Desktop Navbar */}
-      <nav className="hidden md:flex fixed top-0 left-0 right-0 z-50 h-16 items-center justify-between border-b border-border bg-card/95 backdrop-blur-md px-6 overflow-x-hidden">
-        <div className="flex items-center gap-8">
+      {/* Desktop Sidebar */}
+      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 border-r border-border bg-card/95 backdrop-blur-md p-6 overflow-y-auto">
+        <div className="flex flex-col gap-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-foreground">Nakhlah</span>
+            <span className="text-2xl font-bold text-foreground">Nakhlah</span>
           </Link>
 
           {/* Nav Links */}
-          <div className="flex items-center gap-1">
+          <div className="flex flex-col gap-2">
             {navItems.map((item) => {
               const isActive = pathname === item.path;
               return (
@@ -39,18 +38,18 @@ export function Navbar() {
                   key={item.path}
                   href={item.path}
                   className={cn(
-                    "relative flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors",
+                    "relative flex items-center gap-3 rounded-lg px-4 py-3 text-base font-semibold transition-colors",
                     isActive
                       ? "text-accent"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-6 w-6" />
                   <span>{item.label}</span>
                   {isActive && (
                     <motion.div
                       layoutId="navbar-indicator"
-                      className="absolute inset-0 rounded-xl bg-accent/10 -z-10"
+                      className="absolute inset-0 rounded-lg bg-accent/10 -z-10"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -60,38 +59,11 @@ export function Navbar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="mt-auto flex flex-col lg:flex-row lg:mx-auto gap-4">
           <StreakCounter count={0} />
           <ThemeToggle />
         </div>
       </nav>
-
-      {/* Mobile Top Floating Section */}
-      <div className="md:hidden fixed top-16 right-4 z-50 flex flex-col items-center gap-3">
-        {/* <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, type: "spring" }}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-500/10 blur-xl rounded-full" />
-          <div className="relative w-12 h-12 bg-card/80 backdrop-blur-md border border-orange-500/20 rounded-full flex items-center justify-center shadow-lg">
-            <Flame size="md" className="text-orange-500" />
-          </div>
-        </motion.div> */}
-        
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2, type: "spring" }}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-accent/10 blur-xl rounded-full" />
-          <div className="relative w-12 h-12 bg-card/80 backdrop-blur-md border border-accent/20 rounded-full flex items-center justify-center shadow-lg">
-            <ThemeToggle variant="icon" />
-          </div>
-        </motion.div>
-      </div>
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md">

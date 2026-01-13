@@ -1,36 +1,66 @@
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+'use client';
+
+import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+const navLinks = [
+    { href: "/about", label: "About" },
+    { href: "/blog", label: "Blog" },
+    { href: "/store", label: "Store" },
+    { href: "/efficacy", label: "Efficacy" },
+    { href: "/careers", label: "Careers" },
+    { href: "/investors", label: "Investors" },
+    { href: "/terms", label: "Terms" },
+    { href: "/privacy", label: "Privacy" },
+];
 
 export function ProfileSection() {
+  const isSignedIn = false;
+
   return (
-    <div className="bg-card p-4 rounded-lg shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">Profile</h2>
-      <div className="flex items-center space-x-4">
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
+    <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+      {isSignedIn ? (
         <div>
-          <p className="font-semibold">Username</p>
-          <p className="text-sm text-muted-foreground">Joined 2023</p>
+          <div className="flex items-center space-x-4">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold">Username</p>
+              <p className="text-sm text-muted-foreground">Joined 2023</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-4">Achievements</h3>
+            <div className="flex space-x-2 mt-2">
+              <span className="text-2xl">🏆</span>
+              <span className="text-2xl">🏅</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="mt-4">
-        <h3 className="text-md font-semibold">Achievements</h3>
-        <div className="flex space-x-2 mt-2">
-          <span className="text-2xl">🏆</span>
-          <span className="text-2xl">🏅</span>
+      ) : (
+        <div className="text-center space-y-4">
+          <h3 className="text-lg font-semibold mb-4">Create a profile to save your progress!</h3>
+          <div className="flex flex-col gap-2">
+          <Button size="lg" className="w-full">Create a Profile</Button>
+          <Button size="lg" variant="outline" className="w-full">Sign In</Button>
+          </div>
         </div>
-      </div>
-      {/* Footer Links */}
-      <div className="mt-6 pt-6 border-t border-border flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-        <a href="#" className="hover:text-foreground">About</a>
-        <a href="#" className="hover:text-foreground">Blog</a>
-        <a href="#" className="hover:text-foreground">Store</a>
-        <a href="#" className="hover:text-foreground">Careers</a>
-        <a href="#" className="hover:text-foreground">Terms</a>
-        <a href="#" className="hover:text-foreground">Privacy</a>
-      </div>
+      )}
+      <div className="!mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2">
+            {navLinks.map((link) => (
+                <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs font-bold uppercase text-muted-foreground hover:text-foreground"
+                >
+                {link.label}
+                </Link>
+            ))}
+        </div>
     </div>
   );
 }
