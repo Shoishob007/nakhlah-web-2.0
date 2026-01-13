@@ -40,9 +40,13 @@ const lessons = [
 ];
 
 const mascots = [
-  { mood: "happy", position: 2, message: "You're doing great!" },
-  { mood: "excited", position: 5, message: "Keep up the good work!" },
-  { mood: "celebrating", position: 9, message: "You're a star!" },
+  { mood: "happy", size: "xxl", position: 2, message: "You're doing great!" },
+  { mood: "proud", size: "xxl", position: 5, message: "Keep up the good work!" },
+  { mood: "cool", size: "xxl", position: 9, message: "You're a star!" },
+  { mood: "happy", size: "xxl", position: 12, message: "Amazing progress!" },
+  { mood: "proud", size: "xxl", position: 15, message: "You're on fire!" },
+  { mood: "cool", size: "xxl", position: 18, message: "Level 2 mastered!" },
+  { mood: "happy", size: "xxl", position: 20, message: "Almost at the finish line!" },
 ];
 
 export default function LearnPage() {
