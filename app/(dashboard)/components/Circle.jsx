@@ -1,7 +1,7 @@
-
+import React from 'react';
 import { Star, Lock } from "lucide-react";
 
-export function Circle({ isCompleted, isCurrent, isLocked, icon, type }) {
+export function Circle({ isCompleted, isCurrent, isLocked, icon, type, size = 'md' }) {
   const getCircleStyles = () => {
     if (isLocked) {
       return 'bg-[hsl(var(--node-locked))] border-[hsl(var(--node-locked-border))] pathway-node-shadow-locked';
@@ -12,25 +12,41 @@ export function Circle({ isCompleted, isCurrent, isLocked, icon, type }) {
     return 'bg-[hsl(var(--node-yellow))] border-[hsl(var(--node-yellow-border))] pathway-node-shadow';
   };
 
+  const sizeClasses = {
+    sm: 'w-12 h-12',
+    md: 'w-16 h-16',
+    lg: 'w-20 h-20',
+  };
+
+  const iconSizeClasses = {
+    sm: 'w-6 h-6',
+    md: 'w-8 h-8',
+    lg: 'w-10 h-10',
+  };
+
+  const sizeClass = sizeClasses[size] || sizeClasses.md;
+  const iconSizeClass = iconSizeClasses[size] || iconSizeClasses.md;
+
   const getIcon = () => {
     if (isLocked) {
-      return <Lock className="text-white" />;
+      return <Lock className={`text-white ${iconSizeClass}`} />;
     }
     if (isCompleted) {
-      // Forcing a star on all completed regular lessons
       if (type !== 'trophy' && type !== 'checkpoint' && type !== 'crown') {
-        return <Star className="text-white" fill="white" />;
+        return <Star className={`text-white ${iconSizeClass}`} fill="white" />;
       }
     }
-    // Return original icon for special types or current, non-completed lessons
-    return icon;
-  }
+    if (icon) {
+        return React.cloneElement(icon, { className: `${icon.props.className || ''} ${iconSizeClass}` });
+    }
+    return null;
+  };
 
   const isSpecialType = type === 'trophy' || type === 'crown' || type === 'checkpoint';
 
   return (
     <div
-      className={`w-16 h-16 rounded-full flex items-center justify-center border-4 ${getCircleStyles()} cursor-pointer hover:scale-105 transition-transform  ${
+      className={`rounded-full flex items-center justify-center border-4 ${getCircleStyles()} cursor-pointer hover:scale-105 transition-transform ${sizeClass} ${
         isSpecialType && !isLocked ? 'scale-110' : ''
       }`}>
       <div className="text-white">

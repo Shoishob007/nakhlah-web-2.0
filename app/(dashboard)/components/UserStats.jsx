@@ -11,7 +11,7 @@ import { TreasureChest } from "@/components/icons/TreasureChest";
 
 export function UserStats() {
   return (
-    <div className="flex items-center space-x-4 bg-card p-4 rounded-lg shadow-sm justify-center">
+    <div className="flex items-center bg-accent lg:bg-card p-4 rounded-none lg:rounded-lg shadow-sm justify-around lg:shadow-sm">
       {/* Streak Hover */}
       <HoverCard>
         <HoverCardTrigger asChild>
@@ -21,10 +21,10 @@ export function UserStats() {
             className="flex items-center space-x-2 text-lg font-semibold"
           >
             <Flame className="text-orange-500" />
-            <span>0</span>
+            <span className="text-white lg:text-foreground">0</span>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80 space-y-4">
+        <HoverCardContent className="w-80 space-y-4" align="center">
           <div className="space-y-2">
             <h4 className="font-medium leading-none text-lg">0 day streak</h4>
             <p className="text-sm text-muted-foreground">
@@ -67,10 +67,10 @@ export function UserStats() {
             className="flex items-center space-x-2 text-lg font-semibold"
           >
             <GemStone />
-            <span>500</span>
+            <span className="text-white lg:text-foreground">500</span>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80 space-y-4">
+        <HoverCardContent className="w-80 space-y-4" align="center">
           <div className="flex space-x-4 items-center">
             <TreasureChest size="xxl"/>
             <div className="space-y-1">
@@ -99,10 +99,10 @@ export function UserStats() {
             className="flex items-center space-x-2 text-lg font-semibold"
           >
             <Heart className="text-destructive" />
-            <span>5</span>
+            <span className="text-white lg:text-foreground">5</span>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent className="w-80 space-y-4">
+        <HoverCardContent className="w-80 space-y-4" align="end">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Hearts</h4>
             <div className="flex space-x-1">

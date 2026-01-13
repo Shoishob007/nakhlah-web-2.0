@@ -1,4 +1,3 @@
-
 import { Medal, Trophy, Crown, Star } from "lucide-react";
 import { ZigzagPath } from "./components/ZigzagPath";
 import { UserStats } from "./components/UserStats";
@@ -47,26 +46,29 @@ const mascots = [
 ];
 
 export default function LearnPage() {
-  // Main header is 64px, plus py-8 (32px) from main content padding
-  const stickyTopOffset = 'top-[96px]'; 
+  const stickyTopOffset = 'top-6';
 
   return (
     <div className="bg-background text-foreground">
-      <main className="container mx-auto px-4 py-6">
+      {/* Mobile sticky header */}
+      <div className="lg:hidden sticky top-0 z-20 bg-primary shadow-md">
+        <UserStats />
+      </div>
+      
+      <main className="container lg:mx-auto lg:py-6">
         <div className="flex flex-col lg:flex-row gap-12">
 
           {/* Left side: Scrollable pathway */}
-          <div className="lg:w-2/3 lg:h-[calc(100vh-120px)] lg:overflow-y-auto no-scrollbar">
+          <div className="lg:w-2/3 lg:h-[calc(100vh_-_64px)] lg:overflow-y-auto no-scrollbar">
             <ZigzagPath lessons={lessons} levels={levels} mascots={mascots} />
           </div>
 
           {/* Right side: Sticky Sidebar */}
-          <div className={`lg:w-1/3 space-y-8 lg:sticky ${stickyTopOffset} h-fit`}>
+          <div className={`hidden lg:block lg:w-1/3 space-y-8 lg:sticky ${stickyTopOffset} h-fit max-w-sm ml-auto`}>
             <UserStats />
             <DailyQuests />
             <ProfileSection />
           </div>
-
         </div>
       </main>
     </div>
