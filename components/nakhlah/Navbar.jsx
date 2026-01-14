@@ -59,7 +59,7 @@ export function Navbar() {
           </div>
         </div>
 
-        <div className="mt-auto flex flex-col lg:flex-row lg:mx-auto gap-4">
+        <div className="mt-auto flex flex-col sm:flex-row lg:mx-auto gap-4">
           <StreakCounter count={0} />
           <ThemeToggle />
         </div>
