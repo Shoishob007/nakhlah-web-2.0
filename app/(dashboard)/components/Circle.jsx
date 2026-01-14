@@ -1,28 +1,35 @@
-import React from 'react';
+import React from "react";
 import { Lock } from "@/components/icons/Lock";
 import { Star } from "@/components/icons/Star";
 
-export function Circle({ isCompleted, isCurrent, isLocked, icon, type, size = 'md' }) {
+export function Circle({
+  isCompleted,
+  isCurrent,
+  isLocked,
+  icon,
+  type,
+  size = "md",
+}) {
   const getCircleStyles = () => {
     if (isLocked) {
-      return 'bg-[hsl(var(--node-locked))] border-[hsl(var(--node-locked-border))] pathway-node-shadow-locked';
+      return "bg-[hsl(var(--node-locked))] border-[hsl(var(--node-locked-border))] pathway-node-shadow-locked";
     }
     if (isCurrent) {
-      return 'bg-accent border-accent shadow-lg pathway-node-shadow-locked';
+      return "bg-accent border-accent shadow-lg pathway-node-shadow-locked";
     }
-    return 'bg-[hsl(var(--node-yellow))] border-[hsl(var(--node-yellow-border))] pathway-node-shadow';
+    return "bg-[hsl(var(--node-yellow))] border-[hsl(var(--node-yellow-border))] pathway-node-shadow";
   };
 
   const sizeClasses = {
-    sm: 'w-12 h-12',
-    md: 'w-16 h-16',
-    lg: 'w-20 h-20',
+    sm: "w-12 h-12",
+    md: "w-16 h-16",
+    lg: "w-20 h-20",
   };
 
   const iconSizeClasses = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-10 h-10',
+    sm: "w-6 h-6",
+    md: "w-8 h-8",
+    lg: "w-10 h-10",
   };
 
   const sizeClass = sizeClasses[size] || sizeClasses.md;
@@ -32,38 +39,35 @@ export function Circle({ isCompleted, isCurrent, isLocked, icon, type, size = 'm
     if (isLocked) {
       return <Lock size="lg" variant="silver" />;
     }
-  
+
     if (
       (isCurrent || isCompleted) &&
-      type !== 'trophy' &&
-      type !== 'checkpoint' &&
-      type !== 'crown'
+      type !== "trophy" &&
+      type !== "checkpoint" &&
+      type !== "crown"
     ) {
       return <Star size="lg" />;
     }
-  
+
     if (icon) {
       return React.cloneElement(icon, {
-        className: `${icon.props.className || ''} ${iconSizeClass}`,
+        className: `${icon.props.className || ""} ${iconSizeClass}`,
       });
     }
-  
+
     return null;
   };
-  
-  
 
-  const isSpecialType = type === 'trophy' || type === 'crown' || type === 'checkpoint';
+  const isSpecialType =
+    type === "trophy" || type === "crown" || type === "checkpoint";
 
   return (
     <div
       className={`rounded-full flex items-center justify-center border-4 ${getCircleStyles()} cursor-pointer hover:scale-105 transition-transform ${sizeClass} ${
-        isSpecialType && !isLocked ? 'scale-110' : ''
+        isSpecialType && !isLocked ? "scale-110" : ""
       }`}
     >
-      <div className="flex items-center justify-center">
-        {getIcon()}
-      </div>
+      <div className="flex items-center justify-center">{getIcon()}</div>
     </div>
   );
 }

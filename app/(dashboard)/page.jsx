@@ -1,8 +1,11 @@
-import { Medal, Trophy, Crown, Star } from "lucide-react";
 import { ZigzagPath } from "./components/ZigzagPath";
 import { UserStats } from "./components/UserStats";
 import { DailyQuests } from "./components/DailyQuests";
 import { ProfileSection } from "./components/ProfileSection";
+import { Star } from "@/components/icons/Star";
+import { Medal } from "@/components/icons/Medal";
+import { Trophy } from "@/components/icons/Trophy";
+import { Crown } from "@/components/icons/Crown";
 
 const levels = [
   {
@@ -46,8 +49,8 @@ const lessons = [
     id: 3,
     type: "lesson",
     title: "Lesson 3",
-    isCompleted: false,
-    isCurrent: true,
+    isCompleted: true,
+    isCurrent: false,
     icon: <Star />,
     level: 1,
   },
@@ -55,16 +58,16 @@ const lessons = [
     id: 4,
     type: "checkpoint",
     title: "Checkpoint",
-    isCompleted: false,
+    isCompleted: true,
     isCurrent: false,
-    icon: <Medal />,
+    icon: <Medal size="xl" />,
     level: 1,
   },
   {
     id: 5,
     type: "lesson",
     title: "Lesson 4",
-    isCompleted: false,
+    isCompleted: true,
     isCurrent: false,
     icon: <Star />,
     level: 1,
@@ -73,7 +76,7 @@ const lessons = [
     id: 6,
     type: "lesson",
     title: "Lesson 5",
-    isCompleted: false,
+    isCompleted: true,
     isCurrent: false,
     icon: <Star />,
     level: 1,
@@ -82,7 +85,7 @@ const lessons = [
     id: 7,
     type: "lesson",
     title: "Lesson 6",
-    isCompleted: false,
+    isCompleted: true,
     isCurrent: false,
     icon: <Star />,
     level: 1,
@@ -91,7 +94,7 @@ const lessons = [
     id: 8,
     type: "lesson",
     title: "Lesson 7",
-    isCompleted: false,
+    isCompleted: true,
     isCurrent: false,
     icon: <Star />,
     level: 1,
@@ -101,7 +104,7 @@ const lessons = [
     type: "trophy",
     title: "Level 1 Complete",
     isCompleted: false,
-    isCurrent: false,
+    isCurrent: true,
     icon: <Trophy />,
     level: 1,
   },
@@ -140,7 +143,7 @@ const lessons = [
     title: "Checkpoint",
     isCompleted: false,
     isCurrent: false,
-    icon: <Medal />,
+    icon: <Star />,
     level: 2,
   },
   {

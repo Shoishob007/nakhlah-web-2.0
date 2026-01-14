@@ -69,7 +69,7 @@ export function ZigzagPath({ lessons, levels, mascots }) {
       observers.push(observer);
     });
 
-    // Set initial level name
+    // initial level name
     if (levels && levels.length > 0) {
       setCurrentLevelName(levels[0].name);
     }
@@ -130,6 +130,11 @@ export function ZigzagPath({ lessons, levels, mascots }) {
                 const isLastLesson =
                   index === (groupedLessons[level.id] || []).length - 1;
 
+                const leftPercent = parseInt(position.left);
+
+                const bubbleOffsetPercent = leftPercent > 50 ? 1 : 18;
+                const bubbleLeft = `${leftPercent + bubbleOffsetPercent}%`;
+
                 return (
                   <div key={lesson.id} className="relative h-28 w-full">
                     {/* Lesson circle */}
@@ -184,6 +189,57 @@ export function ZigzagPath({ lessons, levels, mascots }) {
                         />
                       )}
                     </div>
+
+                    {/* "Speech / quotation" */}
+                    {lesson.isCurrent && (
+                      <div
+                        aria-hidden
+                        className="absolute z-20"
+                        style={{
+                          left: bubbleLeft,
+                          top: "-35%",
+                          transform: "translateX(-50%)",
+                          width: 110,
+                        }}
+                      >
+                        <div
+                          className="relative mx-auto bg-white text-sm font-semibold px-3 py-2 rounded-md shadow-md border-accent"
+                          style={{
+                            borderWidth: 4,
+                          }}
+                        >
+                          {/* The bubble text */}
+                          <div className="text-center font-semibold text-accent">
+                            START!
+                          </div>
+
+                          {/* 1.  Positioned on top to cover the bubble border */}
+                          <div
+                            className="absolute left-1/2 bg-white border-accent"
+                            style={{
+                              width: 16,
+                              height: 16,
+                              bottom: -11,
+                              transform: "translateX(-50%) rotate(45deg)",
+                              borderRightWidth: 4,
+                              borderBottomWidth: 4,
+                              zIndex: 10,
+                            }}
+                          />
+
+                          {/* 2. The Mask */}
+                          <div
+                            className="absolute left-1/2 -translate-x-1/2 bg-white"
+                            style={{
+                              width: 20,
+                              height: 8,
+                              bottom: -2,
+                              zIndex: 11,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     {/* Mascot */}
                     {mascots.map(
