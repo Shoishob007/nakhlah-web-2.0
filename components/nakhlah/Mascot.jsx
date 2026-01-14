@@ -100,6 +100,46 @@ export const Mascot = ({
             </text>
           </motion.g>
         );
+      case "thinking":
+        return (
+          <motion.text
+            x="55"
+            y="28"
+            fill="#6B7280"
+            fontSize="14"
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            ?
+          </motion.text>
+        );
+
+      case "celebrating":
+        return (
+          <motion.circle
+            cx="40"
+            cy="18"
+            r="6"
+            fill="#FFD700"
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ repeat: Infinity, duration: 1 }}
+          />
+        );
+
+      case "encouraging":
+        return (
+          <motion.text
+            x="58"
+            y="30"
+            fontSize="12"
+            fill="#FDA4AF"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            🔥
+          </motion.text>
+        );
+
       default:
         return null;
     }
@@ -192,6 +232,78 @@ export const Mascot = ({
           <motion.circle cx="51" cy="56" r="4" fill="#1a1a2e" />
           <circle cx="32" cy="54" r="1.5" fill="white" />
           <circle cx="52" cy="54" r="1.5" fill="white" />
+        </>
+      );
+    }
+
+    if (mood === "focused") {
+      return (
+        <>
+          {/* Narrow eyes */}
+          <motion.ellipse cx="30" cy="56" rx="6" ry="4" fill="white" />
+          <motion.ellipse cx="50" cy="56" rx="6" ry="4" fill="white" />
+
+          {/* Pupils – very still */}
+          <circle cx="31" cy="56" r="2.5" fill="#1a1a2e" />
+          <circle cx="51" cy="56" r="2.5" fill="#1a1a2e" />
+
+          {/* Focused eyebrows */}
+          <path
+            d="M24 50 Q30 48 36 50"
+            stroke="#1a1a2e"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M44 50 Q50 48 56 50"
+            stroke="#1a1a2e"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
+        </>
+      );
+    }
+
+    if (mood === "encouraging") {
+      return (
+        <>
+          <motion.ellipse cx="30" cy="55" rx="6" ry="7" fill="white" />
+          <motion.ellipse cx="50" cy="55" rx="6" ry="7" fill="white" />
+
+          <motion.circle
+            cx="31"
+            cy="56"
+            r="3"
+            fill="#1a1a2e"
+            animate={{ y: [0, -1, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          />
+          <motion.circle
+            cx="51"
+            cy="56"
+            r="3"
+            fill="#1a1a2e"
+            animate={{ y: [0, -1, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          />
+
+          {/* Soft eyebrows */}
+          <path
+            d="M24 50 Q30 46 36 50"
+            stroke="#1a1a2e"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M44 50 Q50 46 56 50"
+            stroke="#1a1a2e"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
         </>
       );
     }
@@ -332,6 +444,27 @@ export const Mascot = ({
             fill="none"
           />
         );
+      case "encouraging":
+        return (
+          <motion.path
+            d="M30 70 Q40 76 50 70"
+            stroke="#1a1a2e"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+        );
+
+      case "focused":
+        return (
+          <motion.path
+            d="M34 72 L46 72"
+            stroke="#1a1a2e"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        );
+
       default:
         return null;
     }
@@ -356,8 +489,12 @@ export const Mascot = ({
         style={{ width: dimensions, height: dimensions * 1.3 }}
         animate={{
           rotate: mood === "excited" ? [-3, 3, -3] : 0,
+          scale: mood === "focused" ? [1, 1.015, 1] : 1,
         }}
-        transition={{ repeat: Infinity, duration: 0.5 }}
+        transition={{
+          repeat: Infinity,
+          duration: mood === "focused" ? 2.5 : 0.5,
+        }}
       >
         <svg
           viewBox="0 0 80 104"
