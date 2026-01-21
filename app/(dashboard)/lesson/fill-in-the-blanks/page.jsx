@@ -20,15 +20,16 @@ export default function FillInBlankLesson() {
 
   const handleCheckAnswer = () => {
     if (answer.trim()) {
-      const correct = answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
-      
+      const correct =
+        answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
+
       if (correct) {
         toast({
           title: "Correct! 🎉",
           description: "Great job! Your answer is correct.",
           variant: "success",
         });
-        
+
         setTimeout(() => {
           router.push("/lesson/true-false");
         }, 1500);
@@ -81,7 +82,7 @@ export default function FillInBlankLesson() {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 text-center sm:text-start">
                 Fill in the blank
               </h2>
-              
+
               {/* Audio Sentence */}
               <div className="flex items-center gap-4 bg-card p-6 rounded-2xl border border-border mb-6">
                 <button className="flex-shrink-0 w-12 h-12 rounded-full bg-accent flex items-center justify-center text-accent-foreground hover:opacity-90">
@@ -114,7 +115,7 @@ export default function FillInBlankLesson() {
 
       {/* Bottom Action */}
       <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl container mx-auto px-4 py-6">
+        <div className="container max-w-4xl mx-auto px-4 py-6">
           <Button
             onClick={handleCheckAnswer}
             disabled={!answer.trim()}
