@@ -8,6 +8,8 @@ import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
+import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 // Dummy data
 const DUMMY_SENTENCE = "The ___ is the largest planet in our solar system.";
@@ -17,57 +19,52 @@ export default function FillInBlankLesson() {
   const [answer, setAnswer] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(null);
 
   const handleCheckAnswer = () => {
-    if (answer.trim()) {
-      const correct =
-        answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
+    if (!answer.trim() || isCorrect !== null) return; // Prevent re-submission
+    const correct =
+      answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
+    setIsCorrect(correct);
+  };
 
-      if (correct) {
-        toast({
-          title: "Correct! 🎉",
-          description: "Great job! Your answer is correct.",
-          variant: "success",
-        });
-
-        setTimeout(() => {
-          router.push("/lesson/true-false");
-        }, 1500);
-      } else {
-        toast({
-          title: "Wrong answer",
-          description: `The correct answer is "${DUMMY_CORRECT_ANSWER}"`,
-          variant: "error",
-        });
-        setAnswer("");
-      }
-    }
+  const handleNext = () => {
+    router.push("/lesson/true-false");
   };
 
   const parts = DUMMY_SENTENCE.split("___");
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push("/")}
+              onClick={() => setShowExitDialog(true)}
               className="text-muted-foreground hover:text-foreground"
             >
               <X className="w-6 h-6" />
             </button>
+
             <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
               <div className="h-full bg-accent w-3/5" />
             </div>
+
             <div className="flex items-center gap-2">
-              <GemStone size="sm" />
               <span className="text-accent font-bold">100</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/*  Dialog */}
+      {showExitDialog && (
+        <div className="fixed inset-0 z-50">
+          <LeavingDialog onCancel={() => setShowExitDialog(false)} />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
@@ -101,7 +98,8 @@ export default function FillInBlankLesson() {
                     <Input
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
-                      className="w-48 h-14 text-center text-xl font-bold border-accent"
+                      disabled={isCorrect !== null}
+                      className="w-48 h-14 text-center text-xl font-bold border-accent disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Type here"
                     />
                   </div>
@@ -114,17 +112,14 @@ export default function FillInBlankLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={!answer.trim()}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={isCorrect}
+        correctAnswer={DUMMY_CORRECT_ANSWER}
+        onCheck={handleCheckAnswer}
+        onContinue={handleNext}
+        onSkip={handleNext}
+        disabled={!answer.trim()}
+      />
     </div>
   );
 }
