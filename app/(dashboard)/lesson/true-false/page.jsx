@@ -7,6 +7,8 @@ import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
+import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 // Dummy data
 const DUMMY_STATEMENT = "The Earth is the third planet from the Sun.";
@@ -14,46 +16,31 @@ const DUMMY_CORRECT_ANSWER = true;
 
 export default function TrueFalseLesson() {
   const [selectedOption, setSelectedOption] = useState(null);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [result, setResult] = useState(null);
   const router = useRouter();
   const { toast } = useToast();
 
   const handleOptionClick = (option) => {
+    if (result !== null) return; // Prevent changes after answer submitted
     setSelectedOption(option);
   };
 
   const handleCheckAnswer = () => {
-    if (selectedOption !== null) {
-      const correct = selectedOption === DUMMY_CORRECT_ANSWER;
-
-      if (correct) {
-        toast({
-          title: "Correct! 🎉",
-          description: "Great job! Your answer is correct.",
-          variant: "success",
-        });
-
-        setTimeout(() => {
-          router.push("/lesson/completed");
-        }, 1500);
-      } else {
-        toast({
-          title: "Wrong answer",
-          description: `The statement is ${DUMMY_CORRECT_ANSWER ? "true" : "false"}`,
-          variant: "error",
-        });
-        setSelectedOption(null);
-      }
-    }
+    if (selectedOption === null) return;
+    setResult(selectedOption === DUMMY_CORRECT_ANSWER);
   };
 
+  const onNext = () => router.push("/lesson/completed");
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push("/")}
+              onClick={() => setShowExitDialog(true)}
               className="text-muted-foreground hover:text-foreground"
             >
               <X className="w-6 h-6" />
@@ -68,6 +55,13 @@ export default function TrueFalseLesson() {
           </div>
         </div>
       </div>
+
+      {/*  Dialog */}
+      {showExitDialog && (
+        <div className="fixed inset-0 z-50">
+          <LeavingDialog onCancel={() => setShowExitDialog(false)} />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
@@ -101,14 +95,15 @@ export default function TrueFalseLesson() {
               </div>
 
               {/* Options */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {/* True Option */}
                 <motion.button
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
                   onClick={() => handleOptionClick(true)}
-                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all ${
+                  disabled={result !== null}
+                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     selectedOption === true
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
@@ -134,7 +129,8 @@ export default function TrueFalseLesson() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
                   onClick={() => handleOptionClick(false)}
-                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all ${
+                  disabled={result !== null}
+                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     selectedOption === false
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
@@ -160,17 +156,14 @@ export default function TrueFalseLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={selectedOption === null}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={result}
+        correctAnswer={DUMMY_CORRECT_ANSWER ? "True" : "False"}
+        onCheck={handleCheckAnswer}
+        onContinue={onNext}
+        onSkip={onNext}
+        disabled={selectedOption === null}
+      />
     </div>
   );
 }

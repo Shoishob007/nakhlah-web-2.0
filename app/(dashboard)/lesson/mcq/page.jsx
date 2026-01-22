@@ -7,6 +7,8 @@ import { Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
+import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 const options = [
   { id: 1, text: "The key is eating a burger", correct: true },
@@ -19,42 +21,31 @@ export default function MCQLesson() {
   const [selectedOption, setSelectedOption] = useState(null);
   const router = useRouter();
   const { toast } = useToast();
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(null);
 
   const handleOptionClick = (option) => {
+    if (isCorrect !== null) return; // Prevent changes after answer submitted
     setSelectedOption(option);
   };
 
   const handleCheckAnswer = () => {
-    const isCorrect = selectedOption?.correct || false;
+    if (!selectedOption) return;
+    setIsCorrect(selectedOption.correct);
+  };
 
-    if (isCorrect) {
-      toast({
-        title: "Correct! 🎉",
-        description: "Great job! Your answer is correct.",
-        variant: "success",
-      });
-
-      setTimeout(() => {
-        router.push("/lesson/pair-match");
-      }, 1500);
-    } else {
-      toast({
-        title: "Wrong answer",
-        description: `Correct answer: "The key is eating a burger"`,
-        variant: "error",
-      });
-      setSelectedOption(null);
-    }
+  const handleNext = () => {
+    router.push("/lesson/pair-match");
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push("/")}
+              onClick={() => setShowExitDialog(true)}
               className="text-muted-foreground hover:text-foreground"
             >
               <X className="w-6 h-6" />
@@ -69,6 +60,13 @@ export default function MCQLesson() {
           </div>
         </div>
       </div>
+
+      {/*  Dialog */}
+      {showExitDialog && (
+        <div className="fixed inset-0 z-50">
+          <LeavingDialog onCancel={() => setShowExitDialog(false)} />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
@@ -102,7 +100,8 @@ export default function MCQLesson() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => handleOptionClick(option)}
-                  className={`p-4 rounded-xl border-2 text-left font-semibold transition-all ${
+                  disabled={isCorrect !== null}
+                  className={`p-4 rounded-xl border-2 text-left font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     selectedOption?.id === option.id
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
@@ -117,17 +116,14 @@ export default function MCQLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={!selectedOption}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={isCorrect}
+        correctAnswer="The key is eating a burger"
+        onCheck={handleCheckAnswer}
+        onContinue={handleNext}
+        onSkip={handleNext}
+        disabled={!selectedOption}
+      />
     </div>
   );
 }
