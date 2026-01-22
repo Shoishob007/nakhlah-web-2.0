@@ -49,7 +49,7 @@ export default function PairMatchLesson() {
   const { toast } = useToast();
 
   const handleLeftClick = (item) => {
-    if (item.matched) return;
+    if (item.matched || isCorrect !== null) return; // Prevent changes after answer submitted
     setSelectedLeft(item);
     if (selectedRight) {
       checkMatch(item, selectedRight);
@@ -57,7 +57,7 @@ export default function PairMatchLesson() {
   };
 
   const handleRightClick = (item) => {
-    if (item.matched) return;
+    if (item.matched || isCorrect !== null) return; // Prevent changes after answer submitted
     setSelectedRight(item);
     if (selectedLeft) {
       checkMatch(selectedLeft, item);

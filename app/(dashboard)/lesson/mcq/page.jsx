@@ -25,6 +25,7 @@ export default function MCQLesson() {
   const [isCorrect, setIsCorrect] = useState(null);
 
   const handleOptionClick = (option) => {
+    if (isCorrect !== null) return; // Prevent changes after answer submitted
     setSelectedOption(option);
   };
 
@@ -99,7 +100,8 @@ export default function MCQLesson() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => handleOptionClick(option)}
-                  className={`p-4 rounded-xl border-2 text-left font-semibold transition-all ${
+                  disabled={isCorrect !== null}
+                  className={`p-4 rounded-xl border-2 text-left font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     selectedOption?.id === option.id
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"

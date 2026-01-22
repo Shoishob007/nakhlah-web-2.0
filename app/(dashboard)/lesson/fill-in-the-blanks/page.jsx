@@ -23,7 +23,7 @@ export default function FillInBlankLesson() {
   const [isCorrect, setIsCorrect] = useState(null);
 
   const handleCheckAnswer = () => {
-    if (!answer.trim()) return;
+    if (!answer.trim() || isCorrect !== null) return; // Prevent re-submission
     const correct =
       answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
     setIsCorrect(correct);
@@ -98,7 +98,8 @@ export default function FillInBlankLesson() {
                     <Input
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
-                      className="w-48 h-14 text-center text-xl font-bold border-accent"
+                      disabled={isCorrect !== null}
+                      className="w-48 h-14 text-center text-xl font-bold border-accent disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Type here"
                     />
                   </div>

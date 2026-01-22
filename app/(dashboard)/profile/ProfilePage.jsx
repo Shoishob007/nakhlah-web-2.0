@@ -5,6 +5,8 @@ import AchievementsList from "./components/AchievementsList";
 import MotivationCard from "./components/MotivationCard";
 import QuickStats from "./components/QuickStats";
 import ShareProfile from "./components/ShareProfile";
+import SubscriptionCard from "./components/SubscriptionCard";
+import RefillLivesCard from "./components/RefillLivesCard";
 
 export default function ProfilePage({ onNavigate }) {
   const stats = [
@@ -41,6 +43,8 @@ export default function ProfilePage({ onNavigate }) {
           <MotivationCard />
           <QuickStats />
           <ShareProfile onShare={() => onNavigate("share-profile")} />
+          <SubscriptionCard />
+          <RefillLivesCard />
         </div>
       </div>
 
@@ -48,6 +52,6 @@ export default function ProfilePage({ onNavigate }) {
       <div className="lg:hidden space-y-6 mt-4">
         <QuickStats />
       </div>
-      </div>
+    </div>
   );
 }

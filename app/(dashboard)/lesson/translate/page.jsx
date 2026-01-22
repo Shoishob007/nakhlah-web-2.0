@@ -34,11 +34,13 @@ export default function TranslateLesson() {
   const { toast } = useToast();
 
   const handleWordClick = (word) => {
+    if (result !== null) return; // Prevent changes after answer submitted
     setSelectedWords([...selectedWords, word]);
     setAvailableWords(availableWords.filter((w) => w !== word));
   };
 
   const handleRemoveWord = (index) => {
+    if (result !== null) return; // Prevent changes after answer submitted
     const word = selectedWords[index];
     setAvailableWords([...availableWords, word]);
     setSelectedWords(selectedWords.filter((_, i) => i !== index));
@@ -115,7 +117,8 @@ export default function TranslateLesson() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     onClick={() => handleRemoveWord(index)}
-                    className="px-4 py-2 bg-accent text-accent-foreground rounded-xl font-semibold hover:opacity-90"
+                    disabled={result !== null}
+                    className="px-4 py-2 bg-accent text-accent-foreground rounded-xl font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {word}
                   </motion.button>
@@ -132,7 +135,8 @@ export default function TranslateLesson() {
                   animate={{ scale: 1 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => handleWordClick(word)}
-                  className="px-6 py-3 bg-card border-2 border-border rounded-xl font-semibold text-foreground hover:border-accent transition-colors"
+                  disabled={result !== null}
+                  className="px-6 py-3 bg-card border-2 border-border rounded-xl font-semibold text-foreground hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {word}
                 </motion.button>

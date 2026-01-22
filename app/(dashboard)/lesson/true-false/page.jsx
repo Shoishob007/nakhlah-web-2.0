@@ -22,6 +22,7 @@ export default function TrueFalseLesson() {
   const { toast } = useToast();
 
   const handleOptionClick = (option) => {
+    if (result !== null) return; // Prevent changes after answer submitted
     setSelectedOption(option);
   };
 
@@ -101,7 +102,8 @@ export default function TrueFalseLesson() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
                   onClick={() => handleOptionClick(true)}
-                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all ${
+                  disabled={result !== null}
+                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     selectedOption === true
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"
@@ -127,7 +129,8 @@ export default function TrueFalseLesson() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
                   onClick={() => handleOptionClick(false)}
-                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all ${
+                  disabled={result !== null}
+                  className={`p-6 rounded-2xl border-2 text-center font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     selectedOption === false
                       ? "border-accent bg-accent/10 text-foreground"
                       : "border-border bg-card text-foreground hover:border-accent"

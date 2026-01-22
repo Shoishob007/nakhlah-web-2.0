@@ -44,8 +44,10 @@ export function LessonResultHandler({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", damping: 20, stiffness: 150 }}
-            className={`w-full h-full py-6 ${
-              isCorrect ? "bg-green-100 dark:bg-green-900/40" : "bg-red-100 dark:bg-red-900/40"
+            className={`w-full py-8 px-4 ${
+              isCorrect
+                ? "bg-green-100 dark:bg-green-900/40"
+                : "bg-red-100 dark:bg-red-900/40"
             }`}
           >
             <div className="container max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -56,19 +58,23 @@ export function LessonResultHandler({
                   <XCircle className="w-12 h-12 text-red-600 shadow-sm" />
                 )}
                 <div>
-                  <h3 className={`text-2xl font-black ${isCorrect ? "text-green-800 dark:text-green-400" : "text-red-800 dark:text-red-400"}`}>
+                  <h3
+                    className={`text-2xl font-black ${isCorrect ? "text-green-800 dark:text-green-400" : "text-red-800 dark:text-red-400"}`}
+                  >
                     {isCorrect ? "Correct!" : "Correct answer:"}
                   </h3>
                   {!isCorrect && correctAnswer && (
-                    <p className="text-red-700 dark:text-red-300 font-bold text-lg">{correctAnswer}</p>
+                    <p className="text-red-700 dark:text-red-300 font-bold text-lg">
+                      {correctAnswer}
+                    </p>
                   )}
                 </div>
               </div>
               <Button
                 onClick={onContinue}
                 className={`w-full sm:w-auto sm:min-w-[200px] h-14 font-bold text-lg rounded-xl shadow-lg transform active:scale-95 transition-transform ${
-                  isCorrect 
-                    ? "bg-green-600 hover:bg-green-700 text-white" 
+                  isCorrect
+                    ? "bg-green-600 hover:bg-green-700 text-white"
                     : "bg-red-600 hover:bg-red-700 text-white"
                 }`}
               >
