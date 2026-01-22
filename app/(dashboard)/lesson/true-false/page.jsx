@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
 import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 // Dummy data
 const DUMMY_STATEMENT = "The Earth is the third planet from the Sun.";
@@ -16,7 +17,7 @@ const DUMMY_CORRECT_ANSWER = true;
 export default function TrueFalseLesson() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
-
+  const [result, setResult] = useState(null);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -25,29 +26,11 @@ export default function TrueFalseLesson() {
   };
 
   const handleCheckAnswer = () => {
-    if (selectedOption !== null) {
-      const correct = selectedOption === DUMMY_CORRECT_ANSWER;
-
-      if (correct) {
-        toast({
-          title: "Correct! 🎉",
-          description: "Great job! Your answer is correct.",
-          variant: "success",
-        });
-
-        setTimeout(() => {
-          router.push("/lesson/completed");
-        }, 1500);
-      } else {
-        toast({
-          title: "Wrong answer",
-          description: `The statement is ${DUMMY_CORRECT_ANSWER ? "true" : "false"}`,
-          variant: "error",
-        });
-        setSelectedOption(null);
-      }
-    }
+    if (selectedOption === null) return;
+    setResult(selectedOption === DUMMY_CORRECT_ANSWER);
   };
+
+  const onNext = () => router.push("/lesson/completed");
 
   return (
     <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
@@ -111,7 +94,7 @@ export default function TrueFalseLesson() {
               </div>
 
               {/* Options */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {/* True Option */}
                 <motion.button
                   initial={{ opacity: 0, x: -20 }}
@@ -170,17 +153,14 @@ export default function TrueFalseLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={selectedOption === null}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={result}
+        correctAnswer={DUMMY_CORRECT_ANSWER ? "True" : "False"}
+        onCheck={handleCheckAnswer}
+        onContinue={onNext}
+        onSkip={onNext}
+        disabled={selectedOption === null}
+      />
     </div>
   );
 }

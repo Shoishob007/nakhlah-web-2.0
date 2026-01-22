@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
 import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 const options = [
   { id: 1, text: "The key is eating a burger", correct: true },
@@ -21,32 +22,19 @@ export default function MCQLesson() {
   const router = useRouter();
   const { toast } = useToast();
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(null);
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
   };
 
   const handleCheckAnswer = () => {
-    const isCorrect = selectedOption?.correct || false;
+    if (!selectedOption) return;
+    setIsCorrect(selectedOption.correct);
+  };
 
-    if (isCorrect) {
-      toast({
-        title: "Correct! 🎉",
-        description: "Great job! Your answer is correct.",
-        variant: "success",
-      });
-
-      setTimeout(() => {
-        router.push("/lesson/pair-match");
-      }, 1500);
-    } else {
-      toast({
-        title: "Wrong answer",
-        description: `Correct answer: "The key is eating a burger"`,
-        variant: "error",
-      });
-      setSelectedOption(null);
-    }
+  const handleNext = () => {
+    router.push("/lesson/pair-match");
   };
 
   return (
@@ -126,17 +114,14 @@ export default function MCQLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={!selectedOption}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={isCorrect}
+        correctAnswer="The key is eating a burger"
+        onCheck={handleCheckAnswer}
+        onContinue={handleNext}
+        onSkip={handleNext}
+        disabled={!selectedOption}
+      />
     </div>
   );
 }

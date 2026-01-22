@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
 import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 const leftWords = [
   { id: 1, text: "Anggem", matched: false },
@@ -42,6 +43,7 @@ export default function PairMatchLesson() {
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [selectedRight, setSelectedRight] = useState(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(null);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -80,28 +82,12 @@ export default function PairMatchLesson() {
   };
 
   const handleCheckAnswer = () => {
-    const allMatched =
-      leftState.every((p) => p.matched) && rightState.every((p) => p.matched);
+    const allMatched = leftState.every((p) => p.matched);
+    setIsCorrect(allMatched);
+  };
 
-    if (allMatched) {
-      toast({
-        title: "All pairs matched! 🎉",
-        description: "Great job! All pairs are correctly matched.",
-        variant: "success",
-      });
-
-      setTimeout(() => {
-        router.push("/lesson/fill-in-the-blanks");
-      }, 1500);
-    } else {
-      toast({
-        title: "Incomplete",
-        description: "Please match all pairs correctly.",
-        variant: "error",
-      });
-      setLeftState(leftWords);
-      setRightState(rightWords);
-    }
+  const handleNext = () => {
+    router.push("/lesson/fill-in-the-blanks");
   };
 
   return (
@@ -200,16 +186,13 @@ export default function PairMatchLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={isCorrect}
+        onCheck={handleCheckAnswer}
+        onContinue={handleNext}
+        onSkip={handleNext}
+        disabled={!leftState.every((p) => p.matched)}
+      />
     </div>
   );
 }

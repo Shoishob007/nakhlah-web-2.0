@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
 import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 // Dummy data
 const DUMMY_SENTENCE = "The ___ is the largest planet in our solar system.";
@@ -19,31 +20,17 @@ export default function FillInBlankLesson() {
   const router = useRouter();
   const { toast } = useToast();
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(null);
 
   const handleCheckAnswer = () => {
-    if (answer.trim()) {
-      const correct =
-        answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
+    if (!answer.trim()) return;
+    const correct =
+      answer.trim().toLowerCase() === DUMMY_CORRECT_ANSWER.toLowerCase();
+    setIsCorrect(correct);
+  };
 
-      if (correct) {
-        toast({
-          title: "Correct! 🎉",
-          description: "Great job! Your answer is correct.",
-          variant: "success",
-        });
-
-        setTimeout(() => {
-          router.push("/lesson/true-false");
-        }, 1500);
-      } else {
-        toast({
-          title: "Wrong answer",
-          description: `The correct answer is "${DUMMY_CORRECT_ANSWER}"`,
-          variant: "error",
-        });
-        setAnswer("");
-      }
-    }
+  const handleNext = () => {
+    router.push("/lesson/true-false");
   };
 
   const parts = DUMMY_SENTENCE.split("___");
@@ -124,17 +111,14 @@ export default function FillInBlankLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={!answer.trim()}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={isCorrect}
+        correctAnswer={DUMMY_CORRECT_ANSWER}
+        onCheck={handleCheckAnswer}
+        onContinue={handleNext}
+        onSkip={handleNext}
+        disabled={!answer.trim()}
+      />
     </div>
   );
 }

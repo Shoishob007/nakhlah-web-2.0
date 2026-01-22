@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
 import LeavingDialog from "../leaving/page";
+import { LessonResultHandler } from "../../components/ResultHandler";
 
 const words = [
   "dia",
@@ -27,6 +28,7 @@ export default function TranslateLesson() {
   const [selectedWords, setSelectedWords] = useState([]);
   const [availableWords, setAvailableWords] = useState(words);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [result, setResult] = useState(null);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -44,34 +46,12 @@ export default function TranslateLesson() {
 
   const handleCheckAnswer = () => {
     if (selectedWords.length === 0) return;
-
     const isAnswerCorrect =
       JSON.stringify(selectedWords) === JSON.stringify(correctAnswer);
-
-    if (isAnswerCorrect) {
-      toast({
-        title: "Correct! 🎉",
-        description: "Great job! Your translation is correct.",
-        variant: "success",
-      });
-
-      setTimeout(() => {
-        router.push("/lesson/mcq");
-      }, 1500);
-    } else {
-      toast({
-        title: "Wrong!",
-        description: "Correct answer: Saya berjalan dan dia berenang.",
-        variant: "error",
-      });
-
-      // Reset after toast disappears
-      setTimeout(() => {
-        setSelectedWords([]);
-        setAvailableWords(words);
-      }, 3000);
-    }
+    setResult(isAnswerCorrect);
   };
+
+  const onNext = () => router.push("/lesson/mcq");
 
   return (
     <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col relative">
@@ -163,17 +143,14 @@ export default function TranslateLesson() {
       </div>
 
       {/* Bottom Action */}
-      <div className="border-t border-border bg-background">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
-          <Button
-            onClick={handleCheckAnswer}
-            disabled={selectedWords.length === 0}
-            className="w-full md:w-auto md:min-w-[200px] md:ml-auto md:flex h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl disabled:opacity-50"
-          >
-            Check Answers
-          </Button>
-        </div>
-      </div>
+      <LessonResultHandler
+        isCorrect={result}
+        correctAnswer="Saya berjalan dan dia berenang"
+        onCheck={handleCheckAnswer}
+        onContinue={onNext}
+        onSkip={onNext}
+        disabled={selectedWords.length === 0}
+      />
     </div>
   );
 }
