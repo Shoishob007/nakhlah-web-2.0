@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { CardMenuOptions } from "@/components/nakhlah/CardMenuOptions";
 
 const navLinks = [
   { href: "/about", label: "About" },
@@ -23,19 +24,29 @@ export function ProfileSection() {
     router.push("/auth/login");
   };
 
+  const menuOptions = [
+    {
+      label: "View Full Profile",
+      onClick: () => router.push("/dashboard/profile"),
+    },
+  ];
+
   return (
     <div className="bg-card border border-border rounded-xl p-6 space-y-4">
       {isSignedIn ? (
         <div>
-          <div className="flex items-center space-x-4">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <p className="font-semibold">Username</p>
-              <p className="text-sm text-muted-foreground">Joined 2023</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <p className="font-semibold">Username</p>
+                <p className="text-sm text-muted-foreground">Joined 2023</p>
+              </div>
             </div>
+            <CardMenuOptions options={menuOptions} />
           </div>
           <div className="mt-4">
             <h3 className="text-md font-semibold">Achievements</h3>
