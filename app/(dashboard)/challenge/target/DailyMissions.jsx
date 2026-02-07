@@ -61,20 +61,20 @@ const allMissions = [
   },
 
   // Special missions
-  {
-    label: "Win Streak Challenge",
-    current: 3,
-    target: 7,
-    icon: Flame,
-    type: "special",
-  },
-  {
-    label: "Master 3 Lessons",
-    current: 1,
-    target: 3,
-    icon: Bullseye,
-    type: "special",
-  },
+  // {
+  //   label: "Win Streak Challenge",
+  //   current: 3,
+  //   target: 7,
+  //   icon: Flame,
+  //   type: "special",
+  // },
+  // {
+  //   label: "Master 3 Lessons",
+  //   current: 1,
+  //   target: 3,
+  //   icon: Bullseye,
+  //   type: "special",
+  // },
 ];
 
 const questSections = [
@@ -89,13 +89,7 @@ const questSections = [
     title: "Weekly Challenges",
     icon: "📊",
     description: "Reset every week",
-  },
-  {
-    type: "special",
-    title: "Special Events",
-    icon: "⭐",
-    description: "Limited time events",
-  },
+  }
 ];
 
 export default function DailyMissions() {

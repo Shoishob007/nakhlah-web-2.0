@@ -255,11 +255,11 @@ export default function PremiumSubscription({ onBack }) {
           </div>
 
           {/* Hero Card */}
-          <div className="relative overflow-hidden rounded-3xl bg-accent p-6 md:p-8 text-center shadow-lg">
+          <div className="relative overflow-hidden rounded-3xl bg-accent p-6 text-center shadow-lg">
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
               {/* Mascot */}
               <div className="flex-shrink-0">
-                <Mascot mood="excited" size="xl" message="Let's level up!" />
+                <Mascot mood="excited" size="xxl" />
               </div>
 
               {/* Text Content */}
@@ -280,7 +280,7 @@ export default function PremiumSubscription({ onBack }) {
             {premiumFeatures.map((feature) => (
               <div
                 key={feature.id}
-                className="flex flex-row md:flex-col items-center md:items-center gap-4 p-3 md:p-6 rounded-xl md:rounded-2xl bg-card border border-border transition-all duration-300 text-left md:text-center group hover:border-accent/50"
+                className="flex flex-row md:flex-col items-center md:items-center gap-4 p-3 md:p-6 rounded-xl md:rounded-2xl bg-card border border-border transition-all duration-300 text-left md:text-center"
               >
                 <div
                   className={`shrink-0 p-3 md:p-4 rounded-xl md:rounded-2xl ${feature.iconBg} shadow-sm group-hover:shadow-md transition-shadow`}
@@ -304,11 +304,11 @@ export default function PremiumSubscription({ onBack }) {
           {/* Gems CTA Card */}
           <motion.div
             variants={itemVariants}
-            className="relative rounded-xl bg-card border border-border p-6 hover:border-accent/50 transition-all cursor-pointer group"
+            className="relative rounded-xl border border-border p-6 bg-accent/10 hover:border-accent/50 transition-all cursor-pointer group"
             onClick={() => router.push("/store/gems")}
           >
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+              <div className="p-3 rounded-lg transition-colors">
                 <GemStone size="lg" />
               </div>
               <div className="flex-1">
