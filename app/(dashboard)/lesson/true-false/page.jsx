@@ -1,13 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Volume2, X, Check, X as XIcon } from "lucide-react";
+import { Volume2, X, Check, X as XIcon, Turtle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { ArabicTooltip } from "@/components/nakhlah/ArabicTooltip";
 import LeavingDialog from "../leaving/page";
 import { LessonResultHandler } from "../../components/ResultHandler";
+import { useAudio } from "@/hooks/use-audio";
 
 // Learning sections and True/False question
 const QUESTIONS = [
@@ -15,7 +17,13 @@ const QUESTIONS = [
     id: 1,
     type: "learn",
     audio: "/mp3/kaifa_haluka_df7cdf2652.mp3",
-    arabic: "كَيْفَ حَالُكَ؟",
+    ttsText: "كَيْفَ حَالُكَ؟",
+    gender: "male",
+    arabicParts: [
+      { text: "كَيْفَ", pronunciation: "Kaifa" },
+      { text: " ", pronunciation: "" },
+      { text: "حَالُكَ؟", pronunciation: "Haluka" },
+    ],
     translation: "How are you? (male)",
     image: "/assalamu_alaykum.webp",
   },
@@ -23,7 +31,13 @@ const QUESTIONS = [
     id: 2,
     type: "learn",
     audio: "/mp3/kaifa_haluki_e27efb9dae.mp3",
-    arabic: "كَيْفَ حَالُكِ؟",
+    ttsText: "كَيْفَ حَالُكِ؟",
+    gender: "female",
+    arabicParts: [
+      { text: "كَيْفَ", pronunciation: "Kaifa" },
+      { text: " ", pronunciation: "" },
+      { text: "حَالُكِ؟", pronunciation: "Haluki" },
+    ],
     translation: "How are you? (female)",
     image: "/assalamu_alaykum.webp",
   },
@@ -44,7 +58,7 @@ export default function TrueFalseLesson() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
   const router = useRouter();
-  const audioRef = useRef(null);
+  const { play } = useAudio();
 
   const currentQuestion = QUESTIONS[currentQuestionIndex];
   const totalQuestions = QUESTIONS.length;
@@ -69,10 +83,23 @@ export default function TrueFalseLesson() {
   };
 
   const handlePlayAudio = () => {
-    if (audioRef.current && currentQuestion.audio) {
-      audioRef.current.src = currentQuestion.audio;
-      audioRef.current.play();
-    }
+    play({
+      url: currentQuestion.audio,
+      text: currentQuestion.ttsText,
+      lang: "ar-SA",
+      gender: currentQuestion.gender,
+      rate: 1.0,
+    });
+  };
+
+  const handlePlayAudioSlow = () => {
+    play({
+      url: currentQuestion.audio,
+      text: currentQuestion.ttsText,
+      lang: "ar-SA",
+      gender: currentQuestion.gender,
+      rate: 0.6,
+    });
   };
 
   const handleCheckAnswer = () => {
@@ -92,9 +119,6 @@ export default function TrueFalseLesson() {
 
   return (
     <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
-      {/* Hidden audio element */}
-      <audio ref={audioRef} />
-
       {/* Header */}
       <div className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-4 sm:py-6">
@@ -148,9 +172,28 @@ export default function TrueFalseLesson() {
                   >
                     <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
-                  <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">
-                    {currentQuestion.arabic} ({currentQuestion.translation})
-                  </p>
+                  <button
+                    onClick={handlePlayAudioSlow}
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-muted flex items-center justify-center text-foreground hover:opacity-90 self-start"
+                    aria-label="Play slow audio"
+                  >
+                    <Turtle className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                  <div className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">
+                    {currentQuestion.arabicParts.map((part, idx) => (
+                      <span key={idx}>
+                        {part.pronunciation ? (
+                          <ArabicTooltip
+                            text={part.text}
+                            pronunciation={part.pronunciation}
+                          />
+                        ) : (
+                          part.text
+                        )}
+                      </span>
+                    ))}
+                    ({currentQuestion.translation})
+                  </div>
                 </div>
 
                 {/* Image and Content Side by Side */}
@@ -173,7 +216,18 @@ export default function TrueFalseLesson() {
                     <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10">
                       <div className="text-center space-y-4">
                         <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
-                          {currentQuestion.arabic}
+                          {currentQuestion.arabicParts.map((part, idx) => (
+                            <span key={idx}>
+                              {part.pronunciation ? (
+                                <ArabicTooltip
+                                  text={part.text}
+                                  pronunciation={part.pronunciation}
+                                />
+                              ) : (
+                                part.text
+                              )}
+                            </span>
+                          ))}
                         </h3>
                         <div className="h-px bg-border my-4" />
                         <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-muted-foreground">

@@ -1,62 +1,89 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Volume2, X } from "lucide-react";
+import { Volume2, X, Turtle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
+import { ArabicTooltip } from "@/components/nakhlah/ArabicTooltip";
 import LeavingDialog from "../leaving/page";
 import { LessonResultHandler } from "../../components/ResultHandler";
+import { useAudio } from "@/hooks/use-audio";
 
 // Multiple questions with learning step
 const QUESTIONS = [
   {
     id: 1,
     type: "learn",
-    audio: "/mp3/ismee_e33727b3bb.mp3",
-    arabic: "اِسْمِي",
-    translation: "My name is...",
+    audio: "/mp3/assalamu_alaykum_f39425b3f2.mp3",
+    ttsText: "السَّلامُ عَلَيْكُمْ",
+    arabicParts: [
+      { text: "السَّلامُ", pronunciation: "Assalamu" },
+      { text: " ", pronunciation: "" },
+      { text: "عَلَيْكُمْ", pronunciation: "Alaikum" },
+    ],
+    translation: "Peace be upon you",
     image: "/assalamu_alaykum.webp",
   },
   {
     id: 2,
     type: "question",
     audio: "/mp3/assalamu_alaykum_f39425b3f2.mp3",
-    question: "What does the speaker say in response to As-salamu Alaykum?",
+    ttsText: "السَّلامُ عَلَيْكُمْ",
+    question: "What is the meaning of",
+    arabicParts: [
+      { text: "السَّلامُ", pronunciation: "Assalamu" },
+      { text: " ", pronunciation: "" },
+      { text: "عَلَيْكُمْ", pronunciation: "Alaikum" },
+    ],
+    showArabicInQuestion: true,
     image: "/assalamu_alaykum.webp",
     options: [
-      { id: 1, text: "اِسْمِي", correct: false },
-      { id: 2, text: "وَعَلَيْكُمُ ٱلسَّلَامُ", correct: true },
-      { id: 3, text: "ٱلسَّلَامُ عَلَيْكُمْ", correct: false },
-      { id: 4, text: "كَيْفَ حَالُكَ؟", correct: false },
+      { id: 1, text: "Peace be upon you", correct: true },
+      { id: 2, text: "How are you?", correct: false },
+      { id: 3, text: "My name is", correct: false },
+      { id: 4, text: "Good morning", correct: false },
     ],
   },
   {
     id: 3,
-    type: "question",
-    audio: "/mp3/Ismi_Muhammad_ac06c40781.mp3",
-    question: "What does the speaker say?",
+    type: "learn",
+    audio: "/mp3/ismee_e33727b3bb.mp3",
+    ttsText: "اِسْمِي",
+    arabicParts: [{ text: "اِسْمِي", pronunciation: "Ismee" }],
+    translation: "My name is...",
     image: "/assalamu_alaykum.webp",
-    options: [
-      { id: 1, text: "How are you? (male)", correct: false },
-      { id: 2, text: "My name is Muhammad", correct: true },
-      { id: 3, text: "How are you? (female)", correct: false },
-      { id: 4, text: "My name is Fatima", correct: false },
-    ],
   },
   {
     id: 4,
     type: "question",
+    audio: "/mp3/Ismi_Muhammad_ac06c40781.mp3",
+    ttsText: "اِسْمِي مُحَمَّد",
+    gender: "male",
+    question: "What does the speaker say?",
+    image: "/assalamu_alaykum.webp",
+    options: [
+      { id: 1, text: "My name is Muhammad", correct: true },
+      { id: 2, text: "My name is Fatima", correct: false },
+      { id: 3, text: "How are you? (male)", correct: false },
+      { id: 4, text: "Peace be upon you", correct: false },
+    ],
+  },
+  {
+    id: 5,
+    type: "question",
     audio: "/mp3/ismee_fatima_5a1d266777.mp3",
+    ttsText: "اِسْمِي فَاطِمَه",
+    gender: "female",
     question: "What does the speaker say?",
     image: "/my_name.webp",
     options: [
-      { id: 1, text: "How are you? (male)", correct: false },
-      { id: 2, text: "My name is Muhammad", correct: false },
+      { id: 1, text: "My name is Muhammad", correct: false },
+      { id: 2, text: "My name is Fatima", correct: true },
       { id: 3, text: "How are you? (female)", correct: false },
-      { id: 4, text: "My name is Fatima", correct: true },
+      { id: 4, text: "Peace be upon you", correct: false },
     ],
   },
 ];
@@ -67,7 +94,7 @@ export default function MCQLesson() {
   const router = useRouter();
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
-  const audioRef = useRef(null);
+  const { play } = useAudio();
 
   const currentQuestion = QUESTIONS[currentQuestionIndex];
   const totalQuestions = QUESTIONS.length;
@@ -92,10 +119,23 @@ export default function MCQLesson() {
   };
 
   const handlePlayAudio = () => {
-    if (audioRef.current && currentQuestion.audio) {
-      audioRef.current.src = currentQuestion.audio;
-      audioRef.current.play();
-    }
+    play({
+      url: currentQuestion.audio,
+      text: currentQuestion.ttsText,
+      lang: "ar-SA",
+      gender: currentQuestion.gender,
+      rate: 1.0,
+    });
+  };
+
+  const handlePlayAudioSlow = () => {
+    play({
+      url: currentQuestion.audio,
+      text: currentQuestion.ttsText,
+      lang: "ar-SA",
+      gender: currentQuestion.gender,
+      rate: 0.6,
+    });
   };
 
   const handleCheckAnswer = () => {
@@ -115,9 +155,6 @@ export default function MCQLesson() {
 
   return (
     <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
-      {/* Hidden audio element */}
-      <audio ref={audioRef} />
-
       {/* Header */}
       <div className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-4 sm:py-6">
@@ -171,9 +208,28 @@ export default function MCQLesson() {
                   >
                     <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
-                  <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">
-                    {currentQuestion.arabic} ({currentQuestion.translation})
-                  </p>
+                  <button
+                    onClick={handlePlayAudioSlow}
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-muted flex items-center justify-center text-foreground hover:opacity-90 self-start"
+                    aria-label="Play slow audio"
+                  >
+                    <Turtle className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                  <div className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">
+                    {currentQuestion.arabicParts.map((part, idx) => (
+                      <span key={idx}>
+                        {part.pronunciation ? (
+                          <ArabicTooltip
+                            text={part.text}
+                            pronunciation={part.pronunciation}
+                          />
+                        ) : (
+                          part.text
+                        )}
+                      </span>
+                    ))}
+                    ({currentQuestion.translation})
+                  </div>
                 </div>
 
                 {/* Image and Content Side by Side */}
@@ -196,7 +252,18 @@ export default function MCQLesson() {
                     <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10">
                       <div className="text-center space-y-4">
                         <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
-                          {currentQuestion.arabic}
+                          {currentQuestion.arabicParts.map((part, idx) => (
+                            <span key={idx}>
+                              {part.pronunciation ? (
+                                <ArabicTooltip
+                                  text={part.text}
+                                  pronunciation={part.pronunciation}
+                                />
+                              ) : (
+                                part.text
+                              )}
+                            </span>
+                          ))}
                         </h3>
                         <div className="h-px bg-border my-4" />
                         <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-muted-foreground">
@@ -218,6 +285,13 @@ export default function MCQLesson() {
                   >
                     <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
+                  <button
+                    onClick={handlePlayAudioSlow}
+                    className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-muted flex items-center justify-center text-foreground hover:opacity-90 self-start"
+                    aria-label="Play slow audio"
+                  >
+                    <Turtle className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
                   <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground">
                     Question
                   </p>
@@ -227,6 +301,24 @@ export default function MCQLesson() {
                 <div>
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-4 sm:mb-6 text-center sm:text-start">
                     {currentQuestion.question}
+                    {currentQuestion.showArabicInQuestion && (
+                      <>
+                        {" "}
+                        {currentQuestion.arabicParts.map((part, idx) => (
+                          <span key={idx}>
+                            {part.pronunciation ? (
+                              <ArabicTooltip
+                                text={part.text}
+                                pronunciation={part.pronunciation}
+                              />
+                            ) : (
+                              part.text
+                            )}
+                          </span>
+                        ))}
+                        ?
+                      </>
+                    )}
                   </h2>
                 </div>
 

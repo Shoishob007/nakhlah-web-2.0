@@ -4,16 +4,37 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Volume2, X } from "lucide-react";
+import { Volume2, X, Turtle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GemStone } from "@/components/icons/Gem";
 import { useToast } from "@/components/ui/use-toast";
+import { ArabicTooltip } from "@/components/nakhlah/ArabicTooltip";
 import LeavingDialog from "../leaving/page";
 import { LessonResultHandler } from "../../components/ResultHandler";
+import { useAudio } from "@/hooks/use-audio";
 
-const words = ["أنا", "أمشي", "و", "هي", "تسبح", "يأكل", "نحن", "يقرأ", "هم"];
+const words = [
+  "وَ",
+  "عَلَيْكُمُ",
+  "ٱلسَّلَامُ",
+  "اِسْمِي",
+  "حَالُكَ",
+  "مُحَمَّد",
+];
 
-const correctAnswer = ["أنا", "أمشي", "و", "هي", "تسبح"];
+const correctAnswer = ["وَ", "عَلَيْكُمُ", "ٱلسَّلَامُ"];
+
+const AUDIO_CONFIG = {
+  audio: "/mp3/assalamu_alaykum_f39425b3f2.mp3",
+  ttsText: "السَّلامُ عَلَيْكُمْ",
+  lang: "ar-SA",
+};
+
+const ARABIC_PARTS = [
+  { text: "السَّلامُ", pronunciation: "Assalamu" },
+  { text: " ", pronunciation: "" },
+  { text: "عَلَيْكُمْ", pronunciation: "Alaikum" },
+];
 
 export default function SentenceMakingLesson() {
   const [selectedWords, setSelectedWords] = useState([]);
@@ -23,6 +44,7 @@ export default function SentenceMakingLesson() {
 
   const router = useRouter();
   const { toast } = useToast();
+  const { play } = useAudio();
 
   // Global lesson progress (Sentence-Making = 5/6)
   const LESSON_TYPES = [
@@ -65,6 +87,24 @@ export default function SentenceMakingLesson() {
     );
     sessionStorage.setItem("currentLessonIndex", (currentIndex + 1).toString());
     router.push("/lesson/pair-match");
+  };
+
+  const handlePlayAudio = () => {
+    play({
+      url: AUDIO_CONFIG.audio,
+      text: AUDIO_CONFIG.ttsText,
+      lang: AUDIO_CONFIG.lang,
+      rate: 1.0,
+    });
+  };
+
+  const handlePlayAudioSlow = () => {
+    play({
+      url: AUDIO_CONFIG.audio,
+      text: AUDIO_CONFIG.ttsText,
+      lang: AUDIO_CONFIG.lang,
+      rate: 0.6,
+    });
   };
 
   return (
@@ -111,15 +151,36 @@ export default function SentenceMakingLesson() {
             {/* Question */}
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 text-center sm:text-start">
-                Make this sentence in Arabic
+                Make the response to this greeting
               </h2>
               <div className="flex items-center gap-4 bg-card p-6 rounded-2xl border border-border">
-                <button className="flex-shrink-0 w-12 h-12 rounded-full bg-accent flex items-center justify-center text-accent-foreground hover:opacity-90">
+                <button
+                  onClick={handlePlayAudio}
+                  className="flex-shrink-0 w-12 h-12 rounded-full bg-accent flex items-center justify-center text-accent-foreground hover:opacity-90"
+                >
                   <Volume2 className="w-6 h-6" />
                 </button>
-                <p className="text-xl font-semibold text-foreground">
-                  I walk and she swims
-                </p>
+                <button
+                  onClick={handlePlayAudioSlow}
+                  className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center text-foreground hover:opacity-90"
+                  aria-label="Play slow audio"
+                >
+                  <Turtle className="w-6 h-6" />
+                </button>
+                <div className="text-xl font-semibold text-foreground">
+                  {ARABIC_PARTS.map((part, idx) => (
+                    <span key={idx}>
+                      {part.pronunciation ? (
+                        <ArabicTooltip
+                          text={part.text}
+                          pronunciation={part.pronunciation}
+                        />
+                      ) : (
+                        part.text
+                      )}
+                    </span>
+                  ))}
+                </div>
               </div>
 
               {/* Image for context */}
@@ -133,8 +194,11 @@ export default function SentenceMakingLesson() {
             </div>
 
             {/* Selected Words Area */}
-            <div className="min-h-[80px] bg-card rounded-2xl border-2 border-border p-4">
-              <div className="flex flex-wrap gap-2">
+            <div
+              className="min-h-[80px] bg-card rounded-2xl border-2 border-border p-4"
+              dir="rtl"
+            >
+              <div className="flex flex-wrap gap-2 justify-start">
                 {selectedWords.map((word, index) => (
                   <motion.button
                     key={index}
