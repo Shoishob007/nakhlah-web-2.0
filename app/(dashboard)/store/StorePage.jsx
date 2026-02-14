@@ -1,705 +1,187 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  BookOpen,
-  Zap,
-  Calendar,
-  TrendingUp,
-  Check,
-  Lock,
-  Sparkles,
-  Music,
-  Brain,
-  Clock,
-  Flame,
-  CreditCard,
-  Wallet,
-  ArrowLeft,
-  Home,
-  Star,
-  Mail,
-  User,
-} from "lucide-react";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crown } from "@/components/icons/Crown";
-import { Mascot } from "@/components/nakhlah/Mascot";
-
-const premiumFeatures = [
-  {
-    id: 1,
-    name: "Unlimited Diamonds",
-    description: "Get unlimited amount of diamonds to unlock premium content",
-    icon: BookOpen,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-  },
-  {
-    id: 2,
-    name: "Lessons Reminder",
-    description: "Get daily lesson reminders to keep on track of learning",
-    icon: Calendar,
-    iconBg: "bg-orange-100",
-    iconColor: "text-orange-600",
-  },
-  {
-    id: 3,
-    name: "Learning Calendar",
-    description:
-      "Visualizing your streak, practicing and activities in calendar",
-    icon: Calendar,
-    iconBg: "bg-green-100",
-    iconColor: "text-green-600",
-  },
-  {
-    id: 4,
-    name: "Boost Your XP",
-    description: "Unlock more XP from every single lesson finished",
-    icon: Zap,
-    iconBg: "bg-yellow-100",
-    iconColor: "text-yellow-600",
-  },
-  {
-    id: 5,
-    name: "Learning E-Book",
-    description: "Unlock all e-books to boost your learning experience",
-    icon: BookOpen,
-    iconBg: "bg-purple-100",
-    iconColor: "text-purple-600",
-  },
-  {
-    id: 6,
-    name: "Learn Better",
-    description: "Get learning progress to improve your learning",
-    icon: TrendingUp,
-    iconBg: "bg-pink-100",
-    iconColor: "text-pink-600",
-  },
-  {
-    id: 7,
-    name: "No Waiting Time",
-    description: "Get your quiz result without any waiting time",
-    icon: Clock,
-    iconBg: "bg-indigo-100",
-    iconColor: "text-indigo-600",
-  },
-  {
-    id: 8,
-    name: "Free and No ads",
-    description: "Enjoy learning with no interruptions from ads",
-    icon: Flame,
-    iconBg: "bg-red-100",
-    iconColor: "text-red-600",
-  },
-];
-
-const subscriptionPlans = [
-  {
-    id: "1month",
-    duration: "1 Month",
-    price: "$10.00",
-    savePercent: null,
-  },
-  {
-    id: "3months",
-    duration: "3 Months",
-    price: "Save over 40%",
-    originalPrice: "$30.00",
-    actualPrice: "$25.00",
-    savePercent: "40%",
-  },
-  {
-    id: "6months",
-    duration: "6 Months",
-    price: "Save over 45%",
-    originalPrice: "$60.00",
-    actualPrice: "$45.00",
-    savePercent: "45%",
-    popular: true,
-  },
-  {
-    id: "12months",
-    duration: "12 Months",
-    price: "Save over 50%",
-    originalPrice: "$120.00",
-    actualPrice: "$80.00",
-    savePercent: "50%",
-  },
-];
-
-const paymentMethods = [
-  {
-    id: "paypal",
-    name: "PayPal",
-    logo: "https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg",
-    fields: ["email"],
-  },
-  {
-    id: "googlepay",
-    name: "Google Pay",
-    logo: "https://www.gstatic.com/instantbuy/svg/dark_gpay.svg",
-    fields: ["email"],
-  },
-  {
-    id: "applepay",
-    name: "Apple Pay",
-    logo: "https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg",
-    fields: ["email"],
-  },
-  {
-    id: "mastercard",
-    name: "Mastercard",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
-    fields: ["cardNumber", "cardName", "expiry", "cvv"],
-  },
-  {
-    id: "visa",
-    name: "Visa",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg",
-    fields: ["cardNumber", "cardName", "expiry", "cvv"],
-  },
-  {
-    id: "amex",
-    name: "American Express",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg",
-    fields: ["cardNumber", "cardName", "expiry", "cvv"],
-  },
-];
+import { GemStone } from "@/components/icons/Gem";
+import { Sparkles, Gem, Crown as CrownIcon } from "lucide-react";
+import GemsPurchase from "./GemsPurchase.jsx";
+import PremiumSubscription from "./PremiumSubscription";
 
 export default function StorePage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedPlan, setSelectedPlan] = useState("6months");
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [paymentData, setPaymentData] = useState({
-    email: "",
-    cardNumber: "",
-    cardName: "",
-    expiry: "",
-    cvv: "",
-  });
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
-
-  const handleNext = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handlePaymentSubmit = (e) => {
-    e.preventDefault();
-    setCurrentStep(4);
-  };
-
-  const handleInputChange = (field, value) => {
-    setPaymentData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const formatCardNumber = (value) => {
-    const cleaned = value.replace(/\s/g, "");
-    const formatted = cleaned.match(/.{1,4}/g);
-    return formatted ? formatted.join(" ") : cleaned;
-  };
-
-  const formatExpiry = (value) => {
-    const cleaned = value.replace(/\D/g, "");
-    if (cleaned.length >= 2) {
-      return cleaned.slice(0, 2) + "/" + cleaned.slice(2, 4);
-    }
-    return cleaned;
-  };
+  const [selectedOption, setSelectedOption] = useState(null); // null, 'gems', 'premium'
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header - Always visible */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 text-center md:text-left"
+          className="mb-8"
         >
-          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
               Store
             </h1>
-            <Crown />
+            <Crown size="lg" className="text-accent" />
           </div>
           <p className="text-muted-foreground">
             Unlock your full learning potential with exclusive features
           </p>
         </motion.div>
 
-        {/* Step 1: Get a better & Features */}
-        {currentStep === 1 && (
+        {/* Show selection cards when no option is selected */}
+        {selectedOption === null && (
           <motion.div
-            key="step1"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
           >
-            {/* Hero Card */}
-            <div className="relative overflow-hidden rounded-3xl bg-accent p-6 md:p-8 text-center shadow-lg">
-              <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
-                {/* Mascot */}
-                <div className="flex-shrink-0">
-                  <Mascot mood="excited" size="xl" message="Let's level up!" />
-                </div>
-
-                {/* Text Content */}
-                <div className="flex-1 max-w-2xl">
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                    Get a better & super fast learning up to 5x
-                  </h2>
-                  <p className="text-white/90 text-sm md:text-base">
-                    Unlock all premium channels and accelerate your learning
-                    journey with exclusive content
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Features Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-              {premiumFeatures.map((feature, index) => (
-                <div
-                  key={feature.id}
-                  className="flex flex-row md:flex-col items-center md:items-center gap-4 p-3 md:p-6 rounded-xl md:rounded-2xl bg-card border border-border transition-all duration-300 text-left md:text-center group hover:border-accent/50"
-                >
-                  {/* Responsive Icon Container */}
-                  <div
-                    className={`shrink-0 p-3 md:p-4 rounded-xl md:rounded-2xl ${feature.iconBg} shadow-sm group-hover:shadow-md transition-shadow`}
-                  >
-                    <feature.icon
-                      className={`w-5 h-5 md:w-8 md:h-8 ${feature.iconColor}`}
-                    />
-                  </div>
-
-                  {/* Text Content */}
-                  <div className="flex-1">
-                    <p className="font-bold text-foreground text-sm md:text-base mb-0.5 md:mb-2 leading-tight">
-                      {feature.name}
-                    </p>
-                    <p className="text-xs md:text-sm text-muted-foreground leading-snug md:leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 max-w-2xl mx-auto">
-              <Button
-                className="w-full max-w-md bg-accent hover:bg-accent/90 text-accent-foreground"
-                onClick={handleNext}
-              >
-                Go Premium Now
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 sm:flex-none"
-                onClick={() => router.push("/")}
-              >
-                No, Thanks
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 2: Subscription Plans */}
-        {currentStep === 2 && (
-          <motion.div
-            key="step2"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-8"
-          >
-            {/* Back Button */}
-            <Button variant="ghost" onClick={handleBack} className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-
-            <motion.div variants={itemVariants} className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Choose a subscription plan
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                What would you like to do?
               </h2>
-              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-                Select the perfect plan for your learning journey and save more
-                with longer subscriptions
+              <p className="text-muted-foreground text-sm">
+                Choose between purchasing gems or upgrading to premium
               </p>
-            </motion.div>
+            </div>
 
-            {/* Plans Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {subscriptionPlans.map((plan, index) => (
-                <button
-                  key={plan.id}
-                  onClick={() => setSelectedPlan(plan.id)}
-                  className={`relative p-6 rounded-2xl border-2 transition-all text-center shadow-md hover:shadow-2xl ${
-                    selectedPlan === plan.id
-                      ? "border-accent bg-gradient-to-br from-accent/10 via-accent/5 to-accent/10 shadow-xl"
-                      : "border-border bg-card hover:border-accent/30"
-                  } ${plan.popular ? "lg:scale-110" : ""}`}
-                >
-                  {plan.popular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white border-0 shadow-lg px-4 py-1">
-                      <Star className="w-3 h-3 mr-1 inline" /> Most Popular
-                    </Badge>
-                  )}
-
-                  <div className="space-y-4 pt-2">
-                    <div
-                      className={`w-16 h-16 mx-auto rounded-full border-3 flex items-center justify-center transition-all ${
-                        selectedPlan === plan.id
-                          ? "border-accent bg-accent scale-110"
-                          : "border-border bg-muted"
-                      }`}
-                    >
-                      {selectedPlan === plan.id ? (
-                        <Check className="w-8 h-8 text-white" strokeWidth={3} />
-                      ) : (
-                        <Crown
-                          className={`w-8 h-8 ${selectedPlan === plan.id ? "text-white" : "text-muted-foreground"}`}
-                        />
-                      )}
+            <div className="grid md:grid-cols-2 gap-4 max-w-4xl">
+              {/* Gems Purchase Card */}
+              <motion.button
+                onClick={() => setSelectedOption("gems")}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="relative group rounded-xl bg-card border border-border hover:border-accent p-6 text-left shadow-sm hover:shadow-md transition-all"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <GemStone size="md" className="text-accent" />
                     </div>
-
-                    <div>
-                      <p className="font-bold text-foreground text-xl mb-1">
-                        {plan.duration}
-                      </p>
-                      {plan.savePercent && (
-                        <p className="text-sm text-accent font-semibold mb-2">
-                          {plan.price}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="py-4 border-t border-border">
-                      {plan.actualPrice ? (
-                        <>
-                          <p className="text-sm text-muted-foreground line-through mb-1">
-                            {plan.originalPrice}
-                          </p>
-                          <p className="text-3xl md:text-4xl font-bold text-accent">
-                            {plan.actualPrice}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="text-3xl md:text-4xl font-bold text-foreground">
-                          {plan.price}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        per billing cycle
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-foreground mb-1">
+                        Buy Gems
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        Purchase gems to unlock specific content
                       </p>
                     </div>
                   </div>
-                </button>
-              ))}
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-center pt-4">
-              <Button
-                className="w-full max-w-md bg-accent hover:bg-accent/90 text-accent-foreground"
-                onClick={handleNext}
-              >
-                Continue to Payment
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 3: Payment Method */}
-        {currentStep === 3 && (
-          <motion.div
-            key="step3"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-8"
-          >
-            {/* Back Button */}
-            <Button variant="ghost" onClick={handleBack} className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-
-            <motion.div variants={itemVariants} className="text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                Select payment method
-              </h2>
-              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-                Choose your preferred payment option to complete your
-                subscription
-              </p>
-            </motion.div>
-
-            {/* Payment Methods Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto px-2">
-              {paymentMethods.map((method) => (
-                <button
-                  key={method.id}
-                  onClick={() => setSelectedPayment(method.id)}
-                  className={`relative p-3 sm:p-6 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-lg min-h-[110px] sm:min-h-[140px] ${
-                    selectedPayment === method.id
-                      ? "border-accent bg-gradient-to-br from-accent/10 via-accent/5 to-accent/10 shadow-md scale-[1.02] sm:scale-105"
-                      : "border-border bg-card hover:border-accent/30"
-                  }`}
-                >
-                  {selectedPayment === method.id && (
-                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-accent flex items-center justify-center shadow-lg">
-                      <Check
-                        className="w-3 h-3 sm:w-4 sm:h-4 text-white"
-                        strokeWidth={3}
-                      />
-                    </div>
-                  )}
-
-                  <div className="w-full flex items-center justify-center">
-                    <img
-                      src={method.logo}
-                      alt={method.name}
-                      // Reduced logo size for mobile
-                      className="max-w-[50px] max-h-[50px] sm:max-w-[80px] sm:max-h-[80px] object-contain"
-                    />
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-md">
+                      Instant Access
+                    </span>
+                    <span className="px-2 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-md">
+                      One-Time
+                    </span>
+                    <span className="px-2 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-md">
+                      4 Packages
+                    </span>
                   </div>
 
-                  <span className="font-semibold text-foreground text-xs sm:text-sm text-center leading-tight">
-                    {method.name}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* Payment Form */}
-            <AnimatePresence mode="wait">
-              {selectedPayment && (
-                <motion.form
-                  key={selectedPayment}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  onSubmit={handlePaymentSubmit}
-                  className="max-w-2xl mx-auto bg-card border border-border rounded-2xl p-6 md:p-8 shadow-lg"
-                >
-                  <h3 className="text-xl font-bold text-foreground mb-6">
-                    Enter{" "}
-                    {paymentMethods.find((m) => m.id === selectedPayment)?.name}{" "}
-                    Details
-                  </h3>
-
-                  <div className="space-y-5">
-                    {/* Email field for digital wallets */}
-                    {["paypal", "googlepay", "applepay"].includes(
-                      selectedPayment,
-                    ) && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                          <Mail className="w-4 h-4" />
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={paymentData.email}
-                          onChange={(e) =>
-                            handleInputChange("email", e.target.value)
-                          }
-                          placeholder="your.email@example.com"
-                          className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <span className="text-sm text-muted-foreground">
+                      From $2
+                    </span>
+                    <div className="inline-flex items-center gap-1 text-accent text-sm font-semibold">
+                      <span>Select</span>
+                      <svg
+                        className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
                         />
-                      </div>
-                    )}
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </motion.button>
 
-                    {/* Card fields for credit/debit cards */}
-                    {["mastercard", "visa", "amex"].includes(
-                      selectedPayment,
-                    ) && (
-                      <>
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                            <CreditCard className="w-4 h-4" />
-                            Card Number
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={paymentData.cardNumber}
-                            onChange={(e) => {
-                              const formatted = formatCardNumber(
-                                e.target.value,
-                              );
-                              if (formatted.replace(/\s/g, "").length <= 16) {
-                                handleInputChange("cardNumber", formatted);
-                              }
-                            }}
-                            placeholder="1234 5678 9012 3456"
-                            maxLength={19}
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all font-mono"
-                          />
-                        </div>
+              {/* Premium Subscription Card */}
+              <motion.button
+                onClick={() => setSelectedOption("premium")}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="relative group rounded-xl bg-card border border-border hover:border-primary p-6 text-left shadow-sm hover:shadow-md transition-all"
+              >
+                {/* Popular badge */}
+                <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-md">
+                  RECOMMENDED
+                </div>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            Cardholder Name
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={paymentData.cardName}
-                            onChange={(e) =>
-                              handleInputChange("cardName", e.target.value)
-                            }
-                            placeholder="John Doe"
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-foreground">
-                              Expiry Date
-                            </label>
-                            <input
-                              type="text"
-                              required
-                              value={paymentData.expiry}
-                              onChange={(e) => {
-                                const formatted = formatExpiry(e.target.value);
-                                if (formatted.length <= 5) {
-                                  handleInputChange("expiry", formatted);
-                                }
-                              }}
-                              placeholder="MM/YY"
-                              maxLength={5}
-                              className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all font-mono"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                              <Lock className="w-4 h-4" />
-                              CVV
-                            </label>
-                            <input
-                              type="text"
-                              required
-                              value={paymentData.cvv}
-                              onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, "");
-                                if (value.length <= 4) {
-                                  handleInputChange("cvv", value);
-                                }
-                              }}
-                              placeholder="123"
-                              maxLength={4}
-                              className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all font-mono"
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Crown size="md" className="text-primary" />
+                    </div>
+                    <div className="flex-1 pr-20">
+                      <h3 className="text-xl font-bold text-foreground mb-1">
+                        Go Premium
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        Unlimited access to all premium features
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    className="w-full mt-8 bg-accent hover:bg-accent/90 text-accent-foreground py-6 text-lg font-semibold"
-                  >
-                    <Check className="w-5 h-5 mr-2" />
-                    Confirm Payment
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-md">
+                      Unlimited
+                    </span>
+                    <span className="px-2 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-md">
+                      No Ads
+                    </span>
+                    <span className="px-2 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-md">
+                      All Features
+                    </span>
+                  </div>
 
-                  {/* Security Note */}
-                  <p className="text-xs text-muted-foreground text-center mt-4 flex items-center justify-center gap-2">
-                    <Lock className="w-3 h-3" />
-                    Your payment information is secure and encrypted
-                  </p>
-                </motion.form>
-              )}
-            </AnimatePresence>
-
-            {/* Continue without form (if no payment selected) */}
-            {!selectedPayment && (
-              <div className="flex justify-center pt-4">
-                <p className="text-muted-foreground text-center">
-                  Please select a payment method to continue
-                </p>
-              </div>
-            )}
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <span className="text-sm text-muted-foreground">
+                      From $10/mo
+                    </span>
+                    <div className="inline-flex items-center gap-1 text-primary text-sm font-semibold">
+                      <span>Select</span>
+                      <svg
+                        className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </motion.button>
+            </div>
           </motion.div>
         )}
 
-        {/* Step 4: Success */}
-        {currentStep === 4 && (
-          <motion.div
-            key="step4"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-8 text-center py-12 max-w-3xl mx-auto"
-          >
-            <div className="space-y-6">
-              <div className="flex justify-center mb-8">
-                <Mascot mood="proud" size="xxxl" message="You're awesome!" />
-              </div>
-              <div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                  Payment successful!
-                </h2>
-                <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-                  Congratulations on your purchase! Your premium subscription is
-                  now live & active. You can use all exclusive features whenever
-                  you need. Enjoy your enhanced learning journey!
-                </p>
-              </div>
-            </div>
+        {/* Show Gems Purchase Flow */}
+        {selectedOption === "gems" && (
+          <GemsPurchase onBack={() => setSelectedOption(null)} />
+        )}
 
-            <div className="pt-8">
-              <Button
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                onClick={() => router.push("/")}
-              >
-                <Home className="w-4 h-4 mr-2" />
-                Go to Home
-              </Button>
-            </div>
-          </motion.div>
+        {/* Show Premium Subscription Flow */}
+        {selectedOption === "premium" && (
+          <PremiumSubscription onBack={() => setSelectedOption(null)} />
         )}
       </div>
     </div>

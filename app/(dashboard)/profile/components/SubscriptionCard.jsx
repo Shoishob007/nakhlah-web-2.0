@@ -1,12 +1,15 @@
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function SubscriptionCard() {
+    const router = useRouter();
+  
   return (
     <div className="rounded-2xl bg-card shadow-lg border border-border overflow-hidden p-6">
       <div className="">
         <h3 className="text-xl font-semibold flex items-center gap-2 mb-6">
-          <Crown className="w-5 h-5" />
+          {/* <Crown className="w-5 h-5" /> */}
           Go Pro
         </h3>
       </div>
@@ -18,7 +21,7 @@ export default function SubscriptionCard() {
           <h5 className="font-medium mb-1">What You Get</h5>
           <p>Unlimited lessons, no ads, and exclusive content</p>
         </div>
-        <Button className="w-full bg-gradient-accent hover:bg-gradient-accent/90 text-accent-foreground">
+        <Button onClick={() => router.push("/store")} className="w-full text-accent-foreground">
           Upgrade to Pro
         </Button>
       </div>

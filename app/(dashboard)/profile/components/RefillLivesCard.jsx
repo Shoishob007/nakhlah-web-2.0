@@ -1,12 +1,15 @@
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function RefillLivesCard() {
+    const router = useRouter();
+  
   return (
     <div className="rounded-2xl bg-card shadow-lg border border-border overflow-hidden p-6">
       <div className="">
         <h3 className="text-xl font-semibold flex items-center gap-2 mb-6">
-          <Heart className="w-5 h-5 text-destructive" />
+          {/* <Heart className="w-5 h-5 text-destructive" /> */}
           Refill Lives
         </h3>
       </div>
@@ -21,10 +24,10 @@ export default function RefillLivesCard() {
           </p>
         </div>
         <div className="grid gap-2">
-          <Button variant="outline" className="w-full">
+          <Button onClick={() => router.push("/store/gems")} variant="outline" className="w-full">
             Refill with Gems
           </Button>
-          <Button className="w-full bg-gradient-accent hover:bg-gradient-accent/90 text-accent-foreground">
+          <Button onClick={() => router.push("/store")} className="w-full text-accent-foreground">
             Go Pro (Unlimited)
           </Button>
         </div>

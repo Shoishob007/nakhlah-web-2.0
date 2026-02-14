@@ -2,6 +2,7 @@ import { ZigzagPath } from "./components/ZigzagPath";
 import { UserStats } from "./components/UserStats";
 import { DailyQuests } from "./components/DailyQuests";
 import { ProfileSection } from "./components/ProfileSection";
+import { LeaderboardCard } from "./components/LeaderboardCard";
 import { Star } from "@/components/icons/Star";
 import { Medal } from "@/components/icons/Medal";
 import { Trophy } from "@/components/icons/Trophy";
@@ -286,10 +287,11 @@ export default function LearnPage() {
 
           {/* Right side: Sticky Sidebar */}
           <div
-            className={`hidden lg:block lg:w-1/3 space-y-8 lg:sticky ${stickyTopOffset} h-fit max-w-sm ml-auto`}
+            className={`hidden lg:block lg:w-1/3 space-y-6 lg:h-[calc(100vh_-_64px)] lg:overflow-y-auto no-scrollbar lg:sticky ${stickyTopOffset} h-fit max-w-sm ml-auto`}
           >
             <UserStats />
             <DailyQuests />
+            <LeaderboardCard />
             <ProfileSection />
           </div>
         </div>
