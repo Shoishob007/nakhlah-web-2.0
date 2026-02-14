@@ -15,7 +15,7 @@ export default function ShareProfile({ onShare }) {
         </p>
         <Button 
           onClick={onShare}
-          className="w-full bg-gradient-accent hover:bg-gradient-accent/90 text-accent-foreground"
+          className="w-full text-accent-foreground"
         >
           <Share2 className="w-4 h-4 mr-2" />
           Share Now

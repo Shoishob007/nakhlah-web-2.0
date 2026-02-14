@@ -1,5 +1,5 @@
-import StorePage from "./StorePage";
+import PremiumSubscription from "./PremiumSubscription";
 
 export default function Page() {
-  return <StorePage />;
+  return <PremiumSubscription />;
 }
