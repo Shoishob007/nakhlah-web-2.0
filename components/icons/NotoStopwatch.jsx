@@ -2,6 +2,7 @@ import React from 'react';
 
 export function NotoStopwatch({ size = "md", ...props }) {
   const sizeMap = {
+    xs:20,
     sm: 24,
     md: 36,
     lg: 48,
