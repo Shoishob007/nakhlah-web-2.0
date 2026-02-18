@@ -1,8 +1,10 @@
 "use client";
 
+import { BookOpen } from "@/components/icons/BookOpen";
+import { Lock } from "@/components/icons/Lock";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { X, Lock, BookOpen } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // Mock data structure - you can replace this with actual data
@@ -90,14 +92,12 @@ export function LessonSelectionPopup({
         ? "Complete lessons to unlock more content"
         : "Complete previous nodes to unlock";
   const lessons = hasApiLessonId
-    ? [
-        {
-          id: lessonId,
-          title: "Lesson",
-          isLocked,
-          isCompleted,
-        },
-      ]
+    ? Array.from({ length: 4 }, (_, index) => ({
+        id: `${lessonId}-${index + 1}`,
+        title: `Lesson ${index + 1}`,
+        isLocked: index === 0 ? isLocked : true,
+        isCompleted: false,
+      }))
     : getLessonsForNode(nodeId, isCompleted, isCurrent, isLocked);
 
   const handleLessonClick = (lesson) => {
@@ -125,7 +125,7 @@ export function LessonSelectionPopup({
             <X className="w-6 h-6" />
           </button>
           <DialogTitle className="text-2xl font-bold text-accent-foreground">
-            {hasApiLessonId ? "Start Lesson" : "Choose a Lesson"}
+            {hasApiLessonId ? "Choose a Lesson" : "Choose a Lesson"}
           </DialogTitle>
           <p className="text-accent-foreground/90 text-sm mt-1">
             {hasApiLessonId
@@ -142,7 +142,7 @@ export function LessonSelectionPopup({
 
         {/* Lessons Grid */}
         <div className="p-8">
-          <div className={hasApiLessonId ? "grid grid-cols-1 gap-4" : "grid grid-cols-2 gap-4"}>
+          <div className={hasApiLessonId ? "grid grid-cols-2 gap-4" : "grid grid-cols-2 gap-4"}>
             {lessons.map((lesson, index) => {
               return (
                 <motion.button
@@ -167,7 +167,7 @@ export function LessonSelectionPopup({
                   {/* Lock Icon Overlay */}
                   {lesson.isLocked && (
                     <div className="absolute top-2 right-2 z-10">
-                      <Lock className="w-6 h-6 text-muted-foreground" />
+                      <Lock size="md" />
                     </div>
                   )}
 
@@ -180,11 +180,11 @@ export function LessonSelectionPopup({
                         ? "bg-muted text-muted-foreground"
                         : lesson.isCompleted
                           ? "bg-accent text-accent-foreground"
-                          : "bg-accent/20 text-accent"
+                          : "text-accent"
                     }
                   `}
                   >
-                    <BookOpen className="w-8 h-8" />
+                    <BookOpen size="lg"/>
                   </div>
 
                   {/* Lesson Title */}
@@ -194,7 +194,7 @@ export function LessonSelectionPopup({
                     ${lesson.isLocked ? "text-muted-foreground" : "text-foreground"}
                   `}
                   >
-                    {hasApiLessonId ? "Start" : lesson.title}
+                    {lesson.title}
                   </p>
                 </motion.button>
               );

@@ -88,7 +88,7 @@ export function ZigzagPath({ lessons, levels, mascots }) {
         >
           <div>
             <div className="text-2xl font-bold">
-              {currentLevel ? `Lesson ${currentLevel.id}` : ""}
+              {currentLevel ? `Unit ${currentLevel.id}` : ""}
             </div>
             <div>{currentLevel ? currentLevel.name : ""}</div>
           </div>

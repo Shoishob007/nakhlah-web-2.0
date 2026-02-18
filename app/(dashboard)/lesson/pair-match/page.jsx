@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { GemStone } from "@/components/icons/Gem";
+import LessonHeader from "../../components/LessonHeader";
 import LeavingDialog from "../leaving/page";
 import { LessonResultHandler } from "../../components/ResultHandler";
 
@@ -12,7 +11,7 @@ const QUESTIONS = [
   {
     id: 1,
     audio: "/mp3/kaifa_haluka_df7cdf2652.mp3",
-    title: "Match Arabic with English",
+    title: "Match Arabic & English",
     leftWords: [
       { id: 1, text: "ٱلسَّلَامُ عَلَيْكُمْ", matched: false },
       { id: 2, text: "وَعَلَيْكُمُ ٱلسَّلَامُ", matched: false },
@@ -40,6 +39,7 @@ export default function PairMatchLesson() {
   const [selectedRight, setSelectedRight] = useState(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
+  const [lives] = useState(5);
   const [leftState, setLeftState] = useState(QUESTIONS[0].leftWords);
   const [rightState, setRightState] = useState(QUESTIONS[0].rightWords);
   const [incorrectPairs, setIncorrectPairs] = useState([]);
@@ -127,31 +127,13 @@ export default function PairMatchLesson() {
 
   return (
     <div className="min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col">
-      {/* Header - EXACTLY like MCQ */}
-      <div className="border-b border-border">
-        <div className="container max-w-4xl mx-auto px-4 py-4 sm:py-6">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <button
-              onClick={() => setShowExitDialog(true)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-            <div className="flex-1 h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
-              <div
-                className="h-full bg-accent transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <GemStone size="sm" className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-accent font-bold text-sm sm:text-base">
-                100
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <LessonHeader
+        progressPercentage={progressPercentage}
+        onExit={() => setShowExitDialog(true)}
+        initialElapsedSeconds={0}
+        lives={lives}
+        maxLives={5}
+      />
 
       {/* Exit Dialog */}
       {showExitDialog && (
@@ -161,13 +143,13 @@ export default function PairMatchLesson() {
       )}
 
       {/* Main Content - EXACTLY like MCQ spacing */}
-      <div className="flex-1 flex items-center justify-center p-3 sm:p-4">
+      <div className="flex-1 flex items-start justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden">
         <div className="w-full max-w-4xl mx-auto">
           <motion.div
             key={currentQuestionIndex}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4 sm:space-y-6"
+            className="space-y-3 sm:space-y-4 overflow-x-hidden"
           >
             {/* Title - Same positioning as MCQ audio button & title */}
             <div>
@@ -177,14 +159,14 @@ export default function PairMatchLesson() {
             </div>
 
             {/* Matching Grid - Equal width columns for pair matching */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
               {/* Left Column - Arabic */}
               <div className="w-full">
-                <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-3 sm:mb-4 text-center">
+                <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-3 sm:p-4 max-h-[330px] lg:max-h-[360px] flex flex-col overflow-hidden">
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground mb-2 sm:mb-3 text-center">
                     Arabic
                   </h3>
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-2 sm:space-y-3 overflow-y-auto pr-1">
                     {leftState.map((item, index) => {
                       const isSelected = selectedLeft?.id === item.id;
                       const isMatched = item.matched;
@@ -200,7 +182,7 @@ export default function PairMatchLesson() {
                           transition={{ delay: index * 0.05 }}
                           onClick={() => handleLeftClick(item)}
                           disabled={isMatched}
-                          className={`w-full p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-[60px] sm:min-h-[70px] ${
+                          className={`w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-[50px] sm:min-h-[58px] ${
                             isMatched
                               ? "border-green-500 bg-green-500/10 text-green-600"
                               : isIncorrect
@@ -222,11 +204,11 @@ export default function PairMatchLesson() {
 
               {/* Right Column - English */}
               <div className="w-full">
-                <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-3 sm:mb-4 text-center">
+                <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-3 sm:p-4 max-h-[330px] lg:max-h-[360px] flex flex-col overflow-hidden">
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground mb-2 sm:mb-3 text-center">
                     English
                   </h3>
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-2 sm:space-y-3 overflow-y-auto pr-1">
                     {rightState.map((item, index) => {
                       const isSelected = selectedRight?.id === item.id;
                       const isMatched = item.matched;
@@ -242,7 +224,7 @@ export default function PairMatchLesson() {
                           transition={{ delay: index * 0.05 }}
                           onClick={() => handleRightClick(item)}
                           disabled={isMatched}
-                          className={`w-full p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-[60px] sm:min-h-[70px] ${
+                          className={`w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-h-[50px] sm:min-h-[58px] ${
                             isMatched
                               ? "border-green-500 bg-green-500/10 text-green-600"
                               : isIncorrect
@@ -264,7 +246,7 @@ export default function PairMatchLesson() {
             </div>
 
             {/* Progress Text - Similar to MCQ */}
-            <div className="text-center text-sm sm:text-base text-muted-foreground">
+            <div className="text-center text-sm sm:text-base text-muted-foreground mt-3 pb-1 sm:pb-2">
               {matchedCount} of {leftState.length} pairs correctly matched
             </div>
           </motion.div>
@@ -272,7 +254,7 @@ export default function PairMatchLesson() {
       </div>
 
       {/* Bottom Action - EXACTLY like MCQ */}
-      <div className="">
+      <div className="shrink-0">
         <LessonResultHandler
           isCorrect={isCorrect}
           correctAnswer={
