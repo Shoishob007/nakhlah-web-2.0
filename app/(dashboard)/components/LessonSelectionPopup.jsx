@@ -1,8 +1,10 @@
 "use client";
 
+import { BookOpen } from "@/components/icons/BookOpen";
+import { Lock } from "@/components/icons/Lock";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { X, Lock, BookOpen } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // Mock data structure - you can replace this with actual data
@@ -76,20 +78,38 @@ export function LessonSelectionPopup({
   isLocked,
   onClose,
   open,
+  lessonId,
 }) {
   const router = useRouter();
-  const lessons = getLessonsForNode(nodeId, isCompleted, isCurrent, isLocked);
+  const hasApiLessonId = Boolean(lessonId);
+  const footerText = hasApiLessonId
+    ? isLocked
+      ? "Complete previous lessons to unlock"
+      : ""
+    : isCompleted
+      ? "All lessons are available to practice"
+      : isCurrent
+        ? "Complete lessons to unlock more content"
+        : "Complete previous nodes to unlock";
+  const lessons = hasApiLessonId
+    ? Array.from({ length: 4 }, (_, index) => ({
+        id: `${lessonId}-${index + 1}`,
+        title: `Lesson ${index + 1}`,
+        isLocked: index === 0 ? isLocked : true,
+        isCompleted: false,
+      }))
+    : getLessonsForNode(nodeId, isCompleted, isCurrent, isLocked);
 
   const handleLessonClick = (lesson) => {
     if (lesson.isLocked) return;
 
     // Store the selected lesson info in sessionStorage
-    sessionStorage.setItem("selectedLessonId", lesson.id);
+    // Use lessonId if provided (from actual API), otherwise fall back to lesson.id (mock data)
+    const actualLessonId = lessonId || lesson.id;
+    sessionStorage.setItem("selectedLessonId", actualLessonId);
     sessionStorage.setItem("selectedNodeId", nodeId);
-    sessionStorage.setItem("currentLessonIndex", "0"); // Start from first lesson type
 
-    // Navigate to loading page - will start the lesson sequence
-    router.push("/lesson/loading");
+    router.push("/lesson");
     onClose();
   };
 
@@ -105,20 +125,24 @@ export function LessonSelectionPopup({
             <X className="w-6 h-6" />
           </button>
           <DialogTitle className="text-2xl font-bold text-accent-foreground">
-            Choose a Lesson
+            {hasApiLessonId ? "Choose a Lesson" : "Choose a Lesson"}
           </DialogTitle>
           <p className="text-accent-foreground/90 text-sm mt-1">
-            {isCompleted
-              ? "All lessons unlocked"
-              : isCurrent
-                ? "Start learning"
-                : "Complete previous lessons first"}
+            {hasApiLessonId
+              ? isLocked
+                ? "Lesson is locked"
+                : "Tap to begin"
+              : isCompleted
+                ? "All lessons unlocked"
+                : isCurrent
+                  ? "Start learning"
+                  : "Complete previous lessons first"}
           </p>
         </div>
 
         {/* Lessons Grid */}
         <div className="p-8">
-          <div className="grid grid-cols-2 gap-4">
+          <div className={hasApiLessonId ? "grid grid-cols-2 gap-4" : "grid grid-cols-2 gap-4"}>
             {lessons.map((lesson, index) => {
               return (
                 <motion.button
@@ -143,7 +167,7 @@ export function LessonSelectionPopup({
                   {/* Lock Icon Overlay */}
                   {lesson.isLocked && (
                     <div className="absolute top-2 right-2 z-10">
-                      <Lock className="w-6 h-6 text-muted-foreground" />
+                      <Lock size="md" />
                     </div>
                   )}
 
@@ -156,11 +180,11 @@ export function LessonSelectionPopup({
                         ? "bg-muted text-muted-foreground"
                         : lesson.isCompleted
                           ? "bg-accent text-accent-foreground"
-                          : "bg-accent/20 text-accent"
+                          : "text-accent"
                     }
                   `}
                   >
-                    <BookOpen className="w-8 h-8" />
+                    <BookOpen size="lg"/>
                   </div>
 
                   {/* Lesson Title */}
@@ -178,13 +202,11 @@ export function LessonSelectionPopup({
           </div>
 
           {/* Info Text */}
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            {isCompleted
-              ? "All lessons are available to practice"
-              : isCurrent
-                ? "Complete lessons to unlock more content"
-                : "Complete previous nodes to unlock"}
-          </p>
+          {footerText ? (
+            <p className="text-xs text-muted-foreground text-center mt-6">
+              {footerText}
+            </p>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

@@ -1,37 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Mascot } from "@/components/nakhlah/Mascot";
 import { useRouter } from "next/navigation";
+import LessonLoadingView from "./LessonLoadingView";
 
-// Define the lesson sequence - all lessons will go through these types in order
-const lessonSequence = [
-  "/lesson/mcq",
-  "/lesson/true-false",
-  "/lesson/fill-in-the-blanks",
-  "/lesson/word-making",
-  "/lesson/sentence-making",
-  "/lesson/pair-match",
-];
+const lessonSequence = ["/lesson"];
 
 export default function LessonLoading() {
   const [progress, setProgress] = useState(0);
   const router = useRouter();
+  const [error] = useState(null);
 
   useEffect(() => {
-    // Reset currentLessonIndex to 0 for fresh lesson start
+    const lessonId = sessionStorage.getItem("selectedLessonId")?.trim();
+
+    if (!lessonId) {
+      console.error("No lesson ID found");
+      router.push("/");
+      return;
+    }
+
     sessionStorage.setItem("currentLessonIndex", "0");
+    sessionStorage.setItem("selectedLessonId", lessonId);
 
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          // Navigate to first lesson in the sequence
           setTimeout(() => {
-            // Always start at MCQ (index 0)
-            const route = lessonSequence[0];
-            router.push(route);
+            router.push(lessonSequence[0]);
           }, 500);
           return 100;
         }
@@ -43,50 +40,6 @@ export default function LessonLoading() {
   }, [router]);
 
   return (
-    <div className="min-h-screen sm:min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto text-center">
-        {/* Mascot */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <Mascot mood="proud" size="xxxl" />
-        </motion.div>
-
-        {/* Loading Text */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-2xl font-bold text-accent mb-8"
-        >
-          Loading...
-        </motion.h2>
-
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-accent rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        </div>
-
-        {/* Tip Text */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-sm text-muted-foreground max-w-xs mx-auto"
-        >
-          Complete the course faster to get more XP and Diamonds.
-        </motion.p>
-      </div>
-    </div>
+    <LessonLoadingView progress={progress} error={error} />
   );
 }
