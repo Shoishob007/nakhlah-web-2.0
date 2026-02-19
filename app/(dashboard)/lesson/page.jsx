@@ -416,7 +416,7 @@ export default function LessonPage() {
       <div
         className={`flex-1 flex justify-center p-3 sm:p-4 ${
           questionType === "pair_matching"
-            ? "items-start overflow-y-auto overflow-x-hidden"
+            ? "items-start overflow-x-hidden"
             : "items-center"
         }`}
       >
