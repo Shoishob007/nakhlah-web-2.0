@@ -134,6 +134,74 @@ export async function createUserProfile(profileData, token) {
     }
 }
 
+export async function updateMyProfile(profileDetails, profilePictureFile, token) {
+    try {
+        if (!token) {
+            throw new Error("Missing authentication token");
+        }
+
+        const formData = new FormData();
+        formData.append("data", JSON.stringify(profileDetails || {}));
+
+        if (profilePictureFile) {
+            formData.append("profilePicture", profilePictureFile);
+        }
+
+        const endpoints = API_URL
+            ? [`${API_URL}/api/user-profile/update-me`, `${API_URL}/user-profile/update-me`]
+            : ["/api/user-profile/update-me"];
+
+        let lastError = "Profile update failed";
+
+        for (let index = 0; index < endpoints.length; index += 1) {
+            const endpoint = endpoints[index];
+
+            const response = await fetch(endpoint, {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const rawText = await response.text();
+            let data = null;
+
+            try {
+                data = rawText ? JSON.parse(rawText) : null;
+            } catch {
+                data = null;
+            }
+
+            if (response.ok) {
+                return {
+                    success: true,
+                    profile: data?.doc || data,
+                    message: data?.message || "Profile updated successfully",
+                };
+            }
+
+            const apiMessage = data?.message || rawText || "Profile update failed";
+            lastError = apiMessage;
+
+            const isLastEndpoint = index === endpoints.length - 1;
+            if (!isLastEndpoint && (response.status === 404 || response.status >= 500)) {
+                continue;
+            }
+
+            throw new Error(apiMessage);
+        }
+
+        throw new Error(lastError);
+    } catch (error) {
+        console.error("Profile update error:", error);
+        return {
+            success: false,
+            error: error.message || "Profile update failed",
+        };
+    }
+}
+
 export async function forgotPassword(email) {
     try {
         const response = await fetch(`${API_URL}/api/users/forgot-password`, {

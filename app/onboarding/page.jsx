@@ -11,6 +11,7 @@ import { PurposeStep } from "@/components/nakhlah/onboarding/PurposeStep";
 import { CountryStep } from "@/components/nakhlah/onboarding/CountryStep";
 import { UserSourceStep } from "@/components/nakhlah/onboarding/UserSourceStep";
 import { InterestsStep } from "@/components/nakhlah/onboarding/InterestsStep";
+import { AgeStep } from "@/components/nakhlah/onboarding/AgeStep";
 import { AccountStep } from "@/components/nakhlah/onboarding/AccountStep";
 import { CompletionStep } from "@/components/nakhlah/onboarding/CompletionStep";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -28,11 +29,13 @@ const steps = [
   { id: 4, label: "Country" },
   { id: 5, label: "Source" },
   { id: 6, label: "Interests" },
-  { id: 7, label: "Account" },
-  { id: 8, label: "Ready!" },
+  { id: 7, label: "Age" },
+  { id: 8, label: "Account" },
+  { id: 9, label: "Ready!" },
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const DEFAULT_PROFILE_IMAGE = "https://github.com/shadcn.png";
 
 export default function Onboarding() {
   const router = useRouter();
@@ -43,7 +46,6 @@ export default function Onboarding() {
   const [country, setCountry] = useState("");
   const [userSource, setUserSource] = useState("");
   const [interests, setInterests] = useState([]);
-  const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -105,6 +107,7 @@ export default function Onboarding() {
     const selectedSource = onboardingData?.userSource?.sourceList?.find(
       (item) => item.id === userSource
     );
+    const selectedAge = onboardingData?.age?.ageList?.find((item) => item.id === age);
     const selectedInterests = onboardingData?.interests?.interestList?.filter((item) =>
       interests.includes(item.id)
     );
@@ -114,9 +117,10 @@ export default function Onboarding() {
       selectedPurpose,
       selectedCountry,
       selectedSource,
+      selectedAge,
       selectedInterests,
     };
-  }, [onboardingData, proficiencyLevel, purpose, country, userSource, interests]);
+  }, [onboardingData, proficiencyLevel, purpose, country, userSource, interests, age]);
 
   const canProceed = () => {
     switch (currentStep) {
@@ -133,9 +137,9 @@ export default function Onboarding() {
       case 6:
         return interests.length > 0;
       case 7:
+        return age !== "";
+      case 8:
         return (
-          age !== "" &&
-          name.trim().length >= 2 &&
           email.trim().includes("@") &&
           password.trim().length >= 6
         );
@@ -145,7 +149,7 @@ export default function Onboarding() {
   };
 
   const handleNext = async () => {
-    if (currentStep === 7) {
+    if (currentStep === 8) {
       await handleRegistration();
       return;
     }
@@ -196,7 +200,7 @@ export default function Onboarding() {
         return;
       }
 
-      setCurrentStep(8);
+      setCurrentStep(9);
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("An error occurred during registration");
@@ -217,26 +221,18 @@ export default function Onboarding() {
       return;
     }
 
-    const rawStrength = (selectedValues.strength?.strengthsTitle || "").toLowerCase();
-
-    let languageStrength = "Basic";
-    if (rawStrength.includes("some words") || rawStrength.includes("phrases")) {
-      languageStrength = "Elementary";
-    } else if (rawStrength.includes("simple conversation")) {
-      languageStrength = "Intermediate";
-    } else if (rawStrength.includes("intermediate") || rawStrength.includes("above")) {
-      languageStrength = "Advanced";
-    }
+    const languageStrength = selectedValues.strength?.strengthsTitle || "";
 
     const profileData = {
       onboardInfo: {
-        age: age.toString(),
+        age: selectedValues.selectedAge?.ageTitle || age.toString(),
         country: selectedValues.selectedCountry?.countryName || "",
         purpose: "",
         goalTime: parseInt(dailyGoal) || 10,
         userSource: (selectedValues.selectedSource?.sourceName || "").toLowerCase(),
         languageStrength,
       },
+      profilePictureUrl: DEFAULT_PROFILE_IMAGE,
     };
 
     const profileResult = await createUserProfile(profileData, token);
@@ -255,12 +251,12 @@ export default function Onboarding() {
         country,
         userSource,
         interests,
-        name,
         age,
         email,
         completed: true,
       })
     );
+    localStorage.setItem("nakhlah_profile_prompt_pending", "true");
 
     toast.success("Profile created successfully!");
     router.push("/");
@@ -333,20 +329,25 @@ export default function Onboarding() {
         );
       case 7:
         return (
+          <AgeStep
+            title={onboardingData?.age?.ageTitleTop || "How old are you?"}
+            ages={onboardingData?.age?.ageList || []}
+            selectedAge={age}
+            onSelect={setAge}
+          />
+        );
+      case 8:
+        return (
           <AccountStep
-            name={name}
-            age={age}
             email={email}
-            ageOptions={onboardingData?.age?.ageList || []}
+            password={password}
             onChange={(fields) => {
-              if (fields.name !== undefined) setName(fields.name);
-              if (fields.age !== undefined) setAge(fields.age);
               if (fields.email !== undefined) setEmail(fields.email);
               if (fields.password !== undefined) setPassword(fields.password);
             }}
           />
         );
-      case 8:
+      case 9:
         return (
           <CompletionStep
             language={"arabic"}
