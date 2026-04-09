@@ -1,51 +1,261 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ProgressSteps } from "@/components/nakhlah/ProgressSteps";
 import { ThemeToggle } from "@/components/nakhlah/ThemeToggle";
-import { LanguageStep } from "@/components/nakhlah/onboarding/LanguageStep";
 import { ProficiencyStep } from "@/components/nakhlah/onboarding/ProficiencyStep";
 import { GoalStep } from "@/components/nakhlah/onboarding/GoalStep";
-import { QuizStep } from "@/components/nakhlah/onboarding/QuizStep";
-import { AccountStep } from "@/components/nakhlah/onboarding/AccountStep";
+import { PurposeStep } from "@/components/nakhlah/onboarding/PurposeStep";
+import { CountryStep } from "@/components/nakhlah/onboarding/CountryStep";
 import { UserSourceStep } from "@/components/nakhlah/onboarding/UserSourceStep";
+import { InterestsStep } from "@/components/nakhlah/onboarding/InterestsStep";
+import { AgeStep } from "@/components/nakhlah/onboarding/AgeStep";
+import { AccountStep } from "@/components/nakhlah/onboarding/AccountStep";
 import { CompletionStep } from "@/components/nakhlah/onboarding/CompletionStep";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/lib/authUtils";
-import { createUserProfile } from "@/services/api/auth";
-import { signIn, useSession } from "next-auth/react";
+import {
+  createUserProfile,
+  fetchCurrentUser,
+  fetchUserOnboardingGlobals,
+  refreshAccessToken,
+} from "@/services/api/auth";
+import { signIn } from "next-auth/react";
 import { toast } from "@/components/nakhlah/Toast";
+import { buildApiUrl } from "@/lib/api-config";
 
 const steps = [
-  { id: 1, label: "Level" },
+  { id: 1, label: "Strength" },
   { id: 2, label: "Goal" },
-  { id: 3, label: "Quiz" },
-  { id: 4, label: "About You" },
-  { id: 5, label: "Account" },
-  { id: 6, label: "Ready!" },
+  { id: 3, label: "Purpose" },
+  { id: 4, label: "Country" },
+  { id: 5, label: "Source" },
+  { id: 6, label: "Interests" },
+  { id: 7, label: "Age" },
+  { id: 8, label: "Account" },
+  { id: 9, label: "Ready!" },
 ];
+
+const DEFAULT_PROFILE_IMAGE = "https://github.com/shadcn.png";
+
+const mediaCandidates = [
+  "strengthsMedia",
+  "strengthMedia",
+  "goalMedia",
+  "goalPicture",
+  "purposeMedia",
+  "purposePicture",
+  "countryMedia",
+  "countryPicture",
+  "sourcePicture",
+  "sourceMedia",
+  "interestPicture",
+  "interestMedia",
+  "media",
+  "image",
+  "picture",
+  "icon",
+  "thumbnail",
+  "asset",
+];
+
+const getMediaObject = (item, preferredKeys = []) => {
+  if (!item || typeof item !== "object") return null;
+
+  const keysToCheck = [...preferredKeys, ...mediaCandidates];
+  for (const key of keysToCheck) {
+    const value = item?.[key];
+    if (!value) continue;
+    if (typeof value === "string") return { url: value };
+    if (value?.url) return value;
+  }
+
+  if (Array.isArray(item?.media)) {
+    const mediaEntry = item.media.find((entry) => entry?.url || entry?.media?.url);
+    if (mediaEntry?.url) return mediaEntry;
+    if (mediaEntry?.media?.url) return mediaEntry.media;
+  }
+
+  if (item?.url) {
+    return { url: item.url, alt: item.alt };
+  }
+
+  return null;
+};
+
+const normalizeOnboardingData = (data) => {
+  if (!data || typeof data !== "object") return data;
+
+  const normalizedLanguageStrengthList = (data?.languageStrength?.strengthsList || []).map(
+    (entry) => ({
+      ...entry,
+      strengthsMedia: getMediaObject(entry, ["strengthsMedia", "strengthMedia"]),
+    })
+  );
+
+  const normalizedGoalList = ((data?.Goal?.goalList || data?.goal?.goalList) || []).map(
+    (entry) => ({
+      ...entry,
+      goalMedia: getMediaObject(entry, ["goalMedia", "goalPicture"]),
+    })
+  );
+
+  const normalizedPurposeList = (data?.purpose?.purposeList || []).map((entry) => ({
+    ...entry,
+    purposeMedia: getMediaObject(entry, ["purposeMedia", "purposePicture"]),
+  }));
+
+  const normalizedCountryList = ((data?.Country?.countryList || data?.country?.countryList) || []).map(
+    (entry) => ({
+      ...entry,
+      countryMedia: getMediaObject(entry, ["countryMedia", "countryPicture"]),
+    })
+  );
+
+  const normalizedSourceList = (data?.userSource?.sourceList || []).map((entry) => ({
+    ...entry,
+    sourcePicture: getMediaObject(entry, ["sourcePicture", "sourceMedia"]),
+  }));
+
+  const normalizedInterestList = (data?.interests?.interestList || []).map((entry) => ({
+    ...entry,
+    interestPicture: getMediaObject(entry, ["interestPicture", "interestMedia"]),
+  }));
+
+  return {
+    ...data,
+    languageStrength: {
+      ...(data?.languageStrength || {}),
+      strengthsList: normalizedLanguageStrengthList,
+    },
+    Goal: {
+      ...(data?.Goal || data?.goal || {}),
+      goalList: normalizedGoalList,
+    },
+    purpose: {
+      ...(data?.purpose || {}),
+      purposeList: normalizedPurposeList,
+    },
+    Country: {
+      ...(data?.Country || data?.country || {}),
+      countryList: normalizedCountryList,
+    },
+    userSource: {
+      ...(data?.userSource || {}),
+      sourceList: normalizedSourceList,
+    },
+    interests: {
+      ...(data?.interests || {}),
+      interestList: normalizedInterestList,
+    },
+  };
+};
 
 export default function Onboarding() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedLanguage, setSelectedLanguage] = useState("");
   const [proficiencyLevel, setProficiencyLevel] = useState("");
   const [dailyGoal, setDailyGoal] = useState("");
-  const [quizScore, setQuizScore] = useState(0);
-  const [isRegistering, setIsRegistering] = useState(false);
-
-  // user source and contact fields  
+  const [purpose, setPurpose] = useState("");
+  const [country, setCountry] = useState("");
   const [userSource, setUserSource] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-
-  // account fields
-  const [name, setName] = useState("");
+  const [interests, setInterests] = useState([]);
   const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [onboardingData, setOnboardingData] = useState(null);
+  const [isLoadingOnboarding, setIsLoadingOnboarding] = useState(true);
+  const [loadingError, setLoadingError] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const getMediaUrl = (url) => {
+    if (!url) return "";
+    return buildApiUrl(url);
+  };
+
+  const getActiveAccessToken = async () => {
+    const session = await fetch("/api/auth/session")
+      .then((res) => res.json())
+      .catch(() => null);
+
+    if (session?.accessToken) {
+      return session.accessToken;
+    }
+
+    const refreshResult = await refreshAccessToken(session?.accessToken);
+    const meResult = await fetchCurrentUser(refreshResult?.token || session?.accessToken);
+
+    if (meResult.success && meResult.token) {
+      return meResult.token;
+    }
+
+    if (refreshResult.success && refreshResult.token) {
+      return refreshResult.token;
+    }
+
+    return null;
+  };
+
+  const loadOnboardingData = async () => {
+    setIsLoadingOnboarding(true);
+    setLoadingError("");
+
+    const token = await getActiveAccessToken();
+
+    if (!token) {
+      setLoadingError("Please login first to continue onboarding.");
+      setIsLoadingOnboarding(false);
+      return;
+    }
+
+    const result = await fetchUserOnboardingGlobals(token);
+
+    if (!result.success || !result.data) {
+      setLoadingError(result.error || "Failed to load onboarding data");
+      setIsLoadingOnboarding(false);
+      return;
+    }
+
+    setOnboardingData(normalizeOnboardingData(result.data));
+    setIsLoadingOnboarding(false);
+  };
+
+  useEffect(() => {
+    loadOnboardingData();
+  }, []);
+
+  const selectedValues = useMemo(() => {
+    const strength = onboardingData?.languageStrength?.strengthsList?.find(
+      (item) => item.id === proficiencyLevel
+    );
+    const selectedPurpose = onboardingData?.purpose?.purposeList?.find(
+      (item) => item.id === purpose
+    );
+    const selectedCountry = onboardingData?.Country?.countryList?.find(
+      (item) => item.id === country
+    );
+    const selectedSource = onboardingData?.userSource?.sourceList?.find(
+      (item) => item.id === userSource
+    );
+    const selectedAge = onboardingData?.age?.ageList?.find((item) => item.id === age);
+    const selectedInterests = onboardingData?.interests?.interestList?.filter((item) =>
+      interests.includes(item.id)
+    );
+
+    return {
+      strength,
+      selectedPurpose,
+      selectedCountry,
+      selectedSource,
+      selectedAge,
+      selectedInterests,
+    };
+  }, [onboardingData, proficiencyLevel, purpose, country, userSource, interests, age]);
 
   const canProceed = () => {
     switch (currentStep) {
@@ -54,28 +264,31 @@ export default function Onboarding() {
       case 2:
         return dailyGoal !== "";
       case 3:
-        return true;
+        return purpose !== "";
       case 4:
-        return userSource !== "";
+        return country !== "";
       case 5:
+        return userSource !== "";
+      case 6:
+        return interests.length > 0;
+      case 7:
+        return age !== "";
+      case 8:
         return (
-          name.trim().length >= 2 &&
           email.trim().includes("@") &&
           password.trim().length >= 6
         );
-
       default:
         return true;
     }
   };
 
   const handleNext = async () => {
-    // If on account step (step 5), handle registration
-    if (currentStep === 5) {
+    if (currentStep === 8) {
       await handleRegistration();
       return;
     }
-    
+
     if (currentStep < steps.length) setCurrentStep((s) => s + 1);
   };
 
@@ -83,9 +296,12 @@ export default function Onboarding() {
     if (currentStep > 1) setCurrentStep((s) => s - 1);
   };
 
-  const handleQuizComplete = (score) => {
-    setQuizScore(score);
-    setCurrentStep(4);
+  const toggleInterest = (interestId) => {
+    setInterests((prev) =>
+      prev.includes(interestId)
+        ? prev.filter((id) => id !== interestId)
+        : [...prev, interestId]
+    );
   };
 
   const handleRegistration = async () => {
@@ -97,7 +313,6 @@ export default function Onboarding() {
     setIsRegistering(true);
 
     try {
-      // Register the user
       const result = await registerUser(email, password);
 
       if (!result.success) {
@@ -108,7 +323,6 @@ export default function Onboarding() {
 
       toast.success("Registration successful!");
 
-      // Auto-login with NextAuth
       const signInResult = await signIn("credentials", {
         email,
         password,
@@ -121,8 +335,7 @@ export default function Onboarding() {
         return;
       }
 
-      // Move to completion step
-      setCurrentStep(6);
+      setCurrentStep(9);
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("An error occurred during registration");
@@ -132,38 +345,25 @@ export default function Onboarding() {
   };
 
   const handleComplete = async () => {
-    // Get the session to retrieve the token
-    const session = await fetch('/api/auth/session')
-      .then(res => res.json())
-      .catch(() => null);
-    
-    const token = session?.accessToken;
+    const token = await getActiveAccessToken();
 
     if (!token) {
       toast.error("Session not found. Please try logging in again.");
       return;
     }
 
-    // Map proficiency level to API format
-    const languageStrengthMap = {
-      "beginner": "Basic",
-      "elementary": "Elementary",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
-    };
+    const languageStrength = selectedValues.strength?.strengthsTitle || "";
 
-    // Create user profile before completing onboarding
     const profileData = {
       onboardInfo: {
-        age: age.toString(),
-        country: "", // Can be collected in future or left empty
-        purpose: "", // Can be collected in future or left empty
+        age: selectedValues.selectedAge?.ageTitle || age.toString(),
+        country: selectedValues.selectedCountry?.countryName || "",
+        purpose: "",
         goalTime: parseInt(dailyGoal) || 10,
-        userSource: userSource,
-        languageStrength: languageStrengthMap[proficiencyLevel] || "Basic"
+        userSource: (selectedValues.selectedSource?.sourceName || "").toLowerCase(),
+        languageStrength,
       },
-      fullName: name,
-      // contactNumber: contactNumber
+      profilePictureUrl: DEFAULT_PROFILE_IMAGE,
     };
 
     const profileResult = await createUserProfile(profileData, token);
@@ -176,17 +376,19 @@ export default function Onboarding() {
     localStorage.setItem(
       "nakhlah_onboarding",
       JSON.stringify({
-        language: selectedLanguage,
         proficiencyLevel,
         dailyGoal,
-        quizScore,
-        name,
+        purpose,
+        country,
+        userSource,
+        interests,
         age,
         email,
         completed: true,
-      }),
+      })
     );
-    
+    localStorage.setItem("nakhlah_profile_prompt_pending", "true");
+
     toast.success("Profile created successfully!");
     router.push("/");
     router.refresh();
@@ -197,45 +399,91 @@ export default function Onboarding() {
       case 1:
         return (
           <ProficiencyStep
+            title={onboardingData?.languageStrength?.strengthsTitleTop}
+            levels={onboardingData?.languageStrength?.strengthsList || []}
             selectedLevel={proficiencyLevel}
             onSelect={setProficiencyLevel}
+            getMediaUrl={getMediaUrl}
           />
         );
       case 2:
-        return <GoalStep selectedGoal={dailyGoal} onSelect={setDailyGoal} />;
+        return (
+          <GoalStep
+            title={onboardingData?.Goal?.goalTimeTopTitle}
+            goals={onboardingData?.Goal?.goalList || []}
+            selectedGoal={dailyGoal}
+            onSelect={setDailyGoal}
+            getMediaUrl={getMediaUrl}
+          />
+        );
       case 3:
-        return <QuizStep onComplete={handleQuizComplete} />;
+        return (
+          <PurposeStep
+            title={onboardingData?.purpose?.purposeTitleTop}
+            purposes={onboardingData?.purpose?.purposeList || []}
+            selectedPurpose={purpose}
+            onSelect={setPurpose}
+            getMediaUrl={getMediaUrl}
+          />
+        );
       case 4:
         return (
-          <UserSourceStep
-            userSource={userSource}
-            contactNumber={contactNumber}
-            onSelect={({ userSource: source, contactNumber: contact }) => {
-              if (source !== undefined) setUserSource(source);
-              if (contact !== undefined) setContactNumber(contact);
-            }}
+          <CountryStep
+            title={onboardingData?.Country?.countryNameTop}
+            countries={onboardingData?.Country?.countryList || []}
+            selectedCountry={country}
+            onSelect={setCountry}
+            getMediaUrl={getMediaUrl}
           />
         );
       case 5:
         return (
+          <UserSourceStep
+            title={onboardingData?.userSource?.sourceNameTop}
+            sources={onboardingData?.userSource?.sourceList || []}
+            userSource={userSource}
+            onSelect={({ userSource: source }) => {
+              if (source !== undefined) setUserSource(source);
+            }}
+            getMediaUrl={getMediaUrl}
+          />
+        );
+      case 6:
+        return (
+          <InterestsStep
+            title={onboardingData?.interests?.interestTitleTop}
+            interests={onboardingData?.interests?.interestList || []}
+            selectedInterests={interests}
+            onToggle={toggleInterest}
+            getMediaUrl={getMediaUrl}
+          />
+        );
+      case 7:
+        return (
+          <AgeStep
+            title={onboardingData?.age?.ageTitleTop || "How old are you?"}
+            ages={onboardingData?.age?.ageList || []}
+            selectedAge={age}
+            onSelect={setAge}
+          />
+        );
+      case 8:
+        return (
           <AccountStep
-            name={name}
-            age={age}
             email={email}
+            password={password}
             onChange={(fields) => {
-              if (fields.name !== undefined) setName(fields.name);
-              if (fields.age !== undefined) setAge(fields.age);
               if (fields.email !== undefined) setEmail(fields.email);
               if (fields.password !== undefined) setPassword(fields.password);
             }}
           />
         );
-      case 6:
+      case 9:
         return (
           <CompletionStep
-            language={selectedLanguage}
+            language={"arabic"}
             dailyGoal={dailyGoal}
-            quizScore={quizScore}
+            quizScore={0}
             onComplete={handleComplete}
           />
         );
@@ -246,7 +494,6 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border pt-[env(safe-area-inset-top)]">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -257,30 +504,40 @@ export default function Onboarding() {
         </div>
       </header>
 
-      {/* Progress */}
       <div className=" container mx-auto px-4 py-6">
         <div className="max-w-[520px] mx-auto">
           <ProgressSteps steps={steps} currentStep={currentStep} />
         </div>
       </div>
 
-      {/* Main */}
       <main className="flex-1 container mx-auto px-4 py-6 flex items-start justify-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.28 }}
-            className="w-full"
-          >
-            {renderStep()}
-          </motion.div>
-        </AnimatePresence>
+        {isLoadingOnboarding ? (
+          <div className="w-full max-w-xl mx-auto text-center text-muted-foreground">
+            Loading onboarding options...
+          </div>
+        ) : loadingError ? (
+          <div className="w-full max-w-xl mx-auto text-center space-y-4">
+            <p className="text-destructive">{loadingError}</p>
+            <Button variant="outline" onClick={loadOnboardingData}>
+              Retry
+            </Button>
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.28 }}
+              className="w-full"
+            >
+              {renderStep()}
+            </motion.div>
+          </AnimatePresence>
+        )}
       </main>
 
-      {/* Footer Nav */}
       <footer className="sticky bottom-0 bg-background/80 backdrop-blur-md border-t border-border pb-[env(safe-area-inset-bottom)]">
         <div className="container px-1 py-4 flex items-center justify-between max-w-xl mx-auto">
           <Button
@@ -293,11 +550,10 @@ export default function Onboarding() {
             Back
           </Button>
 
-          {/* If final step -> show done */}
           {currentStep < steps.length ? (
             <Button
               onClick={handleNext}
-              disabled={!canProceed() || isRegistering}
+              disabled={isLoadingOnboarding || !!loadingError || !canProceed() || isRegistering}
               className="gap-2 bg-gradient-to-r from-violet-500 to-indigo-500 text-white"
             >
               {isRegistering ? "Creating Account..." : "Continue"}
