@@ -307,7 +307,13 @@ export default function LessonPage() {
     const token = getSessionToken(session);
 
     if (lessonId && token) {
-      await makeLearnerProgress(lessonId, token);
+      const progressResult = await makeLearnerProgress(lessonId, token);
+      if (progressResult.success && progressResult.data) {
+        sessionStorage.setItem(
+          "lessonProgressData",
+          JSON.stringify(progressResult.data),
+        );
+      }
     }
 
     sessionStorage.removeItem("currentLessonIndex");

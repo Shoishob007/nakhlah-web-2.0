@@ -259,7 +259,7 @@ export function UserStats() {
                     {[...Array(5)].map((_, i) => (
                       <Heart
                         key={i}
-                        className="text-destructive fill-destructive"
+                        className={i < heartsCount ? "opacity-100" : "opacity-30"}
                       />
                     ))}
                   </div>
@@ -290,7 +290,7 @@ export function UserStats() {
                   {[...Array(5)].map((_, i) => (
                     <Heart
                       key={i}
-                      className="text-destructive fill-destructive"
+                      className={i < heartsCount ? "opacity-100" : "opacity-30"}
                     />
                   ))}
                 </div>
