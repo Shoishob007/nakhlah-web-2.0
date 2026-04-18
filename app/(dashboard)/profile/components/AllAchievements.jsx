@@ -1,6 +1,7 @@
 import { Medal } from "@/components/icons/Medal";
+import AchievementTick from "@/components/icons/AchievementTick";
 import { motion } from "framer-motion";
-import { ChevronLeft, CheckCircle, Lock } from "lucide-react";
+import { ChevronLeft, Lock } from "lucide-react";
 import { useMemo } from "react";
 
 const levelColorClasses = [
@@ -128,9 +129,7 @@ export default function AllAchievementsPage({
                               U{achievement.unitOrder || "-"}
                             </div>
                             {isUnlocked && (
-                              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-palm-green border-2 border-card flex items-center justify-center">
-                                <CheckCircle className="w-4 h-4 text-card" />
-                              </div>
+                              <AchievementTick className="absolute -bottom-1 -right-1" />
                             )}
                           </div>
 

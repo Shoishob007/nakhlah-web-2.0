@@ -223,6 +223,21 @@ function normalizeAchievementsPayload(payload) {
     }));
 }
 
+function normalizeDailyQuestPayload(payload) {
+    const dailyQuestObject = payload?.dailyQuest || payload?.data?.dailyQuest || {};
+
+    if (!dailyQuestObject || typeof dailyQuestObject !== "object" || Array.isArray(dailyQuestObject)) {
+        return [];
+    }
+
+    return Object.entries(dailyQuestObject).map(([key, value]) => ({
+        key,
+        required: Number(value?.required) || 0,
+        reward: Number(value?.reward) || 0,
+        icon: value?.icon || null,
+    }));
+}
+
 export async function fetchGamificationBadges(token) {
     try {
         if (!token) {
@@ -281,6 +296,37 @@ export async function fetchQuestionnaireAchievements(token) {
         return {
             success: false,
             error: error.message || "Unable to load achievements",
+        };
+    }
+}
+
+export async function fetchGamificationDailyQuest(token) {
+    try {
+        if (!token) {
+            throw new Error("Authentication required");
+        }
+
+        const response = await fetchWithAuthRetry("/api/globals/gamification?select[dailyQuest]=true", {
+            method: "GET",
+            token,
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(data?.message || "Failed to load daily quests");
+        }
+
+        return {
+            success: true,
+            dailyQuest: normalizeDailyQuestPayload(data),
+            data,
+        };
+    } catch (error) {
+        console.error("Fetch gamification daily quest error:", error);
+        return {
+            success: false,
+            error: error.message || "Unable to load daily quests",
         };
     }
 }

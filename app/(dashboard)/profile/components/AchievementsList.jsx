@@ -1,7 +1,8 @@
 "use client";
 import { Trophy } from "@/components/icons/Trophy";
+import AchievementTick from "@/components/icons/AchievementTick";
 import { motion } from "framer-motion";
-import { CheckCircle, ChevronRight, Lock } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
 
 const resolveCardColor = (isAchieved) =>
   isAchieved
@@ -78,7 +79,7 @@ export default function AchievementsList({
               </div>
 
               {achievement.achieved ? (
-                <CheckCircle className="w-5 h-5 text-accent" />
+                <AchievementTick />
               ) : (
                 <Lock className="w-5 h-5 text-muted-foreground" />
               )}
