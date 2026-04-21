@@ -71,7 +71,8 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
 
     const observer = new IntersectionObserver(observerCallback, {
       root: null,
-      threshold: 0.5,
+      rootMargin: "-15% 0px -80% 0px",
+      threshold: 0,
     });
 
     levelElements.forEach((el) => {
@@ -79,13 +80,12 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
       observers.push(observer);
     });
 
-    // initial level name
-    if (levels && levels.length > 0) {
+    if (levels && levels.length > 0 && !currentLevelId) {
       setCurrentLevelId(levels[0].id);
     }
 
     return () => observers.forEach((o) => o.disconnect());
-  }, [levels, isLoading]);
+  }, [levels, isLoading, currentLevelId]);
 
   return (
     <div className="relative lg:max-w-lg mx-auto">
@@ -97,14 +97,15 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
           )} text-white`}
         >
           <div>
+            <div className="text-sm text-white/90 mb-1 font-semibold uppercase tracking-wider">
+              {currentLevel?.levelName ? `${currentLevel.levelName}, ` : ""}
+              {currentLevel?.name || ""}
+            </div>
             {currentTask?.title ? (
               <div className="text-2xl font-bold leading-tight">
                 {currentTask.title}
               </div>
             ) : null}
-            <div className="text-sm text-white/90 mt-1">
-              {currentLevel?.name || ""}
-            </div>
           </div>
           <button className="text-white hover:bg-white/20 p-2 rounded-full">
             <FileText className="w-6 h-6" />
@@ -147,8 +148,9 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
               {/* Zigzag path for this level */}
               <div className="relative">
                 {levelLessons.map((lesson, index) => {
-                  const position = getPosition(index);
-                  const mascotPosition = getMascotPosition(index);
+                  const globalIndex = lessons.findIndex((l) => l.id === lesson.id);
+                  const position = getPosition(globalIndex >= 0 ? globalIndex : index);
+                  const mascotPosition = getMascotPosition(globalIndex >= 0 ? globalIndex : index);
 
                   return (
                     <div key={lesson.id} className="relative h-28 w-full">
