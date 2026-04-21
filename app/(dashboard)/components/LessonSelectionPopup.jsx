@@ -3,6 +3,7 @@
 import { BookOpen } from "@/components/icons/BookOpen";
 import { Lock } from "@/components/icons/Lock";
 import { Trophy } from "@/components/icons/Trophy";
+import { TreasureChest } from "@/components/icons/TreasureChest";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { CheckCircle2, X } from "lucide-react";
@@ -68,6 +69,7 @@ export function LessonSelectionPopup({
             id: lesson.id,
             title: lesson.title,
             isExam: Boolean(lesson.isExam),
+            isGiftBox: Boolean(lesson.giftBox || lesson.isGiftBox),
             isCompleted: isCompletedLesson,
             isCurrent: isCurrentLesson,
             isLocked: isLockedLesson,
@@ -144,6 +146,8 @@ export function LessonSelectionPopup({
               {lessons.map((lesson, index) => {
                 const lessonIcon = lesson.isExam ? (
                   <Trophy size="lg" />
+                ) : lesson.isGiftBox ? (
+                  <TreasureChest size="lg" />
                 ) : (
                   <BookOpen size="lg" />
                 );

@@ -33,15 +33,9 @@ export function Circle({
     return () => popupListeners.delete(listener);
   }, [nodeId]);
 
-  const getCircleStyles = () => {
-    if (isLocked) {
-      return "bg-[hsl(var(--node-locked))] border-[hsl(var(--node-locked-border))] pathway-node-shadow-locked";
-    }
-    if (isCurrent) {
-      return "bg-accent border-accent shadow-lg pathway-node-shadow-locked";
-    }
-    return "bg-[hsl(var(--node-yellow))] border-[hsl(var(--node-yellow-border))] pathway-node-shadow";
-  };
+  const isSpecialType =
+    type === "trophy" || type === "crown" || type === "checkpoint";
+  const isTrophy = type === "trophy";
 
   const sizeClasses = {
     sm: "w-12 h-12",
@@ -55,17 +49,31 @@ export function Circle({
     lg: "w-10 h-10",
   };
 
+  const trophyIconSizeClasses = {
+    sm: "w-16 h-16",
+    md: "w-20 h-20",
+    lg: "w-24 h-24",
+  };
+
   const sizeClass = sizeClasses[size] || sizeClasses.md;
-  const iconSizeClass = iconSizeClasses[size] || iconSizeClasses.md;
+  const iconSizeClass = isTrophy 
+    ? (trophyIconSizeClasses[size] || trophyIconSizeClasses.md)
+    : (iconSizeClasses[size] || iconSizeClasses.md);
 
   const getIcon = () => {
     if (isLocked) {
+      if (isTrophy && icon) {
+        return React.cloneElement(icon, {
+          variant: "silver",
+          className: `${icon.props.className || ""} ${iconSizeClass}`,
+        });
+      }
       return <Lock size="lg" variant="silver" />;
     }
 
     if (
       (isCurrent || isCompleted) &&
-      type !== "trophy" &&
+      !isTrophy &&
       type !== "checkpoint" &&
       type !== "crown"
     ) {
@@ -81,8 +89,18 @@ export function Circle({
     return null;
   };
 
-  const isSpecialType =
-    type === "trophy" || type === "crown" || type === "checkpoint";
+  const getCircleStyles = () => {
+    if (isTrophy) {
+      return "";
+    }
+    if (isLocked) {
+      return "bg-[hsl(var(--node-locked))] border-[hsl(var(--node-locked-border))] pathway-node-shadow-locked";
+    }
+    if (isCurrent) {
+      return "bg-accent border-accent shadow-lg pathway-node-shadow-locked";
+    }
+    return "bg-[hsl(var(--node-yellow))] border-[hsl(var(--node-yellow-border))] pathway-node-shadow";
+  };
 
   const handleClick = () => {
     if ((isCompleted || isCurrent) && !isLocked) {
@@ -100,9 +118,7 @@ export function Circle({
     <>
       <div
         onClick={handleClick}
-        className={`rounded-full flex items-center justify-center border-4 ${getCircleStyles()} transition-transform ${sizeClass} ${
-          isSpecialType && !isLocked ? "" : ""
-        } ${
+        className={`${!isTrophy ? `rounded-full border-4 ${sizeClass}` : ""} flex items-center justify-center ${getCircleStyles()} transition-transform ${
           (isCompleted || isCurrent) && !isLocked
             ? "cursor-pointer hover:scale-110"
             : isLocked
