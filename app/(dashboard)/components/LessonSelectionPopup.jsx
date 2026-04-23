@@ -38,6 +38,7 @@ export function LessonSelectionPopup({
   const [isGiftAlreadyOpened, setIsGiftAlreadyOpened] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [hasClaimed, setHasClaimed] = useState(false);
+  const [giftRewards, setGiftRewards] = useState(null);
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export function LessonSelectionPopup({
         setLoadError("");
         setIsGiftAlreadyOpened(false);
         setHasClaimed(false);
+        setGiftRewards(null);
 
         if (status === "loading") return;
         if (status === "unauthenticated" || !isSessionValid(session)) {
@@ -107,7 +109,7 @@ export function LessonSelectionPopup({
     loadLessons();
   }, [open, session, status, taskId, isTaskGiftBox]);
 
-// ... keeping the rest the same up to the return
+  // ... keeping the rest the same up to the return
   const footerText = isLocked
     ? "Complete previous tasks to unlock"
     : isCompleted
@@ -121,7 +123,10 @@ export function LessonSelectionPopup({
 
     sessionStorage.setItem("selectedLessonId", lesson.id);
     sessionStorage.setItem("selectedNodeId", taskId);
-    sessionStorage.setItem("selectedLessonIsExam", lesson.isExam ? "true" : "false");
+    sessionStorage.setItem(
+      "selectedLessonIsExam",
+      lesson.isExam ? "true" : "false",
+    );
     sessionStorage.setItem("selectedLessonStatus", lesson.status || "");
 
     router.push("/lesson");
@@ -130,7 +135,7 @@ export function LessonSelectionPopup({
 
   const handleClaimGift = async () => {
     if (isClaiming || hasClaimed || isLocked || isGiftAlreadyOpened) return;
-    
+
     setIsClaiming(true);
     // Optimistic UI update
     setHasClaimed(true);
@@ -138,10 +143,25 @@ export function LessonSelectionPopup({
     try {
       const token = getSessionToken(session);
       const result = await claimGiftBoxTask(taskId, token);
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
+
+      const rewardPayload = result.data || {};
+      setGiftRewards({
+        datesReceived:
+          Number(rewardPayload?.datesReceived) ||
+          Number(rewardPayload?.dateReceived) ||
+          0,
+        injazReceived:
+          Number(rewardPayload?.injazReceived) ||
+          Number(rewardPayload?.InjazReceived) ||
+          0,
+        badgesAdded: Array.isArray(rewardPayload?.badges?.added)
+          ? rewardPayload.badges.added
+          : [],
+      });
 
       const giftLessonId =
         lessons.find((lesson) => lesson.isCurrent || !lesson.isLocked)?.id ||
@@ -150,12 +170,11 @@ export function LessonSelectionPopup({
       if (giftLessonId) {
         await makeLearnerProgress(giftLessonId, token);
       }
-      
+
       // Auto close after showing animation for a bit
       setTimeout(() => {
         onClose();
       }, 2500);
-      
     } catch (error) {
       console.error(error);
       const errorMessage = error?.message || "";
@@ -199,24 +218,85 @@ export function LessonSelectionPopup({
                 {loadError}
               </div>
             )}
-            
+
             {hasClaimed && !isGiftAlreadyOpened && (
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center z-0"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
                 {/* Decorative Sparkles */}
-                <motion.div animate={{ rotate: 180, scale: [1, 1.5, 1], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }} className="absolute -top-4 -left-4 text-yellow-400"><Sparkles className="w-12 h-12" /></motion.div>
-                <motion.div animate={{ rotate: -180, scale: [1, 1.2, 1], opacity: [0, 1, 0] }} transition={{ duration: 1.2, delay: 0.2, repeat: Infinity, repeatType: "reverse" }} className="absolute top-10 right-4 text-yellow-500"><Sparkles className="w-8 h-8" /></motion.div>
-                <motion.div animate={{ rotate: 90, scale: [1, 1.4, 1], opacity: [0, 1, 0] }} transition={{ duration: 1.8, delay: 0.4, repeat: Infinity, repeatType: "reverse" }} className="absolute bottom-5 -left-2 text-yellow-300"><Sparkles className="w-10 h-10" /></motion.div>
-                <motion.div animate={{ rotate: -90, scale: [1, 1.3, 1], opacity: [0, 1, 0] }} transition={{ duration: 1.4, delay: 0.1, repeat: Infinity, repeatType: "reverse" }} className="absolute -bottom-6 right-8 text-yellow-400"><Sparkles className="w-14 h-14" /></motion.div>
+                <motion.div
+                  animate={{
+                    rotate: 180,
+                    scale: [1, 1.5, 1],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                  className="absolute -top-4 -left-4 text-yellow-400"
+                >
+                  <Sparkles className="w-12 h-12" />
+                </motion.div>
+                <motion.div
+                  animate={{
+                    rotate: -180,
+                    scale: [1, 1.2, 1],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.2,
+                    delay: 0.2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                  className="absolute top-10 right-4 text-yellow-500"
+                >
+                  <Sparkles className="w-8 h-8" />
+                </motion.div>
+                <motion.div
+                  animate={{
+                    rotate: 90,
+                    scale: [1, 1.4, 1],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.8,
+                    delay: 0.4,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                  className="absolute bottom-5 -left-2 text-yellow-300"
+                >
+                  <Sparkles className="w-10 h-10" />
+                </motion.div>
+                <motion.div
+                  animate={{
+                    rotate: -90,
+                    scale: [1, 1.3, 1],
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.4,
+                    delay: 0.1,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                  className="absolute -bottom-6 right-8 text-yellow-400"
+                >
+                  <Sparkles className="w-14 h-14" />
+                </motion.div>
               </motion.div>
             )}
 
             <motion.button
               onClick={handleClaimGift}
-              disabled={isLocked || hasClaimed || isClaiming || isGiftAlreadyOpened}
+              disabled={
+                isLocked || hasClaimed || isClaiming || isGiftAlreadyOpened
+              }
               className={`
                 relative z-10 w-48 h-48 rounded-full flex flex-col items-center justify-center
                 transition-all duration-300
@@ -239,7 +319,8 @@ export function LessonSelectionPopup({
                   : { repeat: Infinity, duration: 3, ease: "easeInOut" }
               }
             >
-              <div className={`
+              <div
+                className={`
                 absolute inset-0 rounded-full blur-3xl opacity-50
                 ${
                   isGiftAlreadyOpened
@@ -248,8 +329,9 @@ export function LessonSelectionPopup({
                       ? "bg-yellow-400"
                       : "bg-accent"
                 }
-              `} />
-              
+              `}
+              />
+
               <div className="relative text-accent">
                 {hasClaimed && !isGiftAlreadyOpened ? (
                   <TreasureChest className="w-36 h-36 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)] text-yellow-500" />
@@ -260,8 +342,8 @@ export function LessonSelectionPopup({
                 )}
               </div>
             </motion.button>
-            
-            <motion.div 
+
+            <motion.div
               className="mt-8 text-center z-10"
               initial={false}
               animate={{ y: hasClaimed ? -10 : 0 }}
@@ -276,16 +358,35 @@ export function LessonSelectionPopup({
                       : "You found a gift!"}
               </h3>
               <p className="text-muted-foreground font-semibold">
-                {isLocked 
-                  ? "Complete previous tasks to open." 
+                {isLocked
+                  ? "Complete previous tasks to open."
                   : isGiftAlreadyOpened
                     ? "You already collected this gift earlier."
-                  : hasClaimed 
-                    ? "Your rewards have been added to your account."
-                    : "Tap the chest to claim your rewards."}
+                    : hasClaimed
+                      ? "Your rewards have been added to your account."
+                      : "Tap the chest to claim your rewards."}
               </p>
-            </motion.div>
 
+              {hasClaimed && !isGiftAlreadyOpened && giftRewards ? (
+                <div className="mt-4 inline-flex flex-col items-start gap-1 rounded-xl border border-border/60 bg-card/70 px-4 py-3 text-left">
+                  <p className="text-sm font-bold text-foreground">
+                    You received:
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {giftRewards.injazReceived} Injaz
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {giftRewards.datesReceived} Dates
+                  </p>
+                  {giftRewards.badgesAdded.length ? (
+                    <p className="text-sm text-muted-foreground">
+                      {giftRewards.badgesAdded.length} new badge
+                      {giftRewards.badgesAdded.length > 1 ? "s" : ""}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </motion.div>
           </div>
         </DialogContent>
       </Dialog>
@@ -296,7 +397,6 @@ export function LessonSelectionPopup({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg p-0 gap-0 border-border [&>button]:hidden rounded-2xl overflow-hidden shadow-lg border-2">
-        
         {/* Simple Header */}
         <div className="bg-accent p-5 text-center relative">
           <button

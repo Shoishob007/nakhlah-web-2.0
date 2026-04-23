@@ -10,14 +10,14 @@ const gemPackages = [
     amount: 500,
     price: "$2",
     emoji: "💎",
-    label: "Gem Package 1",
+    label: "Date Package 1",
   },
   {
     id: 2,
     amount: 1000,
     price: "$10",
     emoji: "💎",
-    label: "Gem Package 2",
+    label: "Date Package 2",
     popular: true,
   },
   {
@@ -25,7 +25,7 @@ const gemPackages = [
     amount: 1500,
     price: "$15",
     emoji: "💎",
-    label: "Gem Package 3",
+    label: "Date Package 3",
   },
 ];
 
@@ -37,7 +37,7 @@ export function GemsPurchase() {
 
   return (
     <div className="bg-card p-6 rounded-lg shadow-sm">
-      <h2 className="text-lg font-semibold mb-6 text-center">Get More Gems</h2>
+      <h2 className="text-lg font-semibold mb-6 text-center">Get More Dates</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {gemPackages.map((pkg, index) => (
@@ -64,7 +64,7 @@ export function GemsPurchase() {
 
             <h3 className="font-bold text-foreground mb-2">{pkg.label}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              {pkg.amount} Gems
+              {pkg.amount} Dates
             </p>
 
             <Button
@@ -84,7 +84,7 @@ export function GemsPurchase() {
       </div>
 
       <div className="mt-6 text-center text-sm text-muted-foreground">
-        <p>✨ Gems never expire and can be used anytime!</p>
+        <p>✨ Dates never expire and can be used anytime!</p>
       </div>
     </div>
   );

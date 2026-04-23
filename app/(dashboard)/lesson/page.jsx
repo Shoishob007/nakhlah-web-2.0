@@ -71,6 +71,10 @@ export default function LessonPage() {
   const [showFullMarksClaimedNotice, setShowFullMarksClaimedNotice] =
     useState(false);
   const [isCompletingFromNotice, setIsCompletingFromNotice] = useState(false);
+  const [fullMarksRewardData, setFullMarksRewardData] = useState(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [totalAnswerAttempts, setTotalAnswerAttempts] = useState(0);
+  const [correctAnswerAttempts, setCorrectAnswerAttempts] = useState(0);
 
   const [selectedOptionId, setSelectedOptionId] = useState(null);
   const [selectedTrueFalse, setSelectedTrueFalse] = useState(null);
@@ -142,6 +146,7 @@ export default function LessonPage() {
         setHasWrongAnswer(false);
         setIsExamLesson(selectedLessonIsExam);
         setSelectedLessonStatus(selectedStatus);
+        setFullMarksRewardData(null);
 
         const token = getSessionToken(session);
         if (!token) {
@@ -327,6 +332,13 @@ export default function LessonPage() {
     }
   };
 
+  const recordAnswerAttempt = (isAnswerCorrect) => {
+    setTotalAnswerAttempts((prev) => prev + 1);
+    if (isAnswerCorrect) {
+      setCorrectAnswerAttempts((prev) => prev + 1);
+    }
+  };
+
   const completeLessonAndRedirect = async () => {
     const lessonId = sessionStorage.getItem("selectedLessonId")?.trim();
     const token = getSessionToken(session);
@@ -334,9 +346,23 @@ export default function LessonPage() {
     if (lessonId && token) {
       const progressResult = await makeLearnerProgress(lessonId, token);
       if (progressResult.success && progressResult.data) {
+        const accuracyPercentage =
+          totalAnswerAttempts > 0
+            ? Math.round((correctAnswerAttempts / totalAnswerAttempts) * 100)
+            : 0;
+
         sessionStorage.setItem(
           "lessonProgressData",
-          JSON.stringify(progressResult.data),
+          JSON.stringify({
+            ...progressResult.data,
+            ...(fullMarksRewardData || {}),
+            __clientStats: {
+              elapsedSeconds,
+              totalAnswerAttempts,
+              correctAnswerAttempts,
+              accuracyPercentage,
+            },
+          }),
         );
       }
     }
@@ -360,7 +386,9 @@ export default function LessonPage() {
 
     if (lessonId && token && isExamLesson && !hasWrongAnswer) {
       const fullMarksResult = await reportFullMarks(lessonId, token);
-      if (!fullMarksResult.success) {
+      if (fullMarksResult.success) {
+        setFullMarksRewardData(fullMarksResult.data || null);
+      } else {
         const fullMarksError = (fullMarksResult.error || "").toLowerCase();
         const shouldShowAlreadyClaimed =
           fullMarksError === "please maintain the sequence" ||
@@ -395,6 +423,7 @@ export default function LessonPage() {
       if (!selected.correct) {
         await applyWrongAnswerPenalty();
       }
+      recordAnswerAttempt(selected.correct);
       setIsCorrect(selected.correct);
       return;
     }
@@ -406,6 +435,7 @@ export default function LessonPage() {
       if (!answerIsCorrect) {
         await applyWrongAnswerPenalty();
       }
+      recordAnswerAttempt(answerIsCorrect);
       setIsCorrect(answerIsCorrect);
       return;
     }
@@ -418,6 +448,7 @@ export default function LessonPage() {
       if (!answerIsCorrect) {
         await applyWrongAnswerPenalty();
       }
+      recordAnswerAttempt(answerIsCorrect);
       setIsCorrect(answerIsCorrect);
       return;
     }
@@ -429,6 +460,7 @@ export default function LessonPage() {
       if (!answerIsCorrect) {
         await applyWrongAnswerPenalty();
       }
+      recordAnswerAttempt(answerIsCorrect);
       setIsCorrect(answerIsCorrect);
       return;
     }
@@ -439,6 +471,7 @@ export default function LessonPage() {
       if (!answerIsCorrect) {
         await applyWrongAnswerPenalty();
       }
+      recordAnswerAttempt(answerIsCorrect);
       setIsCorrect(answerIsCorrect);
       return;
     }
@@ -612,6 +645,7 @@ export default function LessonPage() {
         initialElapsedSeconds={0}
         lives={lives}
         maxLives={5}
+        onElapsedSecondsChange={setElapsedSeconds}
       />
 
       {showExitDialog && (

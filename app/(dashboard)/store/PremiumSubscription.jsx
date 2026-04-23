@@ -29,8 +29,8 @@ import { Mascot } from "@/components/nakhlah/Mascot";
 const premiumFeatures = [
   {
     id: 1,
-    name: "Unlimited Diamonds",
-    description: "Get unlimited amount of diamonds to unlock premium content",
+    name: "Unlimited Dates",
+    description: "Get unlimited dates to unlock premium content",
     icon: BookOpen,
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
@@ -54,8 +54,8 @@ const premiumFeatures = [
   },
   {
     id: 4,
-    name: "Boost Your XP",
-    description: "Unlock more XP from every single lesson finished",
+    name: "Boost Your Injaz",
+    description: "Unlock more Injaz from every single lesson finished",
     icon: Zap,
     iconBg: "bg-yellow-100",
     iconColor: "text-yellow-600",
@@ -301,7 +301,7 @@ export default function PremiumSubscription({ onBack }) {
             ))}
           </div>
 
-          {/* Gems CTA Card */}
+          {/* Dates CTA Card */}
           <motion.div
             variants={itemVariants}
             className="relative rounded-xl border border-border p-6 bg-accent/10 hover:border-accent/50 transition-all cursor-pointer group"
@@ -313,10 +313,10 @@ export default function PremiumSubscription({ onBack }) {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-foreground mb-1">
-                  Want to buy more gems?
+                  Want to buy more dates?
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Get gems to unlock lessons and boost your progress
+                  Get dates to unlock lessons and boost your progress
                 </p>
               </div>
               <div className="text-accent">

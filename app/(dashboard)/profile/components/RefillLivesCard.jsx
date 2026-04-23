@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 export default function RefillLivesCard() {
-    const router = useRouter();
-  
+  const router = useRouter();
+
   return (
     <div className="rounded-2xl bg-card shadow-lg border border-border overflow-hidden p-6">
       <div className="">
@@ -20,14 +20,21 @@ export default function RefillLivesCard() {
         <div className="p-3 bg-muted rounded-lg border border-muted-foreground/50 text-sm mb-4">
           <h5 className="font-medium mb-1">Quick Refill</h5>
           <p>
-            Refill your hearts with gems or unlock unlimited hearts with Pro
+            Refill your hearts with dates or unlock unlimited hearts with Pro
           </p>
         </div>
         <div className="grid gap-2">
-          <Button onClick={() => router.push("/store/gems")} variant="outline" className="w-full">
-            Refill with Gems
+          <Button
+            onClick={() => router.push("/store/gems")}
+            variant="outline"
+            className="w-full"
+          >
+            Refill with Dates
           </Button>
-          <Button onClick={() => router.push("/store")} className="w-full text-accent-foreground">
+          <Button
+            onClick={() => router.push("/store")}
+            className="w-full text-accent-foreground"
+          >
             Go Pro (Unlimited)
           </Button>
         </div>

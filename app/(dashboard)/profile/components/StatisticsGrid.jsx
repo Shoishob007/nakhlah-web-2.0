@@ -10,7 +10,7 @@ import { Trophy } from "@/components/icons/Trophy";
 import { motion } from "framer-motion";
 
 export default function StatisticsGrid({ profileData }) {
-  const totalDiamonds = profileData?.gamificationStock?.dateStock ?? 957;
+  const totalDates = profileData?.gamificationStock?.dateStock ?? 957;
   const totalXp = profileData?.gamificationStock?.injazStock ?? 15274;
 
   const userStats = [
@@ -30,15 +30,15 @@ export default function StatisticsGrid({ profileData }) {
     },
     {
       icon: GemStone,
-      value: totalDiamonds.toLocaleString(),
-      label: "Total Diamonds",
+      value: totalDates.toLocaleString(),
+      label: "Total Dates",
       color: "text-primary",
       bg: "bg-muted/30",
     },
     {
       icon: HighVoltage,
       value: totalXp.toLocaleString(),
-      label: "Total XP Gained",
+      label: "Total Injaz Gained",
       color: "text-primary",
       bg: "bg-muted/30",
     },

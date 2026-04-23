@@ -81,7 +81,7 @@ export function UserStats() {
       case "streak":
         return "left-0 -translate-x-0"; // Streak: align to left
       case "gems":
-        return "left-1/2 -translate-x-1/2"; // Gems: center
+        return "left-1/2 -translate-x-1/2"; // Dates: center
       case "hearts":
         return "right-0 translate-x-0"; // Hearts: align to right
       default:
@@ -152,7 +152,7 @@ export function UserStats() {
           )}
         </div>
 
-        {/* Gems */}
+        {/* Dates */}
         <div className="relative">
           <div
             onClick={() => handleMobileClick("gems")}
@@ -178,9 +178,9 @@ export function UserStats() {
                 <div className="flex space-x-4 items-center">
                   <TreasureChest size="xxl" />
                   <div className="space-y-1">
-                    <h4 className="font-medium">Gems</h4>
+                    <h4 className="font-medium">Dates</h4>
                     <p className="text-sm text-muted-foreground">
-                      You have {gemsCount} gems
+                      You have {gemsCount} dates
                     </p>
                     <Button
                       variant="link"
@@ -193,13 +193,13 @@ export function UserStats() {
                 </div>
                 <div className="p-3 bg-muted rounded-lg border border-muted-foreground/50 text-sm">
                   <h5 className="font-medium">Daily Reward</h5>
-                  <p>Complete a lesson today to earn extra gems!</p>
+                  <p>Complete a lesson today to earn extra dates!</p>
                 </div>
               </HoverCardContent>
             </HoverCard>
           </div>
 
-          {/* Mobile Popup for Gems - centered */}
+          {/* Mobile Popup for Dates - centered */}
           {mobileOpenCard === "gems" && (
             <div
               className={`lg:hidden absolute top-full mt-2 w-80 bg-card border rounded-lg shadow-lg z-50 p-4 space-y-4 ${getMobilePopupPosition("gems")}`}
@@ -207,9 +207,9 @@ export function UserStats() {
               <div className="flex space-x-4 items-center">
                 <TreasureChest size="xxl" />
                 <div className="space-y-1">
-                  <h4 className="font-medium">Gems</h4>
+                  <h4 className="font-medium">Dates</h4>
                   <p className="text-sm text-muted-foreground">
-                    You have {gemsCount} gems
+                    You have {gemsCount} dates
                   </p>
                   <button
                     onClick={(e) => {
@@ -224,7 +224,7 @@ export function UserStats() {
               </div>
               <div className="p-3 bg-muted rounded-lg border border-muted-foreground/50 text-sm">
                 <h5 className="font-medium">Daily Reward</h5>
-                <p>Complete a lesson today to earn extra gems!</p>
+                <p>Complete a lesson today to earn extra dates!</p>
               </div>
             </div>
           )}
@@ -259,7 +259,9 @@ export function UserStats() {
                     {[...Array(5)].map((_, i) => (
                       <Heart
                         key={i}
-                        className={i < heartsCount ? "opacity-100" : "opacity-30"}
+                        className={
+                          i < heartsCount ? "opacity-100" : "opacity-30"
+                        }
                       />
                     ))}
                   </div>
@@ -273,7 +275,7 @@ export function UserStats() {
                   <Button variant="outline" className="text-purple-500">
                     UNLIMITED HEARTS
                   </Button>
-                  <Button>REFILL HEARTS (350 gems)</Button>
+                  <Button>REFILL HEARTS (350 dates)</Button>
                 </div>
               </HoverCardContent>
             </HoverCard>
@@ -305,7 +307,7 @@ export function UserStats() {
                   UNLIMITED HEARTS
                 </button>
                 <button className="w-full py-2 bg-primary text-primary-foreground rounded-md">
-                  REFILL HEARTS (350 gems)
+                  REFILL HEARTS (350 dates)
                 </button>
               </div>
             </div>

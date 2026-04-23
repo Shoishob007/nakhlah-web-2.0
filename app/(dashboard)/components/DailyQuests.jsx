@@ -10,8 +10,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 const quests = [
-  { label: "Get 25 Diamonds", current: 12, target: 25, icon: GemStone },
-  { label: "Get 40 XP", current: 40, target: 40, icon: HighVoltage },
+  { label: "Get 25 Dates", current: 12, target: 25, icon: GemStone },
+  { label: "Get 40 Injaz", current: 40, target: 40, icon: HighVoltage },
   { label: "Get 2 perfect lessons", current: 2, target: 2, icon: Bullseye },
   // { label: "Complete 1 challenge", current: 0, target: 1, icon: Flame },
 ];
@@ -43,10 +43,10 @@ export function DailyQuests() {
           const Icon = quest.icon;
 
           return (
-          <motion.li
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
+            <motion.li
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
               key={index}
               className="flex items-center justify-between bg-muted/20 rounded-md p-2"
             >

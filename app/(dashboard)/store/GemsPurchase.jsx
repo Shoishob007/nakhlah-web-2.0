@@ -41,7 +41,7 @@ const gemPackages = [
     price: "$15",
     emoji: "💎",
     label: "Premium Pack",
-    description: "Maximum gems",
+    description: "Maximum dates",
   },
   {
     id: 4,
@@ -146,7 +146,7 @@ export default function GemsPurchase() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
-      {/* Step 1: Select Gem Package */}
+      {/* Step 1: Select Date Package */}
       {currentStep === 1 && (
         <motion.div
           key="gems-step1"
@@ -170,16 +170,16 @@ export default function GemsPurchase() {
             <div className="flex items-center justify-center gap-3 mb-3">
               <GemStone size="lg" className="text-accent" />
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Purchase Gems
+                Purchase Dates
               </h2>
             </div>
             <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-              Boost your learning with gems to unlock premium content and
+              Boost your learning with dates to unlock premium content and
               features
             </p>
           </div>
 
-          {/* Gem Packages Grid */}
+          {/* Date Packages Grid */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
             {gemPackages.map((pkg, index) => (
               <motion.div
@@ -208,7 +208,7 @@ export default function GemsPurchase() {
                     <p className="text-3xl font-bold text-accent">
                       {pkg.amount}
                     </p>
-                    <p className="text-sm text-muted-foreground">Gems</p>
+                    <p className="text-sm text-muted-foreground">Dates</p>
                   </div>
 
                   {/* Package Info */}
@@ -275,7 +275,7 @@ export default function GemsPurchase() {
               {selectedPackage?.label}
             </h3>
             <p className="text-3xl font-bold text-accent mb-1">
-              {selectedPackage?.amount} Gems
+              {selectedPackage?.amount} Dates
             </p>
             <p className="text-xl font-semibold text-foreground">
               {selectedPackage?.price}
@@ -494,7 +494,7 @@ export default function GemsPurchase() {
         >
           <div className="space-y-6">
             <div className="flex justify-center mb-8">
-              <Mascot mood="celebrating" size="xxxl" message="Gems added!" />
+              <Mascot mood="celebrating" size="xxxl" message="Dates added!" />
             </div>
             <div>
               <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -503,11 +503,11 @@ export default function GemsPurchase() {
               <div className="inline-flex items-center gap-3 bg-gradient-to-r from-primary/20 to-accent/20 px-6 py-3 rounded-full mb-6">
                 <GemStone size="md" className="text-accent" />
                 <span className="text-2xl font-bold text-accent">
-                  +{selectedPackage?.amount} Gems
+                  +{selectedPackage?.amount} Dates
                 </span>
               </div>
               <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-                Your gems have been added to your account! Use them to unlock
+                Your dates have been added to your account! Use them to unlock
                 premium content and enhance your learning experience.
               </p>
             </div>
@@ -529,7 +529,7 @@ export default function GemsPurchase() {
                 setSelectedPayment(null);
               }}
             >
-              Buy More Gems
+              Buy More Dates
             </Button>
           </div>
         </motion.div>

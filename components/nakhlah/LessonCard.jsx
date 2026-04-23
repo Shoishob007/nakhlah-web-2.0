@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Lock, Star, CheckCircle2 } from "lucide-react";
 
-
 export function LessonCard({
   title,
   description,
@@ -24,16 +23,18 @@ export function LessonCard({
         isLocked
           ? "cursor-not-allowed border-muted bg-muted/50 opacity-60"
           : isCompleted
-          ? "cursor-pointer border-palm bg-palm/10 shadow-md hover:shadow-lg"
-          : "cursor-pointer border-border bg-card shadow-sm hover:border-accent hover:shadow-md",
-        className
+            ? "cursor-pointer border-palm bg-palm/10 shadow-md hover:shadow-lg"
+            : "cursor-pointer border-border bg-card shadow-sm hover:border-accent hover:shadow-md",
+        className,
       )}
     >
-      {/* XP Badge */}
+      {/* Injaz Badge */}
       {xpReward && !isLocked && (
         <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-primary px-2 py-1">
           <Star className="h-3 w-3 text-primary-foreground" />
-          <span className="text-xs font-bold text-primary-foreground">+{xpReward} XP</span>
+          <span className="text-xs font-bold text-primary-foreground">
+            +{xpReward} Injaz
+          </span>
         </div>
       )}
 
@@ -60,8 +61,8 @@ export function LessonCard({
               isCompleted
                 ? "bg-palm/20 text-palm"
                 : isLocked
-                ? "bg-muted text-muted-foreground"
-                : "bg-accent/10 text-accent"
+                  ? "bg-muted text-muted-foreground"
+                  : "bg-accent/10 text-accent",
             )}
           >
             {icon}
@@ -72,7 +73,7 @@ export function LessonCard({
           <h3
             className={cn(
               "font-bold text-lg",
-              isLocked ? "text-muted-foreground" : "text-foreground"
+              isLocked ? "text-muted-foreground" : "text-foreground",
             )}
           >
             {title}
@@ -93,7 +94,7 @@ export function LessonCard({
                   transition={{ duration: 0.5, ease: "easeOut" }}
                   className={cn(
                     "h-full rounded-full",
-                    isCompleted ? "bg-palm" : "bg-accent"
+                    isCompleted ? "bg-palm" : "bg-accent",
                   )}
                 />
               </div>

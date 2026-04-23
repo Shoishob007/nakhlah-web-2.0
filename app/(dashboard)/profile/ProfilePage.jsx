@@ -27,7 +27,7 @@ export default function ProfilePage({
       onClick: () => onNavigate("following"),
     },
     {
-      label: "Activity XP",
+      label: "Activity Injaz",
       value: `${profileData?.gamificationStock?.injazStock ?? 0}`,
     },
   ];
@@ -43,7 +43,7 @@ export default function ProfilePage({
       value: "195",
       onClick: () => onNavigate("following"),
     },
-    { label: "Activity XP", value: "15,274" },
+    { label: "Activity Injaz", value: "15,274" },
   ];
 
   const resolvedStats = profileData ? dynamicStats : stats;
