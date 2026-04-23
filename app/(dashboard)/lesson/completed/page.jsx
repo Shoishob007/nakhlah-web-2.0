@@ -10,6 +10,15 @@ import { Bullseye } from "@/components/icons/BullsEye";
 import { HighVoltage } from "@/components/icons/High-Voltage";
 import { NotoStopwatch } from "@/components/icons/NotoStopwatch";
 
+function formatTime(totalSeconds) {
+  const clamped = Math.max(0, Number(totalSeconds) || 0);
+  const minutes = Math.floor(clamped / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = (clamped % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
 export default function LessonCompleted() {
   const router = useRouter();
   const [progressData, setProgressData] = useState(null);
@@ -24,28 +33,49 @@ export default function LessonCompleted() {
     }
   }, []);
 
-  const diamondsEarned =
-    progressData?.dateStock ?? progressData?.dateEarned ?? 12;
-  const xpEarned = progressData?.injazStock ?? progressData?.xpEarned ?? 24;
+  const datesReceived =
+    progressData?.datesReceived ??
+    progressData?.dateReceived ??
+    progressData?.dateEarned ??
+    progressData?.dailyQuest?.datesSpend ??
+    progressData?.dateStock ??
+    0;
+  const injazReceived =
+    progressData?.injazReceived ??
+    progressData?.InjazReceived ??
+    progressData?.InjazEarned ??
+    progressData?.dailyQuest?.InjazEarned ??
+    progressData?.xpEarned ??
+    progressData?.injazStock ??
+    0;
+
+  const elapsedSeconds =
+    progressData?.__clientStats?.elapsedSeconds ??
+    progressData?.elapsedSeconds ??
+    0;
+  const accuracyValue =
+    progressData?.__clientStats?.accuracyPercentage ??
+    progressData?.accuracyPercentage ??
+    0;
 
   const stats = [
     {
-      label: "Total XP",
-      value: String(xpEarned),
+      label: "Total Injaz",
+      value: String(injazReceived),
       icon: <HighVoltage size="sm" />,
       border: "border-amber-400",
       header: "bg-amber-500",
     },
     {
       label: "Time",
-      value: "1:45",
+      value: formatTime(elapsedSeconds),
       icon: <NotoStopwatch size="sm" />,
       border: "border-emerald-400",
       header: "bg-emerald-500",
     },
     {
       label: "Accuracy",
-      value: "87%",
+      value: `${Math.max(0, Math.min(100, Number(accuracyValue) || 0))}%`,
       icon: <Bullseye size="sm" />,
       border: "border-rose-400",
       header: "bg-rose-500",
@@ -85,7 +115,7 @@ export default function LessonCompleted() {
             Lesson completed!
           </motion.h1>
 
-          {/* Diamonds Earned Section */}
+          {/* Dates Earned Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -96,7 +126,7 @@ export default function LessonCompleted() {
               {/* Header */}
               <div className="bg-gradient-to-r from-sky-400 to-sky-500 py-4">
                 <p className="text-white text-xl font-bold text-center">
-                  Diamonds
+                  Dates
                 </p>
               </div>
 
@@ -105,7 +135,7 @@ export default function LessonCompleted() {
                 <div className="flex items-center justify-center gap-3">
                   <GemStone size="md" className="text-sky-500" />
                   <span className="text-4xl font-extrabold text-slate-800">
-                    {diamondsEarned}
+                    {datesReceived}
                   </span>
                 </div>
               </div>

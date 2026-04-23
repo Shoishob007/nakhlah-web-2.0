@@ -78,7 +78,9 @@ export function LeaderboardCard() {
               </div>
               <div>
                 <p className="text-sm font-medium">{leader.name}</p>
-                <p className="text-xs text-muted-foreground">{leader.xp} XP</p>
+                <p className="text-xs text-muted-foreground">
+                  {leader.xp} Injaz
+                </p>
               </div>
             </div>
             <span className="text-xs font-bold text-accent">

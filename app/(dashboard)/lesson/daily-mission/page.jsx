@@ -10,13 +10,13 @@ import { Flame } from "@/components/icons/Flame";
 
 const missions = [
   {
-    label: "Get 40 XP",
+    label: "Get 40 Injaz",
     current: 23,
     target: 40,
     icon: (props) => <HighVoltage {...props} />,
   },
   {
-    label: "Get 25 Diamonds",
+    label: "Get 25 Dates",
     current: 12,
     target: 25,
     icon: (props) => <GemStone {...props} />,

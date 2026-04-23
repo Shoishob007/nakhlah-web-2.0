@@ -20,12 +20,19 @@ export default function LessonHeader({
   initialElapsedSeconds = 0,
   lives = 5,
   maxLives = 5,
+  onElapsedSecondsChange,
 }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds);
 
   useEffect(() => {
     setElapsedSeconds(initialElapsedSeconds);
   }, [initialElapsedSeconds]);
+
+  useEffect(() => {
+    if (typeof onElapsedSecondsChange === "function") {
+      onElapsedSecondsChange(elapsedSeconds);
+    }
+  }, [elapsedSeconds, onElapsedSecondsChange]);
 
   useEffect(() => {
     const interval = setInterval(() => {

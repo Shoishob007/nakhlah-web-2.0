@@ -6,15 +6,42 @@ export default function QuickStats({ profileData }) {
   const currentStreak = profileData?.learnerStreak?.currentStreak ?? 7;
   const longestStreak = profileData?.learnerStreak?.currentStreak ?? 21;
   const totalXp = profileData?.gamificationStock?.injazStock ?? 15274;
-  const wordsLearned = profileData?.dailyChallengeActivity?.lessonsPracticed ?? 448;
-  const lessonsCompleted = profileData?.dailyChallengeActivity?.lessonsCompleted ?? 127;
+  const lessonsPracticed =
+    profileData?.dailyChallengeActivity?.lessonsPracticed ?? 448;
+  const lessonsCompleted =
+    profileData?.dailyChallengeActivity?.lessonsCompleted ?? 127;
 
   const quickStats = [
-    { label: "Current Streak", value: `${currentStreak} day${currentStreak === 1 ? "" : "s"}`, icon: Flame, color: "text-primary" },
-    { label: "Longest Streak", value: `${longestStreak} day${longestStreak === 1 ? "" : "s"}`, icon: Target, color: "text-palm-green" },
-    { label: "Total XP", value: `${totalXp}`, icon: Zap, color: "text-amber-500" },
-    { label: "Words Learned", value: `${wordsLearned}`, icon: BookOpen, color: "text-secondary" },
-    { label: "Lessons Completed", value: `${lessonsCompleted}`, icon: Award, color: "text-accent" },
+    {
+      label: "Current Streak",
+      value: `${currentStreak} day${currentStreak === 1 ? "" : "s"}`,
+      icon: Flame,
+      color: "text-primary",
+    },
+    {
+      label: "Longest Streak",
+      value: `${longestStreak} day${longestStreak === 1 ? "" : "s"}`,
+      icon: Target,
+      color: "text-palm-green",
+    },
+    {
+      label: "Total Injaz",
+      value: `${totalXp}`,
+      icon: Zap,
+      color: "text-amber-500",
+    },
+    {
+      label: "Lessons Practiced",
+      value: `${lessonsPracticed}`,
+      icon: BookOpen,
+      color: "text-secondary",
+    },
+    {
+      label: "Lessons Completed",
+      value: `${lessonsCompleted}`,
+      icon: Award,
+      color: "text-accent",
+    },
   ];
 
   return (
@@ -27,7 +54,7 @@ export default function QuickStats({ profileData }) {
       <div className="mb-4 lg:mb-6">
         <h3 className="text-xl font-semibold">Quick Stats</h3>
       </div>
-      
+
       <div className="space-y-3">
         {quickStats.map((stat, index) => {
           const IconComponent = stat.icon;
@@ -41,11 +68,11 @@ export default function QuickStats({ profileData }) {
             >
               <div className="flex items-center gap-3">
                 <IconComponent className={`w-5 h-5 ${stat.color}`} />
-                <span className="text-muted-foreground font-medium">{stat.label}</span>
+                <span className="text-muted-foreground font-medium">
+                  {stat.label}
+                </span>
               </div>
-              <span className="font-bold text-foreground">
-                {stat.value}
-              </span>
+              <span className="font-bold text-foreground">{stat.value}</span>
             </motion.div>
           );
         })}

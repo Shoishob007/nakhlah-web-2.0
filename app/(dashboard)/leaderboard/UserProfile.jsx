@@ -16,7 +16,7 @@ export default function UserProfilePage({ user, onBack }) {
       value: "256",
       onClick: () => console.log("Navigate to following"),
     },
-    { label: "lifetime XP", value: "18,528" },
+    { label: "lifetime Injaz", value: "18,528" },
   ];
 
   const xpData = [
@@ -142,7 +142,7 @@ export default function UserProfilePage({ user, onBack }) {
           </div>
         </motion.div>
 
-        {/* XP Chart Card */}
+        {/* Injaz Chart Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -155,7 +155,7 @@ export default function UserProfilePage({ user, onBack }) {
                 Weekly Activity
               </h3>
               <p className="text-3xl font-bold text-accent">
-                {user?.xp || 948} XP
+                {user?.xp || 948} Injaz
               </p>
             </div>
 
