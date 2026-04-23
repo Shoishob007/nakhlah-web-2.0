@@ -45,12 +45,12 @@ export default function StorePage() {
                 What would you like to do?
               </h2>
               <p className="text-muted-foreground text-sm">
-                Choose between purchasing gems or upgrading to premium
+                Choose between purchasing dates or upgrading to premium
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4 max-w-4xl">
-              {/* Gems Purchase Card */}
+              {/* Dates Purchase Card */}
               <motion.button
                 onClick={() => setSelectedOption("gems")}
                 whileHover={{ scale: 1.01 }}
@@ -64,10 +64,10 @@ export default function StorePage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-foreground mb-1">
-                        Buy Gems
+                        Buy Dates
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        Purchase gems to unlock specific content
+                        Purchase dates to unlock specific content
                       </p>
                     </div>
                   </div>
@@ -174,7 +174,7 @@ export default function StorePage() {
           </motion.div>
         )}
 
-        {/* Show Gems Purchase Flow */}
+        {/* Show Dates Purchase Flow */}
         {selectedOption === "gems" && (
           <GemsPurchase onBack={() => setSelectedOption(null)} />
         )}

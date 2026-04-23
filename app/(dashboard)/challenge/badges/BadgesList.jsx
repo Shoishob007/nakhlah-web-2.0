@@ -102,7 +102,7 @@ export default function BadgesList() {
       {
         id: "locked",
         title: "Locked",
-        description: "Reach the XP target to unlock",
+        description: "Reach the Injaz target to unlock",
         badges: filteredBadges.filter((badge) => !badge.earned),
       },
     ].filter((section) => section.badges.length > 0);
@@ -146,8 +146,8 @@ export default function BadgesList() {
             onChange={(e) => setSort(e.target.value)}
             className="h-9 px-4 rounded-full border border-border text-sm bg-card text-muted-foreground focus:outline-none"
           >
-            <option value="xp-desc">XP (High → Low)</option>
-            <option value="xp-asc">XP (Low → High)</option>
+            <option value="xp-desc">Injaz (High → Low)</option>
+            <option value="xp-asc">Injaz (Low → High)</option>
             <option value="az">Title (A → Z)</option>
           </select>
         </div>
@@ -166,7 +166,7 @@ export default function BadgesList() {
       </div>
 
       <div className="text-sm text-muted-foreground text-center lg:text-right">
-        Your current Activity XP:{" "}
+        Your current Activity Injaz:{" "}
         <span className="font-semibold text-foreground">
           {injazStock.toLocaleString()}
         </span>

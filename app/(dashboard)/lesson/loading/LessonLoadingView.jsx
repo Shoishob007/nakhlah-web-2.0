@@ -58,7 +58,7 @@ export default function LessonLoadingView({ progress = 0, error = null }) {
             transition={{ delay: 0.4 }}
             className="text-sm text-muted-foreground max-w-xs mx-auto"
           >
-            Complete the course faster to get more XP and Diamonds.
+            Complete the course faster to get more Injaz and Dates.
           </motion.p>
         )}
       </div>

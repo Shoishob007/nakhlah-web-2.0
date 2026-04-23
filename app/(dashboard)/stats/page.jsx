@@ -103,7 +103,7 @@ export default function Stats() {
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
-              label: "Total XP",
+              label: "Total Injaz",
               value: (
                 profileData?.gamificationStock?.injazStock ?? 2340
               ).toLocaleString(),
@@ -156,12 +156,12 @@ export default function Stats() {
           ))}
         </div>
 
-        {/* Weekly XP Chart */}
+        {/* Weekly Injaz Chart */}
         <Card variant="elevated" className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-accent" />
-              Weekly XP
+              Weekly Injaz
             </CardTitle>
           </CardHeader>
           <CardContent>

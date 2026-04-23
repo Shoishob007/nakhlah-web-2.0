@@ -15,7 +15,7 @@ export function XPDisplay({ current, nextLevel, level, className }) {
           <span className="font-bold text-foreground">Level {level}</span>
         </div>
         <span className="text-sm font-medium text-muted-foreground">
-          {current} / {nextLevel} XP
+          {current} / {nextLevel} Injaz
         </span>
       </div>
       <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
