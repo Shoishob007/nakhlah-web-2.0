@@ -52,6 +52,56 @@ function normalizeQuestionsPayload(payload) {
   return [];
 }
 
+function parseQuestionSequence(question) {
+  const rawOrder =
+    question?._order ??
+    question?.order ??
+    question?.order_number ??
+    question?.sequence;
+  const parsedOrder = Number(rawOrder);
+
+  return Number.isFinite(parsedOrder) ? parsedOrder : null;
+}
+
+function parseMongoObjectIdValue(id) {
+  if (typeof id !== "string" || !/^[a-f0-9]{24}$/i.test(id)) {
+    return null;
+  }
+
+  const timestampHex = id.slice(0, 8);
+  const timestamp = Number.parseInt(timestampHex, 16);
+
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function sortExamQuestionsForDisplay(questions) {
+  return [...questions]
+    .map((question, index) => ({
+      question,
+      index,
+      sequence: parseQuestionSequence(question),
+      objectIdValue: parseMongoObjectIdValue(question?.id),
+    }))
+    .sort((a, b) => {
+      if (a.sequence !== null || b.sequence !== null) {
+        if (a.sequence === null) return 1;
+        if (b.sequence === null) return -1;
+        if (a.sequence !== b.sequence) return a.sequence - b.sequence;
+      }
+
+      if (a.objectIdValue !== null || b.objectIdValue !== null) {
+        if (a.objectIdValue === null) return 1;
+        if (b.objectIdValue === null) return -1;
+        if (a.objectIdValue !== b.objectIdValue) {
+          return a.objectIdValue - b.objectIdValue;
+        }
+      }
+
+      return a.index - b.index;
+    })
+    .map(({ question }) => question);
+}
+
 export default function LessonPage() {
   const router = useRouter();
   const { play } = useAudio();
@@ -178,11 +228,14 @@ export default function LessonPage() {
         console.log("Lesson API raw response:", result.data);
 
         const normalizedQuestions = normalizeQuestionsPayload(result.data);
-        if (!normalizedQuestions.length) {
+        const orderedQuestions = selectedLessonIsExam
+          ? sortExamQuestionsForDisplay(normalizedQuestions)
+          : normalizedQuestions;
+        if (!orderedQuestions.length) {
           throw new Error("No questions returned from API.");
         }
 
-        setQuestions(normalizedQuestions);
+        setQuestions(orderedQuestions);
         setCurrentIndex(0);
       } catch (error) {
         setLoadError(error?.message || "Unable to load lesson.");
