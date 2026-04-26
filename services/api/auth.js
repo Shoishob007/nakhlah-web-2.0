@@ -128,6 +128,10 @@ async function fetchWithAuthRetry(path, { method = "GET", token, headers = {}, b
         return { response, token: resolvedToken };
     }
 
+    if (!token) {
+        return { response, token: resolvedToken };
+    }
+
     const refreshed = await refreshAccessToken(token);
     if (!refreshed.success) {
         return { response, token: resolvedToken };

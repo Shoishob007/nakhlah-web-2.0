@@ -210,6 +210,10 @@ export default function Onboarding() {
       return session.accessToken;
     }
 
+    if (!session?.user?.id) {
+      return null;
+    }
+
     const refreshResult = await refreshAccessToken(session?.accessToken);
     const meResult = await fetchCurrentUser(
       refreshResult?.token || session?.accessToken,
@@ -230,15 +234,14 @@ export default function Onboarding() {
     setIsLoadingOnboarding(true);
     setLoadingError("");
 
-    const token = await getActiveAccessToken();
+    let result = await fetchUserOnboardingGlobals();
 
-    if (!token) {
-      setLoadingError("Please login first to continue onboarding.");
-      setIsLoadingOnboarding(false);
-      return;
+    if (!result.success) {
+      const token = await getActiveAccessToken();
+      if (token) {
+        result = await fetchUserOnboardingGlobals(token);
+      }
     }
-
-    const result = await fetchUserOnboardingGlobals(token);
 
     if (!result.success || !result.data) {
       setLoadingError(result.error || "Failed to load onboarding data");
@@ -446,7 +449,7 @@ export default function Onboarding() {
     );
     localStorage.removeItem("nakhlah_profile_prompt_pending");
 
-    toast.success("Profile created successfully!");
+    // toast.success("Profile created successfully!");
     router.push("/");
     router.refresh();
   };
