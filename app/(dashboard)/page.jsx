@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ZigzagPath } from "./components/ZigzagPath";
 import { UserStats } from "./components/UserStats";
 import { DailyQuests } from "./components/DailyQuests";
@@ -147,7 +147,7 @@ export default function LearnPage() {
     setShowProfilePrompt(shouldPrompt);
   }, []);
 
-  const loadJourney = async () => {
+  const loadJourney = useCallback(async () => {
     try {
       setIsLoading(true);
       setLoadError("");
@@ -180,11 +180,27 @@ export default function LearnPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, status]);
 
   useEffect(() => {
     loadJourney();
-  }, [session, status]);
+  }, [loadJourney]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const handleJourneyUpdated = () => {
+      loadJourney();
+    };
+
+    window.addEventListener("nakhlah:journey-updated", handleJourneyUpdated);
+    return () => {
+      window.removeEventListener(
+        "nakhlah:journey-updated",
+        handleJourneyUpdated,
+      );
+    };
+  }, [loadJourney]);
 
   const handleCompleteProfile = async ({
     fullName,

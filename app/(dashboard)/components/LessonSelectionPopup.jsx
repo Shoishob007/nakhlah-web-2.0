@@ -167,6 +167,9 @@ export function LessonSelectionPopup({
 
       if (giftLessonId) {
         await makeLearnerProgress(giftLessonId, token);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("nakhlah:journey-updated"));
+        }
       }
 
       // Auto close after showing animation for a bit
