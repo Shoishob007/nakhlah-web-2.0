@@ -6,25 +6,32 @@ import { Flame } from "@/components/icons/Flame";
 import { GemStone } from "@/components/icons/Gem";
 import { HighVoltage } from "@/components/icons/High-Voltage";
 import { Medal } from "@/components/icons/Medal";
-import { Trophy } from "@/components/icons/Trophy";
 import { motion } from "framer-motion";
+import { getProfileBadgeCount } from "@/lib/gamification";
 
-export default function StatisticsGrid({ profileData }) {
-  const totalDates = profileData?.gamificationStock?.dateStock ?? 957;
-  const totalXp = profileData?.gamificationStock?.injazStock ?? 15274;
+export default function StatisticsGrid({ profileData, achievementsData = [] }) {
+  const totalDates = profileData?.gamificationStock?.dateStock ?? 0;
+  const totalXp = profileData?.gamificationStock?.injazStock ?? 0;
+  const tasksCompleted = profileData?.dailyChallengeActivity?.taskCompleted ?? 0;
+  const lessonsCompleted =
+    profileData?.dailyChallengeActivity?.lessonsCompleted ?? 0;
+  const achievementsUnlocked = Array.isArray(achievementsData)
+    ? achievementsData.filter((achievement) => achievement?.achieved).length
+    : 0;
+  const badgesEarned = getProfileBadgeCount(profileData);
 
   const userStats = [
     {
       icon: Flame,
-      value: "127",
-      label: "Challenges",
+      value: `${tasksCompleted}`,
+      label: "Tasks Completed",
       color: "text-primary",
       bg: "bg-muted/30",
     },
     {
       icon: Calendar,
-      value: "448",
-      label: "Lesson Passed",
+      value: `${lessonsCompleted}`,
+      label: "Lessons Completed",
       color: "text-primary",
       bg: "bg-muted/30",
     },
@@ -44,15 +51,15 @@ export default function StatisticsGrid({ profileData }) {
     },
     {
       icon: Bullseye,
-      value: "289",
-      label: "Correct Practice",
+      value: `${achievementsUnlocked}`,
+      label: "Achievements Unlocked",
       color: "text-primary",
       bg: "bg-muted/30",
     },
     {
       icon: Medal,
-      value: "16",
-      label: "Top 3 Position",
+      value: `${badgesEarned}`,
+      label: "Badges Earned",
       color: "text-primary",
       bg: "bg-muted/30",
     },
