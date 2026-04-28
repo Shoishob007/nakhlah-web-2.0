@@ -7,6 +7,7 @@ import { HighVoltage } from "@/components/icons/High-Voltage";
 import { GemStone } from "@/components/icons/Gem";
 import { Bullseye } from "@/components/icons/BullsEye";
 import { Flame } from "@/components/icons/Flame";
+import { CheckCircle2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchGamificationDailyQuest, fetchMyProfile } from "@/services/api";
@@ -90,7 +91,7 @@ export default function DailyMissionUpdate() {
             current,
             target,
             reward: Number(quest?.reward) || 0,
-            status: current >= target && target > 0 ? "completed" : "pending",
+            completed: target > 0 && current >= target,
             IconComponent,
           };
         });
@@ -142,15 +143,11 @@ export default function DailyMissionUpdate() {
                     key={`mission-skeleton-${i}`}
                     className="border border-accent/20 rounded-2xl p-4"
                   >
-                    <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-muted animate-pulse flex-shrink-0" />
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                          <div className="h-3 w-12 bg-muted animate-pulse rounded" />
-                        </div>
-                        <div className="h-3 w-48 bg-muted animate-pulse rounded" />
-                        <div className="w-full h-2 bg-muted animate-pulse rounded-full" />
+                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-24 bg-muted animate-pulse rounded" />
                       </div>
                     </div>
                   </div>
@@ -171,8 +168,6 @@ export default function DailyMissionUpdate() {
             ) : null}
 
             {missions.map((mission, index) => {
-              const safeTarget = mission.target > 0 ? mission.target : 1;
-              const progress = (mission.current / safeTarget) * 100;
               const IconComponent = mission.IconComponent;
 
               return (
@@ -183,34 +178,33 @@ export default function DailyMissionUpdate() {
                   transition={{ delay: 0.3 + index * 0.1 }}
                   className="bg-transparent border border-accent/20 rounded-2xl p-4"
                 >
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center">
-                      <IconComponent size="md" className="text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="font-bold text-foreground">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                        <IconComponent size="md" className="text-accent" />
+                      </div>
+                      <div className="min-w-0">
+                        <p
+                          className={`font-bold text-left ${
+                            mission.completed
+                              ? "line-through text-muted-foreground"
+                              : "text-foreground"
+                          }`}
+                        >
                           {mission.label}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          {mission.current} / {mission.target}
+                        <p className="text-xs text-left text-muted-foreground mt-1">
+                          Reward: {mission.reward.toLocaleString()} Injaz
                         </p>
                       </div>
-                      <p className="text-xs text-left text-muted-foreground mb-2">
-                        Status: {mission.status} • Reward:{" "}
-                        {mission.reward.toLocaleString()} Injaz
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <p className="text-sm text-muted-foreground">
+                        {mission.current} / {mission.target}
                       </p>
-                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.min(progress, 100)}%` }}
-                          transition={{
-                            delay: 0.5 + index * 0.1,
-                            duration: 0.8,
-                          }}
-                          className="h-full bg-accent rounded-full"
-                        />
-                      </div>
+                      {mission.completed ? (
+                        <CheckCircle2 className="w-5 h-5 text-accent" />
+                      ) : null}
                     </div>
                   </div>
                 </motion.div>
