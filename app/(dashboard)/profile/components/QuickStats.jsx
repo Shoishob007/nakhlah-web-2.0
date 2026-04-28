@@ -1,15 +1,16 @@
 "use client";
 import { motion } from "framer-motion";
 import { Flame, Target, Zap, BookOpen, Award } from "lucide-react";
+import { getLongestStreak } from "@/lib/gamification";
 
 export default function QuickStats({ profileData }) {
-  const currentStreak = profileData?.learnerStreak?.currentStreak ?? 7;
-  const longestStreak = profileData?.learnerStreak?.currentStreak ?? 21;
-  const totalXp = profileData?.gamificationStock?.injazStock ?? 15274;
+  const currentStreak = profileData?.learnerStreak?.currentStreak ?? 0;
+  const longestStreak = getLongestStreak(profileData);
+  const totalXp = profileData?.gamificationStock?.injazStock ?? 0;
   const lessonsPracticed =
-    profileData?.dailyChallengeActivity?.lessonsPracticed ?? 448;
+    profileData?.dailyChallengeActivity?.lessonsPracticed ?? 0;
   const lessonsCompleted =
-    profileData?.dailyChallengeActivity?.lessonsCompleted ?? 127;
+    profileData?.dailyChallengeActivity?.lessonsCompleted ?? 0;
 
   const quickStats = [
     {

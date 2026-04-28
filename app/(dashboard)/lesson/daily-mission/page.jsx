@@ -7,13 +7,12 @@ import { HighVoltage } from "@/components/icons/High-Voltage";
 import { GemStone } from "@/components/icons/Gem";
 import { Bullseye } from "@/components/icons/BullsEye";
 import { Flame } from "@/components/icons/Flame";
+import { CheckCircle2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import {
-  fetchGamificationDailyQuest,
-  fetchUserDailyQuest,
-} from "@/services/api";
+import { fetchGamificationDailyQuest, fetchMyProfile } from "@/services/api";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
+import { getDailyQuestCurrentValue } from "@/lib/gamification";
 
 const defaultMissionLabels = [
   "Complete daily challenge",
@@ -21,6 +20,7 @@ const defaultMissionLabels = [
   "Score goal challenge",
   "Bonus challenge",
 ];
+
 const missionIcons = [HighVoltage, GemStone, Bullseye, Flame];
 
 const toTitleCase = (value = "") =>
@@ -34,8 +34,6 @@ export default function DailyMissionUpdate() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [dailyQuestState, setDailyQuestState] = useState([]);
-  const [injazReward, setInjazReward] = useState(0);
-  const [rewardBadges, setRewardBadges] = useState([]);
 
   useEffect(() => {
     const loadDailyMission = async () => {
@@ -58,54 +56,47 @@ export default function DailyMissionUpdate() {
         setIsLoading(true);
         setLoadError("");
 
-        const [currentResult, globalResult] = await Promise.all([
-          fetchUserDailyQuest(token),
+        const [profileResult, globalResult] = await Promise.all([
+          fetchMyProfile(token),
           fetchGamificationDailyQuest(token),
         ]);
 
-        if (!currentResult.success) {
+        if (!profileResult.success) {
           throw new Error(
-            currentResult.error || "Failed to load daily mission progress.",
+            profileResult.error || "Failed to load daily mission progress.",
           );
         }
 
-        const currentStatuses = Array.isArray(
-          currentResult.dailyQuest?.challengeStatuses,
-        )
-          ? currentResult.dailyQuest.challengeStatuses
-          : [];
+        if (!globalResult.success) {
+          throw new Error(globalResult.error || "Failed to load daily quests.");
+        }
 
-        const globalDailyQuest = Array.isArray(globalResult?.dailyQuest)
+        const globalDailyQuest = Array.isArray(globalResult.dailyQuest)
           ? globalResult.dailyQuest
           : [];
+        const profile = profileResult.profile || null;
 
-        const merged = currentStatuses.map((item, index) => {
-          const details = item?.details || {};
-          const globalQuest = globalDailyQuest[index] || {};
+        const merged = globalDailyQuest.map((quest, index) => {
+          const current = getDailyQuestCurrentValue(quest?.key, profile);
+          const target = Number(quest?.required) || 0;
           const IconComponent = missionIcons[index % missionIcons.length];
 
           return {
-            key: globalQuest?.key || `daily-${index + 1}`,
+            key: quest?.key || `daily-${index + 1}`,
             label:
-              (globalQuest?.key && toTitleCase(globalQuest.key)) ||
+              quest?.name ||
+              (quest?.key && toTitleCase(quest.key)) ||
               defaultMissionLabels[index] ||
               `Mission ${index + 1}`,
-            current: Number(details.current) || 0,
-            target:
-              Number(details.required) || Number(globalQuest?.required) || 0,
-            reward: Number(details.reward) || Number(globalQuest?.reward) || 0,
-            status: item?.status || "pending",
+            current,
+            target,
+            reward: Number(quest?.reward) || 0,
+            completed: target > 0 && current >= target,
             IconComponent,
           };
         });
 
         setDailyQuestState(merged);
-        setInjazReward(Number(currentResult.dailyQuest?.injazReward) || 0);
-        setRewardBadges(
-          Array.isArray(currentResult.dailyQuest?.badges)
-            ? currentResult.dailyQuest.badges
-            : [],
-        );
       } catch (error) {
         setLoadError(
           error?.message || "Unable to load daily mission progress.",
@@ -125,36 +116,26 @@ export default function DailyMissionUpdate() {
   };
 
   return (
-    <div className="min-h-screen sm:min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-lg mx-auto text-center flex-1 flex flex-col justify-center">
+    <div className="min-h-screen sm:min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:overflow-hidden">
+      <div className="w-full max-w-lg mx-auto text-center flex-1 min-h-0 flex flex-col justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="bg-transparent lg:bg-card rounded-none lg:rounded-3xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-8"
+          className="bg-transparent lg:bg-card rounded-none lg:rounded-3xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-8 flex flex-col min-h-0 sm:max-h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-4rem)]"
         >
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-center mb-8"
+            className="text-center mb-8 shrink-0"
           >
             <h1 className="text-3xl font-extrabold text-accent mb-2">
               Daily mission updated!
             </h1>
-            {(injazReward > 0 || rewardBadges.length > 0) && (
-              <p className="text-sm text-muted-foreground">
-                {injazReward > 0 &&
-                  `Injaz reward: ${injazReward.toLocaleString()}`}
-                {injazReward > 0 && rewardBadges.length > 0 && " • "}
-                {rewardBadges.length > 0 && `Badges: ${rewardBadges.length}`}
-              </p>
-            )}
           </motion.div>
 
-          {/* Mission Cards */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4 mb-8 min-h-0 flex-1 overflow-y-auto pr-1">
             {isLoading ? (
               <>
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -162,15 +143,11 @@ export default function DailyMissionUpdate() {
                     key={`mission-skeleton-${i}`}
                     className="border border-accent/20 rounded-2xl p-4"
                   >
-                    <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-muted animate-pulse flex-shrink-0" />
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                          <div className="h-3 w-12 bg-muted animate-pulse rounded" />
-                        </div>
-                        <div className="h-3 w-48 bg-muted animate-pulse rounded" />
-                        <div className="w-full h-2 bg-muted animate-pulse rounded-full" />
+                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-24 bg-muted animate-pulse rounded" />
                       </div>
                     </div>
                   </div>
@@ -191,46 +168,43 @@ export default function DailyMissionUpdate() {
             ) : null}
 
             {missions.map((mission, index) => {
-              const safeTarget = mission.target > 0 ? mission.target : 1;
-              const progress = (mission.current / safeTarget) * 100;
               const IconComponent = mission.IconComponent;
 
               return (
                 <motion.div
-                  key={mission.label}
+                  key={mission.key}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + index * 0.1 }}
                   className="bg-transparent border border-accent/20 rounded-2xl p-4"
                 >
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center">
-                      <IconComponent size="md" className="text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="font-bold text-foreground">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                        <IconComponent size="md" className="text-accent" />
+                      </div>
+                      <div className="min-w-0">
+                        <p
+                          className={`font-bold text-left ${
+                            mission.completed
+                              ? "line-through text-muted-foreground"
+                              : "text-foreground"
+                          }`}
+                        >
                           {mission.label}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          {mission.current} / {mission.target}
+                        <p className="text-xs text-left text-muted-foreground mt-1">
+                          Reward: {mission.reward.toLocaleString()} Injaz
                         </p>
                       </div>
-                      <p className="text-xs text-left text-muted-foreground mb-2">
-                        Status: {mission.status} • Reward:{" "}
-                        {mission.reward.toLocaleString()} Injaz
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <p className="text-sm text-muted-foreground">
+                        {mission.current} / {mission.target}
                       </p>
-                      <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.min(progress, 100)}%` }}
-                          transition={{
-                            delay: 0.5 + index * 0.1,
-                            duration: 0.8,
-                          }}
-                          className="h-full bg-accent rounded-full"
-                        />
-                      </div>
+                      {mission.completed ? (
+                        <CheckCircle2 className="w-5 h-5 text-accent" />
+                      ) : null}
                     </div>
                   </div>
                 </motion.div>
@@ -238,12 +212,11 @@ export default function DailyMissionUpdate() {
             })}
           </div>
 
-          {/* Desktop Continue Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="hidden sm:block"
+            className="hidden sm:block shrink-0"
           >
             <Button
               onClick={handleContinue}
@@ -255,7 +228,6 @@ export default function DailyMissionUpdate() {
         </motion.div>
       </div>
 
-      {/* Mobile bottom action */}
       <div className="w-full max-w-lg mx-auto sm:hidden bg-background border-t border-border p-4">
         <Button
           onClick={handleContinue}

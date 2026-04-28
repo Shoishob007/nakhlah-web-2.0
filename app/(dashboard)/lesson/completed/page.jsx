@@ -64,11 +64,11 @@ export default function LessonCompleted() {
 
   const stats = [
     {
-      label: "Total Injaz",
-      value: String(injazReceived),
-      icon: <HighVoltage size="sm" />,
-      border: "border-amber-400",
-      header: "bg-amber-500",
+      label: "Total Dates",
+      value: String(datesReceived),
+      icon: <GemStone size="sm" />,
+      border: "border-sky-400",
+      header: "bg-sky-500",
     },
     {
       label: "Time",
@@ -126,20 +126,20 @@ export default function LessonCompleted() {
             transition={{ delay: 0.5, duration: 0.5 }}
             className="mb-10 px-4 sm:px-0"
           >
-            <div className="max-w-sm mx-auto rounded-2xl overflow-hidden border-2 border-sky-400">
+            <div className="max-w-sm mx-auto rounded-2xl overflow-hidden border-2 border-amber-400">
               {/* Header */}
-              <div className="bg-gradient-to-r from-sky-400 to-sky-500 py-4">
+              <div className="bg-gradient-to-r from-amber-400 to-amber-500 py-4">
                 <p className="text-white text-xl font-bold text-center">
-                  Dates
+                  Injaz Earned
                 </p>
               </div>
 
               {/* Body */}
               <div className="bg-white py-6">
                 <div className="flex items-center justify-center gap-3">
-                  <GemStone size="md" className="text-sky-500" />
+                  <HighVoltage size="md" className="text-amber-500" />
                   <span className="text-4xl font-extrabold text-slate-800">
-                    {datesReceived}
+                    {injazReceived}
                   </span>
                 </div>
               </div>

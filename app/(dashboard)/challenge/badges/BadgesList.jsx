@@ -15,7 +15,7 @@ const toTitleCase = (key) =>
 export default function BadgesList() {
   const { data: session, status } = useSession();
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("xp-desc");
+  const [sort, setSort] = useState("xp-asc");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [badges, setBadges] = useState([]);

@@ -61,7 +61,10 @@ export default function ProfilePage({
             profileData={profileData}
             isLoading={isLoading}
           />
-          <StatisticsGrid profileData={profileData} />
+          <StatisticsGrid
+            profileData={profileData}
+            achievementsData={achievementsData}
+          />
           <XPChart />
           <AchievementsList
             onViewAll={() => onNavigate("all-achievements")}
