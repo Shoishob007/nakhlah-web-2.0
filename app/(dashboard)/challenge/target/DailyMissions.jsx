@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import MissionSection from "./MissionSection";
-import {
-  fetchGamificationDailyQuest,
-  fetchUserDailyQuest,
-} from "@/services/api";
+import { fetchGamificationDailyQuest, fetchMyProfile } from "@/services/api";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
+import { getDailyQuestCurrentValue } from "@/lib/gamification";
 
 const toTitleCase = (key = "") =>
   key
@@ -55,18 +53,18 @@ export default function DailyMissions() {
         setIsLoading(true);
         setLoadError("");
 
-        const [globalResult, currentResult] = await Promise.all([
+        const [globalResult, profileResult] = await Promise.all([
           fetchGamificationDailyQuest(token),
-          fetchUserDailyQuest(token),
+          fetchMyProfile(token),
         ]);
 
         if (!globalResult.success) {
           throw new Error(globalResult.error || "Failed to load daily quests.");
         }
 
-        if (!currentResult.success) {
+        if (!profileResult.success) {
           throw new Error(
-            currentResult.error ||
+            profileResult.error ||
               "Failed to load current daily quest progress.",
           );
         }
@@ -74,31 +72,12 @@ export default function DailyMissions() {
         const globalQuests = Array.isArray(globalResult.dailyQuest)
           ? globalResult.dailyQuest
           : [];
-        const rawStatuses = currentResult.dailyQuest?.challengeStatuses;
-        const statusByKey = new Map();
-        const fallbackStatuses = Array.isArray(rawStatuses) ? rawStatuses : [];
-
-        if (Array.isArray(rawStatuses)) {
-          rawStatuses.forEach((status, index) => {
-            const key =
-              status?.key ||
-              status?.challengeKey ||
-              status?.questKey ||
-              globalQuests[index]?.key ||
-              `daily-${index + 1}`;
-            statusByKey.set(key, status || {});
-          });
-        } else if (rawStatuses && typeof rawStatuses === "object") {
-          Object.entries(rawStatuses).forEach(([key, status]) => {
-            statusByKey.set(key, status || {});
-          });
-        }
+        const profile = profileResult.profile || null;
 
         const normalized = globalQuests.map((quest, index) => {
           const questKey = quest.key || `daily-${index + 1}`;
-          const status =
-            statusByKey.get(questKey) || fallbackStatuses[index] || {};
-          const details = status?.details || {};
+          const current = getDailyQuestCurrentValue(questKey, profile);
+          const target = Number(quest.required) || 0;
 
           return {
             key: questKey,
@@ -107,10 +86,10 @@ export default function DailyMissions() {
               : quest.key
                 ? toTitleCase(quest.key)
                 : defaultLabels[index] || `Mission ${index + 1}`,
-            current: Number(details.current) || 0,
-            target: Number(details.required) || Number(quest.required) || 0,
-            reward: Number(details.reward) || Number(quest.reward) || 0,
-            status: status?.status || "pending",
+            current,
+            target,
+            reward: Number(quest.reward) || 0,
+            status: current >= target && target > 0 ? "completed" : "pending",
             iconUrl: quest.icon?.url || quest.icon || "",
             type: "daily",
           };

@@ -18,6 +18,7 @@ import {
 } from "@/services/api";
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
+import { hasOpenedGiftBox } from "@/lib/gamification";
 
 const sortByOrder = (items, key) =>
   [...(items || [])].sort((a, b) => (a?.[key] || 0) - (b?.[key] || 0));
@@ -88,10 +89,7 @@ export function LessonSelectionPopup({
         setLessons(normalized);
 
         if (isTaskGiftBox && profileResult?.success) {
-          const openedGiftBoxes = profileResult.profile?.openedGiftBoxes;
-          const alreadyOpened =
-            Array.isArray(openedGiftBoxes) &&
-            openedGiftBoxes.some((gift) => gift?.taskId === taskId);
+          const alreadyOpened = hasOpenedGiftBox(profileResult.profile, taskId);
 
           if (alreadyOpened) {
             setIsGiftAlreadyOpened(true);
@@ -333,12 +331,17 @@ export function LessonSelectionPopup({
               />
 
               <div className="relative text-accent">
-                {hasClaimed && !isGiftAlreadyOpened ? (
+                {isGiftAlreadyOpened ? (
+                  <div className="relative">
+                    <TreasureChest className="w-32 h-32 opacity-70 grayscale-[0.15]" />
+                    {/* <div className="absolute -right-2 -top-2 rounded-full bg-emerald-500 p-2 text-white shadow-lg">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div> */}
+                  </div>
+                ) : hasClaimed ? (
                   <TreasureChest className="w-36 h-36 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)] text-yellow-500" />
                 ) : (
-                  <TreasureChest
-                    className={`w-32 h-32 ${isGiftAlreadyOpened ? "opacity-70" : ""}`}
-                  />
+                  <TreasureChest className="w-32 h-32" />
                 )}
               </div>
             </motion.button>
