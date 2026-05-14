@@ -73,7 +73,7 @@ This document outlines the comprehensive refactoring of the lesson learning comp
 - Completes sentences with missing words
 - Randomly shuffles answer options
 - Uses `is_correct` property for validation
-- Displays question with "****\_****" placeholder
+- Displays question with "\***\*\_\*\***" placeholder
 
 ### 5. **Word Making - WordMakingQuestion.jsx**
 
@@ -102,7 +102,7 @@ Navigate to /lesson/loading
     ↓
 Loading Page:
   - Gets lesson ID from sessionStorage
-  - Calls API: GET https://nakhlah-api.nakhlah.net/api/globals/questionnaires/lessons/{lessonId}
+  - Calls API: GET https://nakhlah-api.nakhlah.net/api/lessons/{lessonId}
   - Stores questions in QuestionContext
     ↓
 Navigate to /lesson/question
@@ -119,7 +119,7 @@ Question Page:
 ### API Endpoint
 
 ```
-GET https://nakhlah-api.nakhlah.net/api/globals/questionnaires/lessons/{lessonId}
+GET https://nakhlah-api.nakhlah.net/api/lessons/{lessonId}
 ```
 
 ### Authentication

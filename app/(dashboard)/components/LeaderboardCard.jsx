@@ -4,11 +4,11 @@ import { Trophy } from "@/components/icons/Trophy";
 import { CardMenuOptions } from "@/components/nakhlah/CardMenuOptions";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
-import { buildApiUrl } from "@/lib/api-config";
-import { fetchLeaderboard } from "@/services/api";
+import { getUserKey } from "@/lib/userKey";
+import { useLeaderboardStore } from "@/stores/useLeaderboardStore";
 
 const FALLBACK_LEADERS = [
   {
@@ -37,75 +37,34 @@ const FALLBACK_LEADERS = [
   },
 ];
 
-const toDisplayName = (fullName, email) => {
-  const trimmedName = (fullName || "").trim();
-  if (trimmedName) return trimmedName;
-  const trimmedEmail = (email || "").trim();
-  return trimmedEmail || "Unknown learner";
-};
-
-const toAvatarText = (nameOrEmail) => {
-  const text = (nameOrEmail || "").trim();
-  if (!text) return "NA";
-  const localPart = text.includes("@") ? text.split("@")[0] : text;
-  const parts = localPart
-    .replace(/[^a-zA-Z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
-  }
-  return localPart.slice(0, 2).toUpperCase();
-};
-
-const toMediaUrl = (url) => {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  return buildApiUrl(url);
-};
-
 export function LeaderboardCard() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [topLeaders, setTopLeaders] = useState(FALLBACK_LEADERS);
+  const topThree = useLeaderboardStore((state) => state.topThree);
+  const fetchLeaderboard = useLeaderboardStore(
+    (state) => state.fetchLeaderboard,
+  );
+  const clearLeaderboard = useLeaderboardStore((state) => state.clear);
+  const topLeaders = topThree.length ? topThree : FALLBACK_LEADERS;
 
   useEffect(() => {
     const loadLeaders = async () => {
       if (status === "loading") return;
       if (!isSessionValid(session)) {
-        setTopLeaders(FALLBACK_LEADERS);
+        clearLeaderboard();
         return;
       }
 
       const token = getSessionToken(session);
-      const result = await fetchLeaderboard(token);
-
-      if (!result.success) {
-        setTopLeaders(FALLBACK_LEADERS);
-        return;
-      }
-
-      const mapped = (result.leaderboard || [])
-        .map((item, index) => {
-          const rank = Number(item?.rank);
-          const name = toDisplayName(item?.fullName, item?.email);
-          return {
-            rank: Number.isFinite(rank) ? rank : index + 1,
-            id: item?.id || `leader-card-${index}`,
-            name,
-            xp: Number(item?.injazCount) || 0,
-            avatar: toAvatarText(name),
-            avatarUrl: toMediaUrl(item?.profilePictureUrl),
-          };
-        })
-        .sort((a, b) => a.rank - b.rank)
-        .slice(0, 3);
-
-      setTopLeaders(mapped.length ? mapped : FALLBACK_LEADERS);
+      await fetchLeaderboard({
+        token,
+        userKey: getUserKey(session),
+        sessionUserId: session?.user?.id || "",
+      });
     };
 
     loadLeaders();
-  }, [session, status]);
+  }, [clearLeaderboard, fetchLeaderboard, session, status]);
 
   const menuOptions = [
     {

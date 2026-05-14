@@ -4,106 +4,38 @@ import { Search } from "lucide-react";
 import { Trophy } from "@/components/icons/Trophy";
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
-import { buildApiUrl } from "@/lib/api-config";
-import { fetchLeaderboard } from "@/services/api";
-
-const LEADERBOARD_COLORS = [
-  "from-purple-500 to-pink-500",
-  "from-primary to-accent",
-  "from-orange-500 to-red-500",
-  "from-green-500 to-emerald-500",
-  "from-violet-500 to-purple-500",
-  "from-amber-500 to-orange-500",
-  "from-teal-500 to-cyan-500",
-  "from-rose-500 to-pink-500",
-];
-
-const toDisplayName = (fullName, email) => {
-  const trimmedName = (fullName || "").trim();
-  if (trimmedName) return trimmedName;
-  const trimmedEmail = (email || "").trim();
-  if (!trimmedEmail) return "Unknown learner";
-  return trimmedEmail;
-};
-
-const toAvatarText = (nameOrEmail) => {
-  const text = (nameOrEmail || "").trim();
-  if (!text) return "NA";
-  const localPart = text.includes("@") ? text.split("@")[0] : text;
-  const parts = localPart
-    .replace(/[^a-zA-Z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (parts.length >= 2) {
-    return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
-  }
-  return localPart.slice(0, 2).toUpperCase();
-};
-
-const toMediaUrl = (url) => {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  return buildApiUrl(url);
-};
+import { getUserKey } from "@/lib/userKey";
+import { useLeaderboardStore } from "@/stores/useLeaderboardStore";
 
 export default function Leaderboard({ onViewProfile }) {
   const { data: session, status } = useSession();
-  const [timeFilter, setTimeFilter] = useState("weekly");
-  const [leaderboardData, setLeaderboardData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const timeFilters = [
-    { id: "weekly", label: "Weekly" },
-    { id: "monthly", label: "Monthly" },
-    { id: "alltime", label: "All Time" },
-  ];
+  const leaderboardData = useLeaderboardStore((state) => state.leaderboard);
+  const topThree = useLeaderboardStore((state) => state.topThree);
+  const isLoading = useLeaderboardStore((state) => state.isLoading);
+  const fetchLeaderboard = useLeaderboardStore(
+    (state) => state.fetchLeaderboard,
+  );
+  const clearLeaderboard = useLeaderboardStore((state) => state.clear);
 
   useEffect(() => {
     const loadLeaderboard = async () => {
       if (status === "loading") return;
 
       if (!isSessionValid(session)) {
-        setLeaderboardData([]);
-        setIsLoading(false);
+        clearLeaderboard();
         return;
       }
 
-      setIsLoading(true);
       const token = getSessionToken(session);
-      const result = await fetchLeaderboard(token);
-
-      if (result.success) {
-        const mapped = (result.leaderboard || []).map((item, index) => {
-          const name = toDisplayName(item?.fullName, item?.email);
-          const rankNumber = Number(item?.rank);
-
-          return {
-            rank: Number.isFinite(rankNumber) ? rankNumber : index + 1,
-            id: item?.id || `leader-${index}`,
-            name,
-            email: item?.email || "",
-            xp: Number(item?.injazCount) || 0,
-            avatar: toAvatarText(name),
-            avatarUrl: toMediaUrl(item?.profilePictureUrl),
-            color: LEADERBOARD_COLORS[index % LEADERBOARD_COLORS.length],
-            isCurrentUser:
-              Boolean(session?.user?.id) && session.user.id === item?.id,
-          };
-        });
-        mapped.sort((a, b) => a.rank - b.rank);
-        setLeaderboardData(mapped);
-      } else {
-        setLeaderboardData([]);
-      }
-
-      setIsLoading(false);
+      await fetchLeaderboard({
+        token,
+        userKey: getUserKey(session),
+        sessionUserId: session?.user?.id || "",
+      });
     };
 
     loadLeaderboard();
-  }, [session, status]);
-
-  const topThree = leaderboardData.slice(0, 3);
+  }, [clearLeaderboard, fetchLeaderboard, session, status]);
 
   return (
     <div className="min-h-screen">
@@ -125,28 +57,6 @@ export default function Leaderboard({ onViewProfile }) {
           <button className="w-10 h-10 rounded-xl hover:bg-muted flex items-center justify-center transition-colors">
             <Search className="w-5 h-5 text-muted-foreground" />
           </button>
-        </motion.div>
-
-        {/* Time Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex gap-2 mb-8 mx-auto justify-center lg:justify-start"
-        >
-          {timeFilters.map((filter) => (
-            <button
-              key={filter.id}
-              onClick={() => setTimeFilter(filter.id)}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                timeFilter === filter.id
-                  ? "bg-primary text-primary-foreground shadow-lg"
-                  : "bg-card text-muted-foreground hover:bg-muted border border-border"
-              }`}
-            >
-              {filter.label}
-            </button>
-          ))}
         </motion.div>
 
         {/* Top 3 Podium */}
