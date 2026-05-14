@@ -16,11 +16,12 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import {
-  fetchMyProfile,
   fetchGamificationBadges,
   fetchQuestionnaireAchievements,
 } from "@/services/api";
 import { Medal } from "@/components/icons/Medal";
+import { getUserKey } from "@/lib/userKey";
+import { useProfileStore } from "@/stores/useProfileStore";
 
 const DEFAULT_PROFILE_IMAGE = "https://github.com/shadcn.png";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -55,15 +56,17 @@ export function ProfileSection() {
   const { data: session, status } = useSession();
   const isSignedIn = status === "authenticated";
   const router = useRouter();
-  const [profileData, setProfileData] = useState(null);
   const [badgeDictionary, setBadgeDictionary] = useState([]);
   const [achievements, setAchievements] = useState([]);
+  const profileData = useProfileStore((state) => state.profile);
+  const fetchProfile = useProfileStore((state) => state.fetchMyProfile);
+  const clearProfile = useProfileStore((state) => state.clear);
 
   useEffect(() => {
     const loadProfileData = async () => {
       if (status === "loading") return;
       if (!isSessionValid(session)) {
-        setProfileData(null);
+        clearProfile();
         setBadgeDictionary([]);
         setAchievements([]);
         return;
@@ -72,16 +75,11 @@ export function ProfileSection() {
       const token = getSessionToken(session);
       if (!token) return;
 
-      const [profileResult, badgesResult, achievementsResult] =
-        await Promise.all([
-          fetchMyProfile(token),
-          fetchGamificationBadges(token),
-          fetchQuestionnaireAchievements(token),
-        ]);
-
-      if (profileResult.success) {
-        setProfileData(profileResult.profile || null);
-      }
+      const [_, badgesResult, achievementsResult] = await Promise.all([
+        fetchProfile(token, false, getUserKey(session)),
+        fetchGamificationBadges(token),
+        fetchQuestionnaireAchievements(token),
+      ]);
 
       if (badgesResult.success) {
         setBadgeDictionary(badgesResult.badges || []);
@@ -93,7 +91,7 @@ export function ProfileSection() {
     };
 
     loadProfileData();
-  }, [session, status]);
+  }, [clearProfile, fetchProfile, session, status]);
 
   const profileImage =
     getMediaUrl(profileData?.profilePicture?.url || session?.user?.image) ||

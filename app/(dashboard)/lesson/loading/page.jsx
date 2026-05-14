@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LessonLoadingView from "./LessonLoadingView";
+import { useLessonStore } from "@/stores/useLessonStore";
 
 const lessonSequence = ["/lesson"];
 
@@ -10,9 +11,13 @@ export default function LessonLoading() {
   const [progress, setProgress] = useState(0);
   const router = useRouter();
   const [error] = useState(null);
+  const selectedLessonId = useLessonStore((state) => state.selectedLessonId);
+  const setSelectedLesson = useLessonStore((state) => state.setSelectedLesson);
 
   useEffect(() => {
-    const lessonId = sessionStorage.getItem("selectedLessonId")?.trim();
+    const lessonId =
+      (selectedLessonId || "").trim() ||
+      sessionStorage.getItem("selectedLessonId")?.trim();
 
     if (!lessonId) {
       console.error("No lesson ID found");
@@ -22,6 +27,7 @@ export default function LessonLoading() {
 
     sessionStorage.setItem("currentLessonIndex", "0");
     sessionStorage.setItem("selectedLessonId", lessonId);
+    setSelectedLesson({ lessonId });
 
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -37,9 +43,7 @@ export default function LessonLoading() {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [router]);
+  }, [router, selectedLessonId, setSelectedLesson]);
 
-  return (
-    <LessonLoadingView progress={progress} error={error} />
-  );
+  return <LessonLoadingView progress={progress} error={error} />;
 }

@@ -20,6 +20,8 @@ import {
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import { hasOpenedGiftBox } from "@/lib/gamification";
+import { useDailyQuestStore } from "@/stores/useDailyQuestStore";
+import { useLessonStore } from "@/stores/useLessonStore";
 
 const sortByOrder = (items, key) =>
   [...(items || [])].sort((a, b) => (a?.[key] || 0) - (b?.[key] || 0));
@@ -44,6 +46,7 @@ export function LessonSelectionPopup({
   open,
 }) {
   const router = useRouter();
+  const setSelectedLesson = useLessonStore((state) => state.setSelectedLesson);
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState("");
@@ -127,69 +130,23 @@ export function LessonSelectionPopup({
         ? "Select an available block to begin"
         : "Complete previous tasks to unlock";
 
-  const resolveImmediateNextLessonId = async (currentLessonId) => {
-    const currentIndex = lessons.findIndex(
-      (item) => item.id === currentLessonId,
-    );
-    const sameTaskNextLessonId =
-      currentIndex >= 0 ? lessons[currentIndex + 1]?.id || "" : "";
-
-    if (sameTaskNextLessonId) {
-      return sameTaskNextLessonId;
-    }
-
-    if (!taskId || !isSessionValid(session)) {
-      return "";
-    }
-
-    const token = getSessionToken(session);
-    if (!token) {
-      return "";
-    }
-
-    const journeyResult = await fetchJourneyStructure(token);
-    if (!journeyResult.success) {
-      return "";
-    }
-
-    const orderedTasks = getOrderedJourneyTasks(journeyResult.data || {});
-    const taskIndex = orderedTasks.findIndex((task) => task?.id === taskId);
-    const nextTaskId =
-      taskIndex >= 0 ? orderedTasks[taskIndex + 1]?.id || "" : "";
-
-    if (!nextTaskId) {
-      return "";
-    }
-
-    const nextTaskLessonsResult = await fetchTaskLessons(nextTaskId, token);
-    if (!nextTaskLessonsResult.success) {
-      return "";
-    }
-
-    const nextTaskLessons = sortByOrder(
-      nextTaskLessonsResult.data?.docs,
-      "lessonOrder",
-    );
-    return nextTaskLessons[0]?.id || "";
-  };
-
   const handleLessonClick = async (lesson) => {
     if (lesson.isLocked) return;
 
-    const nextLessonId = await resolveImmediateNextLessonId(lesson.id);
-
     sessionStorage.setItem("selectedLessonId", lesson.id);
-    if (nextLessonId) {
-      sessionStorage.setItem("selectedNextLessonId", nextLessonId);
-    } else {
-      sessionStorage.removeItem("selectedNextLessonId");
-    }
     sessionStorage.setItem("selectedNodeId", taskId);
     sessionStorage.setItem(
       "selectedLessonIsExam",
       lesson.isExam ? "true" : "false",
     );
     sessionStorage.setItem("selectedLessonStatus", lesson.status || "");
+
+    setSelectedLesson({
+      lessonId: lesson.id,
+      nodeId: taskId,
+      status: lesson.status || "",
+      isExam: Boolean(lesson.isExam),
+    });
 
     router.push("/lesson");
     onClose();
@@ -229,11 +186,15 @@ export function LessonSelectionPopup({
         lessons.find((lesson) => lesson.isCurrent || !lesson.isLocked)?.id ||
         lessons[0]?.id ||
         "";
-      const targetLessonId =
-        await resolveImmediateNextLessonId(activeGiftLessonId);
 
-      if (targetLessonId) {
-        await makeLearnerProgress(targetLessonId, token);
+      if (activeGiftLessonId) {
+        const progressResult = await makeLearnerProgress(
+          activeGiftLessonId,
+          token,
+        );
+        if (progressResult?.success) {
+          useDailyQuestStore.getState().invalidate();
+        }
         if (typeof window !== "undefined") {
           window.dispatchEvent(new Event("nakhlah:journey-updated"));
         }

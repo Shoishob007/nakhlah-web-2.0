@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ZigzagPath } from "./components/ZigzagPath";
 import { UserStats } from "./components/UserStats";
 import { DailyQuests } from "./components/DailyQuests";
@@ -9,15 +9,13 @@ import { LeaderboardCard } from "./components/LeaderboardCard";
 import { CompleteProfilePrompt } from "./components/CompleteProfilePrompt";
 import { JourneyErrorFallback } from "./components/JourneyErrorFallback";
 import { Trophy } from "@/components/icons/Trophy";
-import { fetchJourneyStructure, fetchMyProfile } from "@/services/api";
 import { updateMyProfile } from "@/services/api/auth";
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import { toast } from "@/components/nakhlah/Toast";
-import { getCached, setCached, invalidateCache } from "@/lib/clientCache";
-
-const CACHE_JOURNEY = "journey_structure";
-const CACHE_PROFILE = "my_profile";
+import { getUserKey } from "@/lib/userKey";
+import { useJourneyStore } from "@/stores/useJourneyStore";
+import { useProfileStore } from "@/stores/useProfileStore";
 
 const mascots = [];
 
@@ -136,13 +134,20 @@ const buildJourneyView = (journey, currentProgress) => {
 
 export default function LearnPage() {
   const stickyTopOffset = "top-6";
-  const [levels, setLevels] = useState([]);
-  const [lessons, setLessons] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const { data: session, status } = useSession();
+  const journeyData = useJourneyStore((state) => state.journeyData);
+  const isJourneyLoading = useJourneyStore((state) => state.isLoading);
+  const fetchJourney = useJourneyStore((state) => state.fetchJourneyStructure);
+  const invalidateJourney = useJourneyStore((state) => state.invalidate);
+  const clearJourney = useJourneyStore((state) => state.clear);
+  const profileData = useProfileStore((state) => state.profile);
+  const isProfileLoading = useProfileStore((state) => state.isLoading);
+  const fetchProfile = useProfileStore((state) => state.fetchMyProfile);
+  const invalidateProfile = useProfileStore((state) => state.invalidate);
+  const clearProfile = useProfileStore((state) => state.clear);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -151,60 +156,40 @@ export default function LearnPage() {
     setShowProfilePrompt(shouldPrompt);
   }, []);
 
-  const loadJourney = useCallback(async () => {
-    try {
-      setLoadError("");
+  const loadJourney = useCallback(
+    async (forceRefresh = false) => {
+      try {
+        setLoadError("");
 
-      if (status === "loading") return;
-      if (status === "unauthenticated" || !isSessionValid(session)) {
-        throw new Error("Please login to view your journey.");
+        if (status === "loading") return;
+        if (status === "unauthenticated" || !isSessionValid(session)) {
+          clearJourney();
+          clearProfile();
+          throw new Error("Please login to view your journey.");
+        }
+
+        const token = getSessionToken(session);
+        const userKey = getUserKey(session);
+        const [profileResult, journeyResult] = await Promise.all([
+          fetchProfile(token, forceRefresh, userKey),
+          fetchJourney(token, forceRefresh, userKey),
+        ]);
+
+        if (!journeyResult.success) {
+          throw new Error(
+            journeyResult.error || "Failed to load journey structure",
+          );
+        }
+
+        if (!profileResult.success && !profileResult.fromCache) {
+          throw new Error(profileResult.error || "Failed to load profile");
+        }
+      } catch (error) {
+        setLoadError(error?.message || "Unable to load journey structure");
       }
-
-      // Serve from cache instantly — no loading flicker on revisit
-      const cachedJourney = getCached(CACHE_JOURNEY);
-      const cachedProfile = getCached(CACHE_PROFILE);
-      if (cachedJourney && cachedProfile) {
-        const { sections, nodes } = buildJourneyView(
-          cachedJourney,
-          cachedProfile?.currentProgress || null,
-        );
-        setLevels(sections);
-        setLessons(nodes);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      const token = getSessionToken(session);
-      const [profileResult, journeyResult] = await Promise.all([
-        fetchMyProfile(token),
-        fetchJourneyStructure(token),
-      ]);
-
-      if (!journeyResult.success) {
-        throw new Error(
-          journeyResult.error || "Failed to load journey structure",
-        );
-      }
-
-      const journeyData = journeyResult.data || {};
-      const profileData = profileResult?.profile || null;
-
-      setCached(CACHE_JOURNEY, journeyData);
-      if (profileData) setCached(CACHE_PROFILE, profileData);
-
-      const { sections, nodes } = buildJourneyView(
-        journeyData,
-        profileData?.currentProgress || null,
-      );
-      setLevels(sections);
-      setLessons(nodes);
-    } catch (error) {
-      setLoadError(error?.message || "Unable to load journey structure");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [session, status]);
+    },
+    [clearJourney, clearProfile, fetchJourney, fetchProfile, session, status],
+  );
 
   useEffect(() => {
     loadJourney();
@@ -214,9 +199,9 @@ export default function LearnPage() {
     if (typeof window === "undefined") return undefined;
 
     const handleJourneyUpdated = () => {
-      invalidateCache(CACHE_JOURNEY);
-      invalidateCache(CACHE_PROFILE);
-      loadJourney();
+      invalidateJourney();
+      invalidateProfile();
+      loadJourney(true);
     };
 
     window.addEventListener("nakhlah:journey-updated", handleJourneyUpdated);
@@ -226,7 +211,17 @@ export default function LearnPage() {
         handleJourneyUpdated,
       );
     };
-  }, [loadJourney]);
+  }, [invalidateJourney, invalidateProfile, loadJourney]);
+
+  const { levels, lessons } = useMemo(() => {
+    const { sections, nodes } = buildJourneyView(
+      journeyData || {},
+      profileData?.currentProgress || null,
+    );
+    return { levels: sections, lessons: nodes };
+  }, [journeyData, profileData]);
+
+  const isLoading = isJourneyLoading || isProfileLoading;
 
   const handleCompleteProfile = async ({
     fullName,
@@ -290,7 +285,10 @@ export default function LearnPage() {
             style={{ top: "env(safe-area-inset-top, 0px)" }}
           >
             {loadError ? (
-              <JourneyErrorFallback error={loadError} onRetry={loadJourney} />
+              <JourneyErrorFallback
+                error={loadError}
+                onRetry={() => loadJourney(true)}
+              />
             ) : (
               <ZigzagPath
                 lessons={lessons}

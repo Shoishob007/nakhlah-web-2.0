@@ -49,12 +49,22 @@ export default function FiveDaysStraight() {
   }, [session, status]);
 
   const recentDays = useMemo(() => {
-    const completedDates = new Set(
-      (Array.isArray(streakData?.dates) ? streakData.dates : [])
-        .filter((item) => item?.status === "completed" && item?.date)
-        .map((item) => normalizeDateKey(item.date))
-        .filter(Boolean),
-    );
+    // Build a map of dates to their status, preferring "missed" over "completed"
+    const dateStatusMap = new Map();
+    const dates = Array.isArray(streakData?.dates) ? streakData.dates : [];
+
+    dates.forEach((item) => {
+      if (item?.date) {
+        const key = normalizeDateKey(item.date);
+        if (key) {
+          const currentStatus = dateStatusMap.get(key);
+          // Prefer "missed" status if it exists
+          if (item.status === "missed" || !currentStatus) {
+            dateStatusMap.set(key, item.status);
+          }
+        }
+      }
+    });
 
     const today = new Date();
     const output = [];
@@ -63,9 +73,10 @@ export default function FiveDaysStraight() {
       const day = new Date(today);
       day.setDate(today.getDate() - offset);
 
+      const dayKey = dateKey(day);
       output.push({
         label: weekdayLabel(day),
-        completed: completedDates.has(dateKey(day)),
+        completed: dateStatusMap.get(dayKey) === "completed",
       });
     }
 

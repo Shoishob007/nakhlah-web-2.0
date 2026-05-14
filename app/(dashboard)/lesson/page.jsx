@@ -17,16 +17,17 @@ import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import {
   fetchLessonQuestions as fetchLessonAPI,
   fetchTaskExamQuestions,
-  fetchMyProfile,
   claimUserDailyQuest,
   makeLearnerProgress,
   reportFullMarks,
   reportWrongAnswer,
 } from "@/services/api";
-import { getCached, setCached } from "@/lib/clientCache";
 import { resolveLessonCompletionDailyQuestParams } from "@/lib/gamification";
+import { useDailyQuestStore } from "@/stores/useDailyQuestStore";
+import { useLessonStore } from "@/stores/useLessonStore";
+import { useProfileStore } from "@/stores/useProfileStore";
+import { getUserKey } from "@/lib/userKey";
 
-const CACHE_PROFILE = "my_profile";
 import LessonLoadingView from "./loading/LessonLoadingView";
 
 const LESSON_SESSION_STORAGE_KEY = "activeLessonSessionV1";
@@ -57,22 +58,61 @@ function normalizeText(value) {
 }
 
 function getQuestionMedia(question, mediaType) {
-  const mediaList = Array.isArray(question?.questionMedia)
-    ? question.questionMedia
-    : [];
+  const mediaList = Array.isArray(question?.question_media)
+    ? question.question_media
+    : Array.isArray(question?.questionMedia)
+      ? question.questionMedia
+      : [];
   const mediaItem = mediaList.find((item) => item?.mediaType === mediaType);
   const mediaUrl = mediaItem?.media?.url;
 
   return mediaUrl ? getMediaUrl(mediaUrl) : "";
 }
 
+function normalizeAnswerFields(answer) {
+  // Normalize answer field names from camelCase to snake_case
+  return {
+    ...answer,
+    id: answer.id,
+    title: answer.title,
+    is_correct: answer.is_correct ?? answer.isCorrect ?? false,
+    order_number:
+      answer.order_number ??
+      answer.orderNumber ??
+      answer._order ??
+      answer.order,
+    left_title: answer.left_title || answer.leftTitle,
+    right_title: answer.right_title || answer.RightTitle || answer.rightTitle,
+    media: answer.media,
+  };
+}
+
+function normalizeQuestionFields(question) {
+  // Map camelCase API fields to snake_case format
+  return {
+    ...question,
+    id: question.id || question._id,
+    question_type: question.question_type || question.questionType,
+    question_title: question.question_title || question.questionTitle,
+    question_media: question.question_media || question.questionMedia || [],
+    answers: Array.isArray(question.answers)
+      ? question.answers.map(normalizeAnswerFields)
+      : [],
+    learn_answer: question.learn_answer || question.learnAnswer,
+    true_false_answer: question.true_false_answer ?? question.trueFalseAnswer,
+  };
+}
+
 function normalizeQuestionsPayload(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.docs)) return payload.docs;
-  if (Array.isArray(payload?.questions)) return payload.questions;
-  if (Array.isArray(payload?.items)) return payload.items;
-  return [];
+  let questions = [];
+  if (Array.isArray(payload)) questions = payload;
+  else if (Array.isArray(payload?.data)) questions = payload.data;
+  else if (Array.isArray(payload?.docs)) questions = payload.docs;
+  else if (Array.isArray(payload?.questions)) questions = payload.questions;
+  else if (Array.isArray(payload?.items)) questions = payload.items;
+  else return [];
+
+  return questions.map(normalizeQuestionFields);
 }
 
 function parseQuestionSequence(question) {
@@ -168,6 +208,20 @@ export default function LessonPage() {
   const router = useRouter();
   const { play } = useAudio();
   const { data: session, status } = useSession();
+  const storeSelectedLessonId = useLessonStore(
+    (state) => state.selectedLessonId,
+  );
+  const storeSelectedNodeId = useLessonStore((state) => state.selectedNodeId);
+  const storeSelectedLessonStatus = useLessonStore(
+    (state) => state.selectedLessonStatus,
+  );
+  const storeSelectedLessonIsExam = useLessonStore(
+    (state) => state.selectedLessonIsExam,
+  );
+  const clearLessonSelection = useLessonStore(
+    (state) => state.clearLessonSelection,
+  );
+  const fetchProfile = useProfileStore((state) => state.fetchMyProfile);
 
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -211,7 +265,6 @@ export default function LessonPage() {
   const imageUrl = getQuestionMedia(currentQuestion, "image");
   const audioUrl = getQuestionMedia(currentQuestion, "audio");
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (status === "loading") return;
 
@@ -222,10 +275,8 @@ export default function LessonPage() {
 
   useEffect(() => {
     const fetchLessonQuestions = async () => {
-      // Wait for session to load
       if (status === "loading") return;
 
-      // Check if session is valid
       if (!isSessionValid(session)) {
         setLoadError("Please login to access lessons.");
         setIsLoading(false);
@@ -233,12 +284,19 @@ export default function LessonPage() {
         return;
       }
 
-      const lessonId = sessionStorage.getItem("selectedLessonId")?.trim();
-      const taskId = sessionStorage.getItem("selectedNodeId")?.trim();
+      const lessonId =
+        (storeSelectedLessonId || "").trim() ||
+        sessionStorage.getItem("selectedLessonId")?.trim();
+      const taskId =
+        (storeSelectedNodeId || "").trim() ||
+        sessionStorage.getItem("selectedNodeId")?.trim();
       const selectedLessonIsExam =
+        Boolean(storeSelectedLessonIsExam) ||
         sessionStorage.getItem("selectedLessonIsExam") === "true";
       const selectedStatus =
-        sessionStorage.getItem("selectedLessonStatus")?.trim() || "";
+        (selectedLessonStatus || "").trim() ||
+        sessionStorage.getItem("selectedLessonStatus")?.trim() ||
+        "";
       const lessonSessionKey = buildLessonSessionKey({
         lessonId,
         taskId,
@@ -324,23 +382,19 @@ export default function LessonPage() {
           ? fetchTaskExamQuestions(taskId, token)
           : fetchLessonAPI(lessonId, token);
 
-        const cachedProfile = getCached(CACHE_PROFILE);
         const [result, profileResult] = await Promise.all([
           questionsRequest,
-          cachedProfile ? Promise.resolve(null) : fetchMyProfile(token),
+          fetchProfile(token, false, getUserKey(session)),
         ]);
 
         if (!result.success) {
           throw new Error(result.error);
         }
 
-        const resolvedProfile =
-          cachedProfile ||
-          (profileResult?.success ? profileResult.profile : null);
+        const resolvedProfile = profileResult?.success
+          ? profileResult.profile
+          : null;
         if (resolvedProfile) {
-          if (!cachedProfile && profileResult?.success) {
-            setCached(CACHE_PROFILE, resolvedProfile);
-          }
           const palmStock = Number(
             resolvedProfile?.gamificationStock?.palm?.palmStock,
           );
@@ -348,8 +402,6 @@ export default function LessonPage() {
             setLives(palmStock);
           }
         }
-
-        console.log("Lesson API raw response:", result.data);
 
         const normalizedQuestions = normalizeQuestionsPayload(result.data);
         const orderedQuestions = selectedLessonIsExam
@@ -369,7 +421,16 @@ export default function LessonPage() {
     };
 
     fetchLessonQuestions();
-  }, [status, session, router]);
+  }, [
+    fetchProfile,
+    storeSelectedLessonId,
+    storeSelectedNodeId,
+    storeSelectedLessonIsExam,
+    storeSelectedLessonStatus,
+    status,
+    session,
+    router,
+  ]);
 
   useEffect(() => {
     if (currentIndex >= totalQuestions && totalQuestions > 0) {
@@ -381,9 +442,14 @@ export default function LessonPage() {
     if (typeof window === "undefined") return;
     if (isLoading || !questions.length) return;
 
-    const lessonId = sessionStorage.getItem("selectedLessonId")?.trim();
-    const taskId = sessionStorage.getItem("selectedNodeId")?.trim();
+    const lessonId =
+      (storeSelectedLessonId || "").trim() ||
+      sessionStorage.getItem("selectedLessonId")?.trim();
+    const taskId =
+      (storeSelectedNodeId || "").trim() ||
+      sessionStorage.getItem("selectedNodeId")?.trim();
     const selectedLessonIsExam =
+      Boolean(storeSelectedLessonIsExam) ||
       sessionStorage.getItem("selectedLessonIsExam") === "true";
 
     if (!lessonId) return;
@@ -411,6 +477,10 @@ export default function LessonPage() {
       }),
     );
   }, [
+    storeSelectedLessonId,
+    storeSelectedNodeId,
+    storeSelectedLessonIsExam,
+    storeSelectedLessonStatus,
     isLoading,
     questions,
     selectedLessonStatus,
@@ -567,15 +637,19 @@ export default function LessonPage() {
     rewardPayload = null,
     accuracyPercentageOverride = null,
     hasWrongAnswerOverride = null,
+    forceDailyQuestRefresh = false,
   } = {}) => {
-    const lessonId = sessionStorage.getItem("selectedLessonId")?.trim();
-    const nextLessonId = sessionStorage.getItem("selectedNextLessonId")?.trim();
+    const lessonId =
+      (storeSelectedLessonId || "").trim() ||
+      sessionStorage.getItem("selectedLessonId")?.trim();
     const token = getSessionToken(session);
     let progressPayload = normalizeLessonRewardPayload(rewardPayload);
+    let shouldInvalidateDailyQuestCache = Boolean(forceDailyQuestRefresh);
 
-    if (lessonId && token && !skipLearnerProgress && nextLessonId) {
-      const progressResult = await makeLearnerProgress(nextLessonId, token);
+    if (lessonId && token && !skipLearnerProgress) {
+      const progressResult = await makeLearnerProgress(lessonId, token);
       if (progressResult.success && progressResult.data) {
+        shouldInvalidateDailyQuestCache = true;
         progressPayload = normalizeLessonRewardPayload({
           ...progressResult.data,
           ...(progressPayload || {}),
@@ -600,6 +674,10 @@ export default function LessonPage() {
         accuracyPercentage,
         hasWrongAnswer: hasWrongAnswerToUse,
       });
+
+      if (dailyQuestClaims.length > 0) {
+        shouldInvalidateDailyQuestCache = true;
+      }
 
       const mergedClaimPayload = dailyQuestClaims.reduce(
         (accumulator, item) => {
@@ -655,13 +733,17 @@ export default function LessonPage() {
       );
     }
 
+    if (token && shouldInvalidateDailyQuestCache) {
+      useDailyQuestStore.getState().invalidate();
+    }
+
     sessionStorage.removeItem("currentLessonIndex");
     sessionStorage.removeItem(LESSON_SESSION_STORAGE_KEY);
     sessionStorage.removeItem("selectedLessonId");
-    sessionStorage.removeItem("selectedNextLessonId");
     sessionStorage.removeItem("selectedNodeId");
     sessionStorage.removeItem("selectedLessonIsExam");
     sessionStorage.removeItem("selectedLessonStatus");
+    clearLessonSelection();
     router.push("/lesson/completed");
   };
 
@@ -689,6 +771,7 @@ export default function LessonPage() {
         await completeLessonAndRedirect({
           skipLearnerProgress: true,
           rewardPayload: rewardData,
+          forceDailyQuestRefresh: true,
           accuracyPercentageOverride:
             totalAnswerAttempts > 0
               ? Math.round((correctAnswerAttempts / totalAnswerAttempts) * 100)

@@ -45,7 +45,7 @@ export async function fetchJourneyStructure(token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry("/api/globals/questionnaires/journey-structure", {
+        const response = await fetchWithAuthRetry("/api/lessons/journey-structure", {
             method: "GET",
             token,
         });
@@ -75,7 +75,7 @@ export async function claimGiftBoxTask(taskId, token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/gift-box/${taskId}`, {
+        const response = await fetchWithAuthRetry(`/api/lessons/gift-box/${taskId}`, {
             method: "GET",
             token,
         });
@@ -105,7 +105,7 @@ export async function fetchTaskLessons(taskId, token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/tasks/${taskId}/lessons`, {
+        const response = await fetchWithAuthRetry(`/api/lessons/tasks/${taskId}/lessons`, {
             method: "GET",
             token,
         });
@@ -135,7 +135,7 @@ export async function fetchTaskExamQuestions(taskId, token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/tasks/${taskId}/exam-questions`, {
+        const response = await fetchWithAuthRetry(`/api/lessons/tasks/${taskId}/exam-questions`, {
             method: "GET",
             token,
         });
@@ -162,7 +162,11 @@ export async function fetchTaskExamQuestions(taskId, token) {
 
 export async function fetchLessonQuestions(lessonId, token) {
     try {
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/lessons/${lessonId}`, {
+        if (!token) {
+            throw new Error("Authentication required");
+        }
+
+        const response = await fetchWithAuthRetry(`/api/lessons/${lessonId}`, {
             method: "GET",
             token,
         });
@@ -170,7 +174,7 @@ export async function fetchLessonQuestions(lessonId, token) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data?.message || "Failed to load lesson");
+            throw new Error(data?.message || "Failed to load lesson questions");
         }
 
         return {
@@ -178,10 +182,10 @@ export async function fetchLessonQuestions(lessonId, token) {
             data,
         };
     } catch (error) {
-        console.error("Fetch lesson error:", error);
+        console.error("Fetch lesson questions error:", error);
         return {
             success: false,
-            error: error.message || "Unable to load lesson",
+            error: error.message || "Unable to load lesson questions",
         };
     }
 }
@@ -192,7 +196,7 @@ export async function reportFullMarks(lessonId, token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/full-marks/${lessonId}`, {
+        const response = await fetchWithAuthRetry(`/api/lessons/full-marks/${lessonId}`, {
             method: "GET",
             token,
         });
@@ -222,7 +226,7 @@ export async function makeLearnerProgress(lessonId, token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/make-learner-progress/${lessonId}`, {
+        const response = await fetchWithAuthRetry(`/api/lessons/make-learner-progress/${lessonId}`, {
             method: "GET",
             token,
         });
@@ -252,7 +256,7 @@ export async function reportWrongAnswer(token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry("/api/globals/questionnaires/wrong-answer", {
+        const response = await fetchWithAuthRetry("/api/lessons/wrong-answer", {
             method: "GET",
             token,
         });
@@ -412,7 +416,7 @@ export async function fetchQuestionnaireAchievements(token) {
             throw new Error("Authentication required");
         }
 
-        const response = await fetchWithAuthRetry("/api/globals/questionnaires/get-achievements", {
+        const response = await fetchWithAuthRetry("/api/lessons/get-achievements", {
             method: "GET",
             token,
         });
@@ -536,7 +540,7 @@ export async function claimUserDailyQuest(token, quest) {
 
 export async function submitLessonCompletion(lessonId, score, token) {
     try {
-        const response = await fetchWithAuthRetry(`/api/globals/questionnaires/lessons/${lessonId}/complete`, {
+        const response = await fetchWithAuthRetry(`/api/lessons/${lessonId}/complete`, {
             method: "POST",
             token,
             body: JSON.stringify({ score }),
