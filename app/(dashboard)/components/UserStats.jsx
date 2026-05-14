@@ -13,10 +13,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
-import { fetchLearnerStreak, fetchMyProfile } from "@/services/api";
-import { getCached, setCached } from "@/lib/clientCache";
-
-const CACHE_PROFILE = "my_profile";
+import { getUserKey } from "@/lib/userKey";
+import { useProfileStore } from "@/stores/useProfileStore";
+import { useStreakStore } from "@/stores/useStreakStore";
 
 const normalizeDateKey = (value) => {
   if (!value) return "";
@@ -32,55 +31,64 @@ const normalizeDateKey = (value) => {
 export function UserStats() {
   const router = useRouter();
   const [mobileOpenCard, setMobileOpenCard] = useState(null);
-  const [streakData, setStreakData] = useState(null);
-  const [profileData, setProfileData] = useState(null);
   const { data: session, status } = useSession();
+  const profileData = useProfileStore((state) => state.profile);
+  const fetchProfile = useProfileStore((state) => state.fetchMyProfile);
+  const clearProfile = useProfileStore((state) => state.clear);
+  const streakData = useStreakStore((state) => state.streakData);
+  const fetchStreak = useStreakStore((state) => state.fetchLearnerStreak);
+  const clearStreak = useStreakStore((state) => state.clear);
 
   useEffect(() => {
     const loadStats = async () => {
       if (status === "loading") return;
-      if (status === "unauthenticated" || !isSessionValid(session)) return;
+      if (status === "unauthenticated" || !isSessionValid(session)) {
+        clearProfile();
+        clearStreak();
+        return;
+      }
 
       const token = getSessionToken(session);
       if (!token) return;
 
-      const [profileResult, streakResult] = await Promise.all([
-        getCached(CACHE_PROFILE)
-          ? Promise.resolve(null)
-          : fetchMyProfile(token),
-        fetchLearnerStreak(token),
+      await Promise.all([
+        fetchProfile(token, false, getUserKey(session)),
+        fetchStreak({ token, userKey: getUserKey(session) }),
       ]);
-
-      const cachedProfile = getCached(CACHE_PROFILE);
-      if (cachedProfile) {
-        setProfileData(cachedProfile);
-      } else if (profileResult?.success) {
-        setCached(CACHE_PROFILE, profileResult.profile || null);
-        setProfileData(profileResult.profile || null);
-      }
-
-      if (streakResult.success) {
-        setStreakData(streakResult.streak || null);
-      }
     };
 
     loadStats();
-  }, [session, status]);
+  }, [clearProfile, clearStreak, fetchProfile, fetchStreak, session, status]);
 
   const streakCount = streakData?.currentStreak ?? 0;
   const gemsCount = profileData?.gamificationStock?.dateStock ?? 0;
   const heartsCount = profileData?.gamificationStock?.palm?.palmStock ?? 5;
   const streakActivities = useMemo(() => {
+    // Build a map of dates, preferring "missed" status over "completed"
+    const dateStatusMap = new Map();
     const dates = Array.isArray(streakData?.dates) ? streakData.dates : [];
-    return dates.reduce((acc, entry) => {
-      if (entry?.date && entry?.status === "completed") {
-        const key = normalizeDateKey(entry.date);
+
+    dates.forEach((item) => {
+      if (item?.date) {
+        const key = normalizeDateKey(item.date);
         if (key) {
-          acc[key] = true;
+          const currentStatus = dateStatusMap.get(key);
+          // Prefer "missed" status if it exists
+          if (item.status === "missed" || !currentStatus) {
+            dateStatusMap.set(key, item.status);
+          }
         }
       }
-      return acc;
-    }, {});
+    });
+
+    // Only include completed dates
+    const activities = {};
+    dateStatusMap.forEach((status, key) => {
+      if (status === "completed") {
+        activities[key] = true;
+      }
+    });
+    return activities;
   }, [streakData]);
   const streakMessage =
     streakCount > 0
