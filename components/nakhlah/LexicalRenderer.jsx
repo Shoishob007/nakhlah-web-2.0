@@ -72,6 +72,21 @@ function renderNode(node, idx) {
         renderNode(child, i),
       );
       const isEmpty = !node.children || node.children.length === 0;
+      const hasBlockChild = (node.children || []).some((child) =>
+        ["horizontalrule", "list"].includes(child?.type),
+      );
+
+      if (hasBlockChild) {
+        return (
+          <div
+            key={idx}
+            className={`mb-3 leading-relaxed text-foreground/90 ${alignClass}`}
+          >
+            {isEmpty ? <br /> : children}
+          </div>
+        );
+      }
+
       return (
         <p
           key={idx}

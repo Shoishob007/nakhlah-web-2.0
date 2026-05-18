@@ -16,7 +16,7 @@ export function ArabicTooltip({ text, pronunciation }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="cursor-help border-b border-dotted border-foreground/30 hover:border-foreground/60 transition-colors">
+          <span className="cursor-help border-b border-dotted border-foreground/30 hover:border-foreground/60 hover:text-accent transition-colors">
             {text}
           </span>
         </TooltipTrigger>

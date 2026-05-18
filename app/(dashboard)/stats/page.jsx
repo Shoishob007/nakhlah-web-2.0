@@ -73,17 +73,17 @@ export default function Stats() {
 
   // Static demo data for weekly chart
   const weeklyData = [
-    { day: "Mon", xp: 120 },
-    { day: "Tue", xp: 150 },
-    { day: "Wed", xp: 100 },
-    { day: "Thu", xp: 180 },
-    { day: "Fri", xp: 140 },
-    { day: "Sat", xp: 160 },
-    { day: "Sun", xp: 130 },
+    { day: "Mon", injaz: 120 },
+    { day: "Tue", injaz: 150 },
+    { day: "Wed", injaz: 100 },
+    { day: "Thu", injaz: 180 },
+    { day: "Fri", injaz: 140 },
+    { day: "Sat", injaz: 160 },
+    { day: "Sun", injaz: 130 },
   ];
 
-  const maxXp = Math.max(...weeklyData.map((d) => d.xp), 1);
-  const totalWeeklyInjaz = weeklyData.reduce((sum, d) => sum + d.xp, 0);
+  const maxInjaz = Math.max(...weeklyData.map((d) => d.injaz), 1);
+  const totalWeeklyInjaz = weeklyData.reduce((sum, d) => sum + d.injaz, 0);
 
   return (
     <div className="min-h-screen bg-background max-w-7xl mx-auto">
@@ -179,7 +179,8 @@ export default function Stats() {
                   key={day.day}
                   initial={{ height: 0 }}
                   animate={{
-                    height: maxXp > 0 ? `${(day.xp / maxXp) * 100}%` : "0%",
+                    height:
+                      maxInjaz > 0 ? `${(day.injaz / maxInjaz) * 100}%` : "0%",
                   }}
                   transition={{ delay: 0.1 * index, duration: 0.5 }}
                   className="flex flex-1 flex-col items-center"
@@ -187,7 +188,10 @@ export default function Stats() {
                   <div
                     className="w-full rounded-t-lg transition-all hover:opacity-80 bg-gradient-to-t from-accent to-accent/80"
                     style={{
-                      height: maxXp > 0 ? `${(day.xp / maxXp) * 100}%` : "0%",
+                      height:
+                        maxInjaz > 0
+                          ? `${(day.injaz / maxInjaz) * 100}%`
+                          : "0%",
                       minHeight: "20px",
                     }}
                   />
@@ -195,7 +199,7 @@ export default function Stats() {
                     {day.day}
                   </span>
                   <span className="text-xs font-bold text-accent">
-                    {day.xp}
+                    {day.injaz}
                   </span>
                 </motion.div>
               ))}

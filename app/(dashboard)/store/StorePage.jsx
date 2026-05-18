@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crown } from "@/components/icons/Crown";
-import { GemStone } from "@/components/icons/Gem";
+import { DatesIcon } from "@/components/icons/PublicAssetIcons";
 import { Sparkles, Gem, Crown as CrownIcon } from "lucide-react";
 import GemsPurchase from "./GemsPurchase.jsx";
 import PremiumSubscription from "./PremiumSubscription";
 
 export default function StorePage() {
   const router = useRouter();
-  const [selectedOption, setSelectedOption] = useState(null); // null, 'gems', 'premium'
+  const [selectedOption, setSelectedOption] = useState(null); // null, 'dates', 'premium'
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +52,7 @@ export default function StorePage() {
             <div className="grid md:grid-cols-2 gap-4 max-w-4xl">
               {/* Dates Purchase Card */}
               <motion.button
-                onClick={() => setSelectedOption("gems")}
+                onClick={() => setSelectedOption("dates")}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 className="relative group rounded-xl bg-card border border-border hover:border-accent p-6 text-left shadow-sm hover:shadow-md transition-all"
@@ -60,7 +60,7 @@ export default function StorePage() {
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                      <GemStone size="md" className="text-accent" />
+                      <DatesIcon size="md" className="text-accent" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-foreground mb-1">
@@ -175,7 +175,7 @@ export default function StorePage() {
         )}
 
         {/* Show Dates Purchase Flow */}
-        {selectedOption === "gems" && (
+        {selectedOption === "dates" && (
           <GemsPurchase onBack={() => setSelectedOption(null)} />
         )}
 

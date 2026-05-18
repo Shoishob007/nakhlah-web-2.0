@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mascot } from "@/components/nakhlah/Mascot";
-import { GemStone } from "@/components/icons/Gem";
+import { DatesIcon } from "@/components/icons/PublicAssetIcons";
 import {
   ArrowLeft,
   Home,
@@ -149,7 +149,7 @@ export default function GemsPurchase() {
       {/* Step 1: Select Date Package */}
       {currentStep === 1 && (
         <motion.div
-          key="gems-step1"
+          key="dates-step1"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -168,7 +168,7 @@ export default function GemsPurchase() {
           {/* Header */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <GemStone size="lg" className="text-accent" />
+              <DatesIcon size="lg" className="text-accent" />
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                 Purchase Dates
               </h2>
@@ -252,7 +252,7 @@ export default function GemsPurchase() {
       {/* Step 2: Payment */}
       {currentStep === 2 && (
         <motion.div
-          key="gems-step2"
+          key="dates-step2"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -486,7 +486,7 @@ export default function GemsPurchase() {
       {/* Step 3: Success */}
       {currentStep === 3 && (
         <motion.div
-          key="gems-step3"
+          key="dates-step3"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -501,7 +501,7 @@ export default function GemsPurchase() {
                 Purchase successful!
               </h2>
               <div className="inline-flex items-center gap-3 bg-gradient-to-r from-primary/20 to-accent/20 px-6 py-3 rounded-full mb-6">
-                <GemStone size="md" className="text-accent" />
+                <DatesIcon size="md" className="text-accent" />
                 <span className="text-2xl font-bold text-accent">
                   +{selectedPackage?.amount} Dates
                 </span>

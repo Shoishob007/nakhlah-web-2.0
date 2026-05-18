@@ -15,7 +15,7 @@ const FALLBACK_LEADERS = [
     rank: 1,
     id: "fallback-1",
     name: "Maryland Winkles",
-    xp: 948,
+    injaz: 948,
     avatar: "MW",
     avatarUrl: "",
   },
@@ -23,7 +23,7 @@ const FALLBACK_LEADERS = [
     rank: 2,
     id: "fallback-2",
     name: "Andrew Ainsley",
-    xp: 872,
+    injaz: 872,
     avatar: "AA",
     avatarUrl: "",
   },
@@ -31,7 +31,7 @@ const FALLBACK_LEADERS = [
     rank: 3,
     id: "fallback-3",
     name: "Charlotte Hanlin",
-    xp: 769,
+    injaz: 769,
     avatar: "CH",
     avatarUrl: "",
   },
@@ -110,7 +110,7 @@ export function LeaderboardCard() {
               <div>
                 <p className="text-sm font-medium">{leader.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {leader.xp} Injaz
+                  {leader.injaz} Injaz
                 </p>
               </div>
             </div>

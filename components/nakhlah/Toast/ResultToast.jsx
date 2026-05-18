@@ -3,10 +3,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Volume2, X, Check, X as XIcon } from "lucide-react";
-import { GemStone } from "@/components/icons/Gem";
 
 // Reusable Result Toast Component
-const ResultToast = ({ isCorrect, isVisible, onContinue, correctAnswer, buttonText }) => {
+const ResultToast = ({
+  isCorrect,
+  isVisible,
+  onContinue,
+  correctAnswer,
+  buttonText,
+}) => {
   return (
     <AnimatePresence>
       {isVisible && (

@@ -4,12 +4,14 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { GemStone } from "@/components/icons/Gem";
-import { Flame } from "@/components/icons/Flame";
-import { Heart } from "@/components/icons/Heart";
+import {
+  DatesIcon,
+  PalmIcon,
+  StreakIcon,
+} from "@/components/icons/PublicAssetIcons";
 import { TreasureChest } from "@/components/icons/TreasureChest";
 import { StreakCalendar } from "@/components/nakhlah/StreakCalendar";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
@@ -28,10 +30,12 @@ const normalizeDateKey = (value) => {
   return "";
 };
 
+const JOURNEY_REFRESH_FLAG_KEY = "nakhlah:journey-needs-refresh";
+
 export function UserStats() {
   const router = useRouter();
   const [mobileOpenCard, setMobileOpenCard] = useState(null);
-  const hasForcedHeartsRefreshRef = useRef(false);
+  const hasForcedPalmRefreshRef = useRef(false);
   const { data: session, status } = useSession();
   const profileData = useProfileStore((state) => state.profile);
   const fetchProfile = useProfileStore((state) => state.fetchMyProfile);
@@ -40,8 +44,8 @@ export function UserStats() {
   const fetchStreak = useStreakStore((state) => state.fetchLearnerStreak);
   const clearStreak = useStreakStore((state) => state.clear);
 
-  useEffect(() => {
-    const loadStats = async () => {
+  const loadStats = useCallback(
+    async (forceRefresh = false) => {
       if (status === "loading") return;
       if (status === "unauthenticated" || !isSessionValid(session)) {
         clearProfile();
@@ -54,30 +58,58 @@ export function UserStats() {
 
       const userKey = getUserKey(session);
       const [profileResult] = await Promise.all([
-        fetchProfile(token, false, userKey),
-        fetchStreak({ token, userKey }),
+        fetchProfile(token, forceRefresh, userKey),
+        fetchStreak({ token, userKey, forceRefresh }),
       ]);
 
-      const cachedHearts = Number(
+      const cachedPalmTrees = Number(
         profileResult?.profile?.gamificationStock?.palm?.palmStock,
       );
 
       if (
-        Number.isFinite(cachedHearts) &&
-        cachedHearts === 0 &&
-        !hasForcedHeartsRefreshRef.current
+        Number.isFinite(cachedPalmTrees) &&
+        cachedPalmTrees === 0 &&
+        !hasForcedPalmRefreshRef.current
       ) {
-        hasForcedHeartsRefreshRef.current = true;
+        hasForcedPalmRefreshRef.current = true;
         await fetchProfile(token, true, userKey);
       }
+    },
+    [clearProfile, clearStreak, fetchProfile, fetchStreak, session, status],
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const shouldForceRefresh =
+      sessionStorage.getItem(JOURNEY_REFRESH_FLAG_KEY) === "true";
+
+    if (shouldForceRefresh) {
+      sessionStorage.removeItem(JOURNEY_REFRESH_FLAG_KEY);
+    }
+
+    loadStats(shouldForceRefresh);
+  }, [loadStats]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const handleJourneyUpdated = () => {
+      void loadStats(true);
     };
 
-    loadStats();
-  }, [clearProfile, clearStreak, fetchProfile, fetchStreak, session, status]);
+    window.addEventListener("nakhlah:journey-updated", handleJourneyUpdated);
+    return () => {
+      window.removeEventListener(
+        "nakhlah:journey-updated",
+        handleJourneyUpdated,
+      );
+    };
+  }, [loadStats]);
 
   const streakCount = streakData?.currentStreak ?? 0;
-  const gemsCount = profileData?.gamificationStock?.dateStock ?? 0;
-  const heartsCount = profileData?.gamificationStock?.palm?.palmStock ?? 5;
+  const datesCount = profileData?.gamificationStock?.dateStock ?? 0;
+  const palmTreesCount = profileData?.gamificationStock?.palm?.palmStock ?? 5;
   const streakActivities = useMemo(() => {
     // Build a map of dates, preferring "missed" status over "completed"
     const dateStatusMap = new Map();
@@ -109,10 +141,10 @@ export function UserStats() {
     streakCount > 0
       ? `You're on a ${streakCount}-day streak.`
       : "Do a lesson today to start a new streak!";
-  const heartsMessage =
-    heartsCount >= 5
-      ? "You have full hearts"
-      : `You have ${heartsCount} hearts`;
+  const palmTreesMessage =
+    palmTreesCount >= 5
+      ? "You have full Palm Trees"
+      : `You have ${palmTreesCount} Palm Trees`;
 
   const handleMobileClick = (stat) => {
     setMobileOpenCard(mobileOpenCard === stat ? null : stat);
@@ -126,10 +158,10 @@ export function UserStats() {
     switch (stat) {
       case "streak":
         return "left-0 -translate-x-0"; // Streak: align to left
-      case "gems":
+      case "dates":
         return "left-1/2 -translate-x-1/2"; // Dates: center
-      case "hearts":
-        return "right-0 translate-x-0"; // Hearts: align to right
+      case "palms":
+        return "right-0 translate-x-0"; // Palm Trees: align to right
       default:
         return "left-1/2 -translate-x-1/2";
     }
@@ -152,7 +184,7 @@ export function UserStats() {
             onClick={() => handleMobileClick("streak")}
             className="lg:hidden flex items-center space-x-2 text-lg font-semibold cursor-pointer"
           >
-            <Flame className="text-orange-500" />
+            <StreakIcon className="text-orange-500" />
             <span className="text-white">{streakCount}</span>
           </div>
 
@@ -164,7 +196,7 @@ export function UserStats() {
                   size="sm"
                   className="flex items-center space-x-2 text-lg font-semibold"
                 >
-                  <Flame className="text-orange-500" />
+                  <StreakIcon className="text-orange-500" />
                   <span className="text-foreground">{streakCount}</span>
                 </Button>
               </HoverCardTrigger>
@@ -201,11 +233,11 @@ export function UserStats() {
         {/* Dates */}
         <div className="relative">
           <div
-            onClick={() => handleMobileClick("gems")}
+            onClick={() => handleMobileClick("dates")}
             className="lg:hidden flex items-center space-x-2 text-lg font-semibold cursor-pointer"
           >
-            <GemStone />
-            <span className="text-white">{gemsCount}</span>
+            <DatesIcon />
+            <span className="text-white">{datesCount}</span>
           </div>
 
           <div className="hidden lg:block">
@@ -216,8 +248,8 @@ export function UserStats() {
                   size="sm"
                   className="flex items-center space-x-2 text-lg font-semibold"
                 >
-                  <GemStone />
-                  <span className="text-foreground">{gemsCount}</span>
+                  <DatesIcon />
+                  <span className="text-foreground">{datesCount}</span>
                 </Button>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 space-y-4" align="center">
@@ -226,7 +258,7 @@ export function UserStats() {
                   <div className="space-y-1">
                     <h4 className="font-medium">Dates</h4>
                     <p className="text-sm text-muted-foreground">
-                      You have {gemsCount} dates
+                      You have {datesCount} dates
                     </p>
                     <Button
                       variant="link"
@@ -246,16 +278,16 @@ export function UserStats() {
           </div>
 
           {/* Mobile Popup for Dates - centered */}
-          {mobileOpenCard === "gems" && (
+          {mobileOpenCard === "dates" && (
             <div
-              className={`lg:hidden absolute top-full mt-2 w-80 bg-card border rounded-lg shadow-lg z-50 p-4 space-y-4 ${getMobilePopupPosition("gems")}`}
+              className={`lg:hidden absolute top-full mt-2 w-80 bg-card border rounded-lg shadow-lg z-50 p-4 space-y-4 ${getMobilePopupPosition("dates")}`}
             >
               <div className="flex space-x-4 items-center">
                 <TreasureChest size="xxl" />
                 <div className="space-y-1">
                   <h4 className="font-medium">Dates</h4>
                   <p className="text-sm text-muted-foreground">
-                    You have {gemsCount} dates
+                    You have {datesCount} dates
                   </p>
                   <button
                     onClick={(e) => {
@@ -276,14 +308,14 @@ export function UserStats() {
           )}
         </div>
 
-        {/* Hearts */}
+        {/* Palm Trees */}
         <div className="relative">
           <div
-            onClick={() => handleMobileClick("hearts")}
+            onClick={() => handleMobileClick("palms")}
             className="lg:hidden flex items-center space-x-2 text-lg font-semibold cursor-pointer"
           >
-            <Heart className="text-destructive" />
-            <span className="text-white">{heartsCount}</span>
+            <PalmIcon className="text-destructive" />
+            <span className="text-white">{palmTreesCount}</span>
           </div>
 
           <div className="hidden lg:block">
@@ -294,24 +326,24 @@ export function UserStats() {
                   size="sm"
                   className="flex items-center space-x-2 text-lg font-semibold"
                 >
-                  <Heart className="text-destructive" />
-                  <span className="text-foreground">{heartsCount}</span>
+                  <PalmIcon className="text-destructive" />
+                  <span className="text-foreground">{palmTreesCount}</span>
                 </Button>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 space-y-4" align="end">
                 <div className="space-y-2">
-                  <h4 className="font-medium leading-none">Hearts</h4>
+                  <h4 className="font-medium leading-none">Palm Trees</h4>
                   <div className="flex space-x-1">
                     {[...Array(5)].map((_, i) => (
-                      <Heart
+                      <PalmIcon
                         key={i}
                         className={
-                          i < heartsCount ? "opacity-100" : "opacity-30"
+                          i < palmTreesCount ? "opacity-100" : "opacity-30"
                         }
                       />
                     ))}
                   </div>
-                  <p className="text-sm font-semibold">{heartsMessage}</p>
+                  <p className="text-sm font-semibold">{palmTreesMessage}</p>
                   <p className="text-sm text-muted-foreground">
                     Keep on learning
                   </p>
@@ -319,30 +351,32 @@ export function UserStats() {
 
                 <div className="grid gap-2">
                   <Button variant="outline" className="text-purple-500">
-                    UNLIMITED HEARTS
+                    UNLIMITED PALM TREES
                   </Button>
-                  <Button>REFILL HEARTS (350 dates)</Button>
+                  <Button>REFILL PALM TREES (350 dates)</Button>
                 </div>
               </HoverCardContent>
             </HoverCard>
           </div>
 
-          {/* Mobile Popup for Hearts - positioned to the left */}
-          {mobileOpenCard === "hearts" && (
+          {/* Mobile Popup for Palm Trees - positioned to the left */}
+          {mobileOpenCard === "palms" && (
             <div
-              className={`lg:hidden absolute top-full mt-2 w-80 bg-card border rounded-lg shadow-lg z-50 p-4 space-y-4 ${getMobilePopupPosition("hearts")}`}
+              className={`lg:hidden absolute top-full mt-2 w-80 bg-card border rounded-lg shadow-lg z-50 p-4 space-y-4 ${getMobilePopupPosition("palms")}`}
             >
               <div className="space-y-2">
-                <h4 className="font-medium leading-none">Hearts</h4>
+                <h4 className="font-medium leading-none">Palm Trees</h4>
                 <div className="flex space-x-1">
                   {[...Array(5)].map((_, i) => (
-                    <Heart
+                    <PalmIcon
                       key={i}
-                      className={i < heartsCount ? "opacity-100" : "opacity-30"}
+                      className={
+                        i < palmTreesCount ? "opacity-100" : "opacity-30"
+                      }
                     />
                   ))}
                 </div>
-                <p className="text-sm font-semibold">{heartsMessage}</p>
+                <p className="text-sm font-semibold">{palmTreesMessage}</p>
                 <p className="text-sm text-muted-foreground">
                   Keep on learning
                 </p>
@@ -350,10 +384,10 @@ export function UserStats() {
 
               <div className="grid gap-2">
                 <button className="w-full py-2 border rounded-md text-purple-500">
-                  UNLIMITED HEARTS
+                  UNLIMITED PALM TREES
                 </button>
                 <button className="w-full py-2 bg-primary text-primary-foreground rounded-md">
-                  REFILL HEARTS (350 dates)
+                  REFILL PALM TREES (350 dates)
                 </button>
               </div>
             </div>

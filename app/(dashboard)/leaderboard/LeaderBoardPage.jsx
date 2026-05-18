@@ -93,7 +93,7 @@ export default function Leaderboard({ onViewProfile }) {
                 {topThree[1]?.name}
               </p>
               <p className="text-accent font-bold text-lg">
-                {topThree[1]?.xp} Injaz
+                {topThree[1]?.injaz} Injaz
               </p>
             </div>
             <div className="w-24 lg:w-32 h-24 bg-gradient-to-b from-gray-300 to-gray-400 rounded-t-2xl mt-2 flex items-center justify-center">
@@ -128,7 +128,7 @@ export default function Leaderboard({ onViewProfile }) {
                 {topThree[0]?.name}
               </p>
               <p className="text-accent font-bold text-2xl">
-                {topThree[0]?.xp} Injaz
+                {topThree[0]?.injaz} Injaz
               </p>
             </div>
             <div className="w-28 lg:w-36 h-32 bg-gradient-to-b from-violet-400 to-violet-500 rounded-t-2xl mt-2 flex items-center justify-center shadow-lg">
@@ -163,7 +163,7 @@ export default function Leaderboard({ onViewProfile }) {
                 {topThree[2]?.name}
               </p>
               <p className="text-accent font-bold text-lg">
-                {topThree[2]?.xp} Injaz
+                {topThree[2]?.injaz} Injaz
               </p>
             </div>
             <div className="w-24 lg:w-32 h-20 bg-gradient-to-b from-amber-600 to-amber-700 rounded-t-2xl mt-2 flex items-center justify-center">
@@ -233,7 +233,7 @@ export default function Leaderboard({ onViewProfile }) {
                     {user.name}
                   </p>
                   <p className="text-muted-foreground text-sm">
-                    {user.xp} Injaz
+                    {user.injaz} Injaz
                   </p>
                 </div>
               </motion.button>

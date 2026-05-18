@@ -3,17 +3,19 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { HighVoltage } from "@/components/icons/High-Voltage";
-import { GemStone } from "@/components/icons/Gem";
+import {
+  DatesIcon,
+  InjazStarIcon,
+  StreakIcon,
+} from "@/components/icons/PublicAssetIcons";
 import { Bullseye } from "@/components/icons/BullsEye";
-import { Flame } from "@/components/icons/Flame";
 import { CheckCircle2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchUserDailyQuest } from "@/services/api";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 
-const missionIcons = [HighVoltage, GemStone, Bullseye, Flame];
+const missionIcons = [InjazStarIcon, DatesIcon, Bullseye, StreakIcon];
 
 const toTitleCase = (value = "") =>
   value

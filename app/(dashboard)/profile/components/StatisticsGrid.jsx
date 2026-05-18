@@ -2,9 +2,11 @@
 import { BarChart } from "@/components/icons/BarChart";
 import { Bullseye } from "@/components/icons/BullsEye";
 import { Calendar } from "@/components/icons/Calendar";
-import { Flame } from "@/components/icons/Flame";
-import { GemStone } from "@/components/icons/Gem";
-import { HighVoltage } from "@/components/icons/High-Voltage";
+import {
+  DatesIcon,
+  InjazStarIcon,
+  StreakIcon,
+} from "@/components/icons/PublicAssetIcons";
 import { Medal } from "@/components/icons/Medal";
 import { motion } from "framer-motion";
 import { getProfileBadgeCount } from "@/lib/gamification";
@@ -23,28 +25,28 @@ export default function StatisticsGrid({ profileData, achievementsData = [] }) {
 
   const userStats = [
     {
-      icon: Flame,
+      icon: StreakIcon,
       value: `${tasksCompleted}`,
-      label: "Tasks Completed",
+      label: "Tasks Completed Today",
       color: "text-primary",
       bg: "bg-muted/30",
     },
     {
       icon: Calendar,
       value: `${lessonsCompleted}`,
-      label: "Lessons Completed",
+      label: "Lessons Completed Today",
       color: "text-primary",
       bg: "bg-muted/30",
     },
     {
-      icon: GemStone,
+      icon: DatesIcon,
       value: totalDates.toLocaleString(),
       label: "Total Dates",
       color: "text-primary",
       bg: "bg-muted/30",
     },
     {
-      icon: HighVoltage,
+      icon: InjazStarIcon,
       value: totalXp.toLocaleString(),
       label: "Total Injaz Gained",
       color: "text-primary",

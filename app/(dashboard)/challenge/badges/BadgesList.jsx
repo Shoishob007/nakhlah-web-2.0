@@ -15,7 +15,7 @@ const toTitleCase = (key) =>
 export default function BadgesList() {
   const { data: session, status } = useSession();
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("xp-asc");
+  const [sort, setSort] = useState("injaz-asc");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [badges, setBadges] = useState([]);
@@ -59,13 +59,15 @@ export default function BadgesList() {
         }
 
         const normalizedBadges = (badgesResult.badges || []).map((badge) => {
-          const xp = Number(badge.target) || 0;
+          const injazTarget = Number(badge.target) || 0;
           return {
             key: badge.key,
             title: badge.name || toTitleCase(badge.key || "Badge"),
-            xp,
+            injazTarget,
             icon: badge.icon,
-            earned: (Number.isFinite(resolvedInjaz) ? resolvedInjaz : 0) >= xp,
+            earned:
+              (Number.isFinite(resolvedInjaz) ? resolvedInjaz : 0) >=
+              injazTarget,
           };
         });
 
@@ -86,8 +88,8 @@ export default function BadgesList() {
         badge.title.toLowerCase().includes(search.toLowerCase()),
       )
       .sort((a, b) => {
-        if (sort === "xp-desc") return b.xp - a.xp;
-        if (sort === "xp-asc") return a.xp - b.xp;
+        if (sort === "injaz-desc") return b.injazTarget - a.injazTarget;
+        if (sort === "injaz-asc") return a.injazTarget - b.injazTarget;
         if (sort === "az") return a.title.localeCompare(b.title);
         return 0;
       });
@@ -146,8 +148,8 @@ export default function BadgesList() {
             onChange={(e) => setSort(e.target.value)}
             className="h-9 px-4 rounded-full border border-border text-sm bg-card text-muted-foreground focus:outline-none"
           >
-            <option value="xp-desc">Injaz (High → Low)</option>
-            <option value="xp-asc">Injaz (Low → High)</option>
+            <option value="injaz-desc">Injaz (High → Low)</option>
+            <option value="injaz-asc">Injaz (Low → High)</option>
             <option value="az">Title (A → Z)</option>
           </select>
         </div>
