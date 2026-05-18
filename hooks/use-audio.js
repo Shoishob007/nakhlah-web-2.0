@@ -13,6 +13,15 @@ const normalizeTtsText = (text, lang) => {
   return normalized;
 };
 
+const isExpectedPlaybackInterruption = (error) => {
+  const message = (error?.message || "").toLowerCase();
+  return (
+    error?.name === "AbortError" ||
+    message.includes("interrupted") ||
+    message.includes("pause")
+  );
+};
+
 /**
  * Custom hook to handle audio playback with fallback to Text-to-Speech (TTS).
  * Prioritizes pre-recorded MP3 files for accurate pronunciation, falls back to native browser TTS.
@@ -23,6 +32,7 @@ export const useAudio = () => {
   const audioRef = useRef(null);
   const synthRef = useRef(null);
   const utteranceRef = useRef(null);
+  const playbackRequestIdRef = useRef(0);
 
   const [voices, setVoices] = useState([]);
 
@@ -69,6 +79,9 @@ export const useAudio = () => {
 
   const play = useCallback(
     ({ url, text, lang = "ar-SA", gender, voiceName, rate = 1 }) => {
+      const requestId = playbackRequestIdRef.current + 1;
+      playbackRequestIdRef.current = requestId;
+
       // Stop any currently playing audio or speech
       if (audioRef.current) {
         audioRef.current.pause();
@@ -88,7 +101,15 @@ export const useAudio = () => {
           audioRef.current.playbackRate = safeRate;
           audioRef.current
             .play()
-            .catch((e) => console.error("Audio play error:", e));
+            .catch((e) => {
+              if (
+                requestId !== playbackRequestIdRef.current ||
+                isExpectedPlaybackInterruption(e)
+              ) {
+                return;
+              }
+              console.error("Audio play error:", e);
+            });
         }
       } else if (text && synthRef.current) {
         // Fallback to TTS (only when no MP3 is provided)
@@ -191,6 +212,7 @@ export const useAudio = () => {
   );
 
   const pause = useCallback(() => {
+    playbackRequestIdRef.current += 1;
     if (audioRef.current) {
       audioRef.current.pause();
     }
@@ -201,6 +223,7 @@ export const useAudio = () => {
   }, []);
 
   const stop = useCallback(() => {
+    playbackRequestIdRef.current += 1;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
