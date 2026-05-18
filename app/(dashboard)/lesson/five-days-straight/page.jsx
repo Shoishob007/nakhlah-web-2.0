@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Flame } from "@/components/icons/Flame";
+import { StreakIcon } from "@/components/icons/PublicAssetIcons";
 import { Check } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -125,7 +125,10 @@ export default function FiveDaysStraight() {
                 }}
                 className="absolute inset-0 blur-3xl rounded-full"
               />
-              <Flame size="xxxl" className="relative mx-auto text-orange-500" />
+              <StreakIcon
+                size="xxxl"
+                className="relative mx-auto text-orange-500"
+              />
             </div>
           </motion.div>
 

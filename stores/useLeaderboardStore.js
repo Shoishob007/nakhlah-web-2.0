@@ -101,7 +101,7 @@ export const useLeaderboardStore = create((set, get) => ({
                     id: item?.id || `leader-${index}`,
                     name,
                     email: item?.email || "",
-                    xp: Number(item?.injazCount) || 0,
+                    injaz: Number(item?.injazCount) || 0,
                     avatar: toAvatarText(name),
                     avatarUrl: toMediaUrl(item?.profilePictureUrl),
                     color: LEADERBOARD_COLORS[index % LEADERBOARD_COLORS.length],

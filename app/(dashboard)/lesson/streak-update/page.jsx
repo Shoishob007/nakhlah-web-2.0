@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Flame } from "@/components/icons/Flame";
+import { StreakIcon } from "@/components/icons/PublicAssetIcons";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchLearnerStreak } from "@/services/api";
@@ -70,7 +70,10 @@ export default function StreakUpdate() {
                 }}
                 className="absolute inset-0 blur-3xl rounded-full"
               />
-              <Flame size="xxxl" className="relative mx-auto text-orange-500" />
+              <StreakIcon
+                size="xxxl"
+                className="relative mx-auto text-orange-500"
+              />
             </div>
           </motion.div>
 

@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConditionalNavbar from "@/components/nakhlah/ConditionalNavbar";
 import MainLayout from "@/components/MainLayout";
@@ -6,8 +6,8 @@ import { ThemeProvider } from "next-themes";
 import SessionProvider from "@/components/SessionProvider";
 import { CustomToaster } from "@/components/nakhlah/Toast";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
+        className={`${inter.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <SessionProvider>
           <ThemeProvider

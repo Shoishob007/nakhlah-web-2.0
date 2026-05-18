@@ -19,14 +19,14 @@ export default function UserProfilePage({ user, onBack }) {
     { label: "lifetime Injaz", value: "18,528" },
   ];
 
-  const xpData = [
-    { day: "Mon", xp: 650 },
-    { day: "Tue", xp: 780 },
-    { day: "Wed", xp: 920 },
-    { day: "Thu", xp: 850 },
-    { day: "Fri", xp: 890 },
-    { day: "Sat", xp: 1020 },
-    { day: "Sun", xp: 948 },
+  const injazData = [
+    { day: "Mon", injaz: 650 },
+    { day: "Tue", injaz: 780 },
+    { day: "Wed", injaz: 920 },
+    { day: "Thu", injaz: 850 },
+    { day: "Fri", injaz: 890 },
+    { day: "Sat", injaz: 1020 },
+    { day: "Sun", injaz: 948 },
   ];
 
   return (
@@ -163,7 +163,7 @@ export default function UserProfilePage({ user, onBack }) {
                 Weekly Activity
               </h3>
               <p className="text-3xl font-bold text-accent">
-                {user?.xp || 948} Injaz
+                {user?.injaz ?? user?.xp ?? 948} Injaz
               </p>
             </div>
 
@@ -171,14 +171,14 @@ export default function UserProfilePage({ user, onBack }) {
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={xpData}
+                  data={injazData}
                   margin={{ top: 10, right: 10, left: 15, bottom: 0 }}
                 >
                   <XAxis dataKey="day" tickLine={false} axisLine={false} />
                   <YAxis width={30} tickLine={false} axisLine={false} />
                   <Line
                     type="monotone"
-                    dataKey="xp"
+                    dataKey="injaz"
                     stroke="hsl(var(--accent))"
                     strokeWidth={4}
                     dot={false}
