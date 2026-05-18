@@ -2,15 +2,12 @@
 import { motion } from "framer-motion";
 import { Flame, Target, CalendarDays, Award } from "lucide-react";
 import { getLongestStreak } from "@/lib/gamification";
+import { getCurrentStreakCount, getMissedDaysCount } from "@/lib/streakUtils";
 
 export default function QuickStats({ profileData }) {
-  const currentStreak = profileData?.learnerStreak?.currentStreak ?? 0;
+  const currentStreak = getCurrentStreakCount(profileData?.learnerStreak);
   const longestStreak = getLongestStreak(profileData);
-  const missedDays = Array.isArray(profileData?.learnerStreak?.dates)
-    ? profileData.learnerStreak.dates.filter(
-        (entry) => (entry?.status || "").toLowerCase() === "missed",
-      ).length
-    : 0;
+  const missedDays = getMissedDaysCount(profileData?.learnerStreak);
   const badgesUnlocked = Array.isArray(profileData?.gamificationStock?.badges)
     ? profileData.gamificationStock.badges.length
     : 0;

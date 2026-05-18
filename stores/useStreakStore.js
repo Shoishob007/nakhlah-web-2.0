@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createCachedSlice } from "./_utils/createCachedSlice";
 import { fetchLearnerStreak as fetchLearnerStreakApi } from "@/services/api";
+import { buildStreakActivities } from "@/lib/streakUtils";
 
 /**
  * Streak Store
@@ -9,23 +10,6 @@ import { fetchLearnerStreak as fetchLearnerStreakApi } from "@/services/api";
  * Note: No persistence (session-specific, users expect fresh on reload)
  */
 const STREAK_TTL_MS = 5 * 60 * 1000;
-
-const normalizeDateKey = (value) => {
-    if (!value) return "";
-    if (typeof value === "string") return value.slice(0, 10);
-    if (value instanceof Date) return value.toISOString().slice(0, 10);
-    return "";
-};
-
-const toActivities = (dates = []) => {
-    return dates.reduce((acc, entry) => {
-        if (entry?.date && entry?.status === "completed") {
-            const key = normalizeDateKey(entry.date);
-            if (key) acc[key] = true;
-        }
-        return acc;
-    }, {});
-};
 
 export const useStreakStore = create((set, get) => ({
     ...createCachedSlice(STREAK_TTL_MS),
@@ -77,7 +61,7 @@ export const useStreakStore = create((set, get) => ({
             userKey,
             streakData,
             dates,
-            activities: toActivities(dates),
+            activities: buildStreakActivities(dates),
             isLoading: false,
             error: null,
             lastFetchedAt: Date.now(),
