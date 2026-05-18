@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { X, Clock3 } from "lucide-react";
-import { Heart } from "@/components/icons/Heart";
+import { PalmIcon } from "@/components/icons/PublicAssetIcons";
 import { NotoStopwatch } from "@/components/icons/NotoStopwatch";
 
 function formatTime(totalSeconds) {
@@ -17,31 +17,10 @@ function formatTime(totalSeconds) {
 export default function LessonHeader({
   progressPercentage,
   onExit,
-  initialElapsedSeconds = 0,
-  lives = 5,
-  maxLives = 5,
-  onElapsedSecondsChange,
+  elapsedSeconds = 0,
+  palmTrees = 5,
+  maxPalmTrees = 5,
 }) {
-  const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds);
-
-  useEffect(() => {
-    setElapsedSeconds(initialElapsedSeconds);
-  }, [initialElapsedSeconds]);
-
-  useEffect(() => {
-    if (typeof onElapsedSecondsChange === "function") {
-      onElapsedSecondsChange(elapsedSeconds);
-    }
-  }, [elapsedSeconds, onElapsedSecondsChange]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const normalizedProgress = useMemo(
     () => Math.max(0, Math.min(100, progressPercentage || 0)),
     [progressPercentage],
@@ -74,11 +53,11 @@ export default function LessonHeader({
           </div>
 
           <div className="flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full bg-card border border-border">
-            {Array.from({ length: maxLives }).map((_, index) => (
-              <Heart
+            {Array.from({ length: maxPalmTrees }).map((_, index) => (
+              <PalmIcon
                 key={index}
                 size="sm"
-                className={index < lives ? "opacity-100" : "opacity-30"}
+                className={index < palmTrees ? "opacity-100" : "opacity-30"}
               />
             ))}
           </div>

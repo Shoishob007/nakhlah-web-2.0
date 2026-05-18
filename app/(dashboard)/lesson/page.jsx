@@ -225,9 +225,9 @@ async function claimLessonCompletionDailyQuests(token, rewards) {
   return results;
 }
 
-function syncProfileLives(nextLives) {
-  const livesValue = Number(nextLives);
-  if (!Number.isFinite(livesValue)) return;
+function syncProfilePalmTrees(nextPalmTrees) {
+  const palmTreesValue = Number(nextPalmTrees);
+  if (!Number.isFinite(palmTreesValue)) return;
 
   useProfileStore.setState((state) => {
     const currentProfile = state.profile;
@@ -241,7 +241,7 @@ function syncProfileLives(nextLives) {
           ...(currentProfile.gamificationStock || {}),
           palm: {
             ...(currentProfile.gamificationStock?.palm || {}),
-            palmStock: livesValue,
+            palmStock: palmTreesValue,
           },
         },
       },
@@ -249,7 +249,7 @@ function syncProfileLives(nextLives) {
         ...(currentProfile.gamificationStock || {}),
         palm: {
           ...(currentProfile.gamificationStock?.palm || {}),
-          palmStock: livesValue,
+          palmStock: palmTreesValue,
         },
       },
     };
@@ -282,7 +282,7 @@ export default function LessonPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
-  const [lives, setLives] = useState(5);
+  const [palmTrees, setPalmTrees] = useState(5);
   const [hasWrongAnswer, setHasWrongAnswer] = useState(false);
   const [isExamLesson, setIsExamLesson] = useState(false);
   const [selectedLessonStatus, setSelectedLessonStatus] = useState("");
@@ -293,6 +293,7 @@ export default function LessonPage() {
     useState(false);
   const [fullMarksRewardData, setFullMarksRewardData] = useState(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [timerStartedAtMs, setTimerStartedAtMs] = useState(null);
   const [totalAnswerAttempts, setTotalAnswerAttempts] = useState(0);
   const [correctAnswerAttempts, setCorrectAnswerAttempts] = useState(0);
 
@@ -321,7 +322,7 @@ export default function LessonPage() {
   const activeUserKey = getUserKey(session);
 
   const questionType = currentQuestion?.question_type;
-  const hasLives = lives > 0;
+  const hasPalmTrees = palmTrees > 0;
 
   const imageUrl = getQuestionMedia(currentQuestion, "image");
   const audioUrl = getQuestionMedia(currentQuestion, "audio");
@@ -417,7 +418,7 @@ export default function LessonPage() {
 
         if (!profileResult.success) {
           throw new Error(
-            profileResult.error || "Unable to verify available lives.",
+            profileResult.error || "Unable to verify available Palm Trees.",
           );
         }
 
@@ -429,18 +430,20 @@ export default function LessonPage() {
             resolvedProfile?.gamificationStock?.palm?.palmStock,
           );
           if (Number.isFinite(palmStock)) {
-            setLives(palmStock);
-            syncProfileLives(palmStock);
+            setPalmTrees(palmStock);
+            syncProfilePalmTrees(palmStock);
             if (palmStock <= 0) {
-              setLoadError("You need more hearts before opening this lesson.");
+              setLoadError(
+                "You need more Palm Trees before opening this lesson.",
+              );
               setIsLoading(false);
               return;
             }
           } else {
-            throw new Error("Unable to verify available lives.");
+            throw new Error("Unable to verify available Palm Trees.");
           }
         } else {
-          throw new Error("Unable to verify available lives.");
+          throw new Error("Unable to verify available Palm Trees.");
         }
 
         const cachedSession = safelyParseLessonSession(
@@ -474,9 +477,11 @@ export default function LessonPage() {
               : 0,
           );
 
-          const cachedLives = Number(cachedSession.lives);
-          if (Number.isFinite(cachedLives)) {
-            setLives(cachedLives);
+          const cachedPalmTrees = Number(
+            cachedSession.palmTrees ?? cachedSession.lives,
+          );
+          if (Number.isFinite(cachedPalmTrees)) {
+            setPalmTrees(cachedPalmTrees);
           }
 
           setHasWrongAnswer(Boolean(cachedSession.hasWrongAnswer));
@@ -485,6 +490,19 @@ export default function LessonPage() {
           const cachedElapsedSeconds = Number(cachedSession.elapsedSeconds);
           if (Number.isFinite(cachedElapsedSeconds)) {
             setElapsedSeconds(cachedElapsedSeconds);
+          }
+
+          const cachedTimerStartedAtMs = Number(cachedSession.timerStartedAtMs);
+          if (
+            Number.isFinite(cachedTimerStartedAtMs) &&
+            cachedTimerStartedAtMs > 0
+          ) {
+            setTimerStartedAtMs(cachedTimerStartedAtMs);
+          } else if (
+            Number.isFinite(cachedElapsedSeconds) &&
+            cachedElapsedSeconds >= 0
+          ) {
+            setTimerStartedAtMs(Date.now() - cachedElapsedSeconds * 1000);
           }
 
           const cachedTotalAnswerAttempts = Number(
@@ -525,6 +543,12 @@ export default function LessonPage() {
 
         setQuestions(orderedQuestions);
         setCurrentIndex(0);
+        setElapsedSeconds(0);
+        setTimerStartedAtMs(Date.now());
+        setTotalAnswerAttempts(0);
+        totalAnswerAttemptsRef.current = 0;
+        setCorrectAnswerAttempts(0);
+        correctAnswerAttemptsRef.current = 0;
       } catch (error) {
         setLoadError(error?.message || "Unable to load lesson.");
       } finally {
@@ -563,6 +587,41 @@ export default function LessonPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (isLoading || isNavigatingToCompletion || !questions.length) return;
+
+    if (!Number.isFinite(timerStartedAtMs) || timerStartedAtMs <= 0) {
+      setTimerStartedAtMs(Date.now());
+      return;
+    }
+
+    const syncElapsedSeconds = () => {
+      setElapsedSeconds(
+        Math.max(0, Math.floor((Date.now() - timerStartedAtMs) / 1000)),
+      );
+    };
+
+    syncElapsedSeconds();
+
+    const interval = setInterval(syncElapsedSeconds, 1000);
+    const handleWindowFocus = () => syncElapsedSeconds();
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        syncElapsedSeconds();
+      }
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleWindowFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isLoading, isNavigatingToCompletion, questions.length, timerStartedAtMs]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     if (isLoading || !questions.length) return;
 
     const lessonId =
@@ -594,10 +653,12 @@ export default function LessonPage() {
         selectedLessonStatus,
         questions,
         currentIndex,
-        lives,
+        palmTrees,
+        lives: palmTrees,
         hasWrongAnswer,
         fullMarksRewardData,
         elapsedSeconds,
+        timerStartedAtMs,
         totalAnswerAttempts,
         correctAnswerAttempts,
       }),
@@ -613,10 +674,11 @@ export default function LessonPage() {
     questions,
     selectedLessonStatus,
     currentIndex,
-    lives,
+    palmTrees,
     hasWrongAnswer,
     fullMarksRewardData,
     elapsedSeconds,
+    timerStartedAtMs,
     totalAnswerAttempts,
     correctAnswerAttempts,
     session,
@@ -758,8 +820,8 @@ export default function LessonPage() {
 
     const palmStock = Number(result.data?.palmStock);
     if (Number.isFinite(palmStock)) {
-      setLives(palmStock);
-      syncProfileLives(palmStock);
+      setPalmTrees(palmStock);
+      syncProfilePalmTrees(palmStock);
     }
   };
 
@@ -909,8 +971,10 @@ export default function LessonPage() {
   };
 
   const goToNext = async () => {
-    if (!hasLives) {
-      toast.error("No lives left. Refill palms to continue this lesson.");
+    if (!hasPalmTrees) {
+      toast.error(
+        "No Palm Trees left. Refill Palm Trees to continue this lesson.",
+      );
       return;
     }
 
@@ -980,8 +1044,8 @@ export default function LessonPage() {
 
   const handleCheckAnswer = async () => {
     if (!currentQuestion) return;
-    if (!hasLives) {
-      toast.error("No lives left. Refill palms to answer questions.");
+    if (!hasPalmTrees) {
+      toast.error("No Palm Trees left. Refill Palm Trees to answer questions.");
       return;
     }
 
@@ -1125,7 +1189,7 @@ export default function LessonPage() {
   }
 
   if (loadError) {
-    const isLifeError = /heart|life/i.test(loadError);
+    const isLifeError = /heart|life|palm/i.test(loadError);
 
     return (
       <div className="min-h-screen sm:min-h-[calc(100vh_-_64px)] lg:min-h-screen bg-background flex items-center justify-center p-4">
@@ -1134,12 +1198,12 @@ export default function LessonPage() {
           <div className="space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground">
               {isLifeError
-                ? "No hearts left for this lesson"
+                ? "No Palm Trees left for this lesson"
                 : "Lesson unavailable"}
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
               {isLifeError
-                ? "Take a short break, refill your hearts, and come back ready to continue the journey."
+                ? "Take a short break, refill your Palm Trees, and come back ready to continue the journey."
                 : loadError}
             </p>
           </div>
@@ -1155,7 +1219,7 @@ export default function LessonPage() {
                 onClick={() => router.push("/store")}
                 className="px-5 py-3 rounded-xl border border-border bg-background text-foreground font-semibold"
               >
-                Refill Hearts
+                Refill Palm Trees
               </button>
             ) : null}
           </div>
@@ -1243,10 +1307,9 @@ export default function LessonPage() {
       <LessonHeader
         progressPercentage={progressPercentage}
         onExit={() => setShowExitDialog(true)}
-        initialElapsedSeconds={0}
-        lives={lives}
-        maxLives={5}
-        onElapsedSecondsChange={setElapsedSeconds}
+        elapsedSeconds={elapsedSeconds}
+        palmTrees={palmTrees}
+        maxPalmTrees={5}
       />
 
       {showExitDialog && (
@@ -1790,14 +1853,14 @@ export default function LessonPage() {
             <div className="container max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <button
                 onClick={goToNext}
-                disabled={!hasLives}
+                disabled={!hasPalmTrees}
                 className="text-muted-foreground hover:text-foreground font-bold text-lg underline underline-offset-4 order-2 sm:order-1"
               >
                 Skip
               </button>
               <button
                 onClick={goToNext}
-                disabled={!hasLives}
+                disabled={!hasPalmTrees}
                 className="w-full sm:w-auto sm:min-w-[200px] h-14 bg-accent hover:opacity-90 text-accent-foreground font-bold text-lg rounded-xl order-1 sm:order-2"
               >
                 Continue
@@ -1827,7 +1890,7 @@ export default function LessonPage() {
             onContinue={goToNext}
             onSkip={goToNext}
             disabled={
-              !hasLives ||
+              !hasPalmTrees ||
               (questionType === "mcq"
                 ? !selectedOptionId
                 : questionType === "true_false"

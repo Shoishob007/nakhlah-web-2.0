@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { GemStone } from "@/components/icons/Gem";
 import { motion } from "framer-motion";
 
 const gemPackages = [

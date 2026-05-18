@@ -34,12 +34,12 @@ export default function QuickStats({ profileData }) {
       icon: CalendarDays,
       color: "text-secondary",
     },
-    {
-      label: "Badges Unlocked",
-      value: `${badgesUnlocked}`,
-      icon: Award,
-      color: "text-accent",
-    },
+    // {
+    //   label: "Badges Unlocked",
+    //   value: `${badgesUnlocked}`,
+    //   icon: Award,
+    //   color: "text-accent",
+    // },
   ];
 
   return (
@@ -50,7 +50,7 @@ export default function QuickStats({ profileData }) {
       className="bg-transparent lg:bg-card rounded-none lg:rounded-2xl shadow-none lg:shadow-lg border-0 lg:border lg:border-border p-0 lg:p-6"
     >
       <div className="mb-4 lg:mb-6">
-        <h3 className="text-xl font-semibold">Quick Stats</h3>
+        <h3 className="text-xl font-semibold">Streak Overview</h3>
       </div>
 
       <div className="space-y-3">

@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Mascot } from "@/components/nakhlah/Mascot";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { GemStone } from "@/components/icons/Gem";
+import { DatesIcon, InjazStarIcon } from "@/components/icons/PublicAssetIcons";
 import { Bullseye } from "@/components/icons/BullsEye";
-import { HighVoltage } from "@/components/icons/High-Voltage";
 import { NotoStopwatch } from "@/components/icons/NotoStopwatch";
 
 function formatTime(totalSeconds) {
@@ -19,7 +18,10 @@ function formatTime(totalSeconds) {
   return `${minutes}:${seconds}`;
 }
 
-function calculateAccuracyPercentage({ totalQuestions, correctAnswerAttempts }) {
+function calculateAccuracyPercentage({
+  totalQuestions,
+  correctAnswerAttempts,
+}) {
   const normalizedQuestionCount = Number(totalQuestions);
   const normalizedCorrectAttempts = Number(correctAnswerAttempts);
 
@@ -104,7 +106,7 @@ export default function LessonCompleted() {
     {
       label: "Total Dates",
       value: String(datesReceived),
-      icon: <GemStone size="sm" />,
+      icon: <DatesIcon size="sm" />,
       border: "border-sky-400",
       header: "bg-sky-500",
     },
@@ -175,7 +177,7 @@ export default function LessonCompleted() {
               {/* Body */}
               <div className="bg-white py-6">
                 <div className="flex items-center justify-center gap-3">
-                  <HighVoltage size="md" className="text-amber-500" />
+                  <InjazStarIcon size="md" className="text-amber-500" />
                   <span className="text-4xl font-extrabold text-slate-800">
                     {injazReceived}
                   </span>

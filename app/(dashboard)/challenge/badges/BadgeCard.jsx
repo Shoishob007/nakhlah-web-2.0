@@ -14,7 +14,7 @@ const getIconUrl = (url) => {
 
 export default function BadgeCard({ badge }) {
   const iconUrl = getIconUrl(badge.icon?.url || badge.icon);
-  const xp = Number(badge.xp) || 0;
+  const injazTarget = Number(badge.injazTarget ?? badge.xp) || 0;
   const isEarned = Boolean(badge.earned);
 
   return (
@@ -46,7 +46,7 @@ export default function BadgeCard({ badge }) {
 
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold text-accent">
-              {xp.toLocaleString()} Injaz
+              {injazTarget.toLocaleString()} Injaz
             </span>
             <span className="text-xs text-muted-foreground">•</span>
             <span className="text-muted-foreground">

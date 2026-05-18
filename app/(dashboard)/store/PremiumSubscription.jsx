@@ -23,7 +23,7 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crown } from "@/components/icons/Crown";
-import { GemStone } from "@/components/icons/Gem";
+import { DatesIcon } from "@/components/icons/PublicAssetIcons";
 import { Mascot } from "@/components/nakhlah/Mascot";
 
 const premiumFeatures = [
@@ -305,11 +305,11 @@ export default function PremiumSubscription({ onBack }) {
           <motion.div
             variants={itemVariants}
             className="relative rounded-xl border border-border p-6 bg-accent/10 hover:border-accent/50 transition-all cursor-pointer group"
-            onClick={() => router.push("/store/gems")}
+            onClick={() => router.push("/store/dates")}
           >
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg transition-colors">
-                <GemStone size="lg" />
+                <DatesIcon size="lg" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-foreground mb-1">
