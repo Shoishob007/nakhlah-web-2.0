@@ -17,6 +17,7 @@ import {
 import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import { fetchMyProfile } from "@/services/api";
+import { getCurrentStreakCount } from "@/lib/streakUtils";
 
 const achievements = [
   {
@@ -115,7 +116,7 @@ export default function Stats() {
             },
             {
               label: "Current Streak",
-              value: `${profileData?.learnerStreak?.currentStreak ?? 0} days`,
+              value: `${getCurrentStreakCount(profileData?.learnerStreak)} days`,
               icon: Flame,
               color: "text-orange-500",
             },

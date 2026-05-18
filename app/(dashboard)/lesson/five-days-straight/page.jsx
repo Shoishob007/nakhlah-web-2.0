@@ -9,22 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchLearnerStreak } from "@/services/api";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
-
-const weekdayLabel = (date) =>
-  date.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2);
-
-const dateKey = (date) => date.toISOString().slice(0, 10);
-
-const normalizeDateKey = (value) => {
-  if (!value) return "";
-  if (typeof value === "string") {
-    return value.slice(0, 10);
-  }
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-  return "";
-};
+import { getCurrentStreakCount, getRecentStreakDays } from "@/lib/streakUtils";
 
 export default function FiveDaysStraight() {
   const router = useRouter();
@@ -49,44 +34,11 @@ export default function FiveDaysStraight() {
   }, [session, status]);
 
   const recentDays = useMemo(() => {
-    // Build a map of dates to their status, preferring "missed" over "completed"
-    const dateStatusMap = new Map();
-    const dates = Array.isArray(streakData?.dates) ? streakData.dates : [];
-
-    dates.forEach((item) => {
-      if (item?.date) {
-        const key = normalizeDateKey(item.date);
-        if (key) {
-          const currentStatus = dateStatusMap.get(key);
-          // Prefer "missed" status if it exists
-          if (item.status === "missed" || !currentStatus) {
-            dateStatusMap.set(key, item.status);
-          }
-        }
-      }
-    });
-
-    const today = new Date();
-    const output = [];
-
-    for (let offset = 6; offset >= 0; offset -= 1) {
-      const day = new Date(today);
-      day.setDate(today.getDate() - offset);
-
-      const dayKey = dateKey(day);
-      output.push({
-        label: weekdayLabel(day),
-        completed: dateStatusMap.get(dayKey) === "completed",
-      });
-    }
-
-    return output;
+    return getRecentStreakDays(streakData, 7);
   }, [streakData]);
 
-  const currentStreak = Number(streakData?.currentStreak) || 0;
-  const trackedCompletedDays = (
-    Array.isArray(streakData?.dates) ? streakData.dates : []
-  ).filter((item) => item?.status === "completed").length;
+  const currentStreak = getCurrentStreakCount(streakData);
+  const trackedCompletedDays = recentDays.filter((day) => day.completed).length;
 
   const handleContinue = () => {
     router.push("/");
@@ -139,7 +91,7 @@ export default function FiveDaysStraight() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="text-3xl md:text-4xl font-extrabold text-foreground mb-2"
           >
-            {currentStreak} days straight!
+            {currentStreak} day{currentStreak === 1 ? "" : "s"} straight!
           </motion.h1>
 
           {/* Description */}

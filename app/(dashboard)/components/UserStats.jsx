@@ -20,17 +20,10 @@ import { refillPalmTrees } from "@/services/api";
 import { useProfileStore } from "@/stores/useProfileStore";
 import { useStreakStore } from "@/stores/useStreakStore";
 import { toast } from "@/components/nakhlah/Toast";
-
-const normalizeDateKey = (value) => {
-  if (!value) return "";
-  if (typeof value === "string") {
-    return value.slice(0, 10);
-  }
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-  return "";
-};
+import {
+  buildStreakActivities,
+  getCurrentStreakCount,
+} from "@/lib/streakUtils";
 
 const JOURNEY_REFRESH_FLAG_KEY = "nakhlah:journey-needs-refresh";
 
@@ -110,36 +103,16 @@ export function UserStats() {
     };
   }, [loadStats]);
 
-  const streakCount = streakData?.currentStreak ?? 0;
+  const streakCount = getCurrentStreakCount(streakData);
   const datesCount = profileData?.gamificationStock?.dateStock ?? 0;
   const palmTreesCount = profileData?.gamificationStock?.palm?.palmStock ?? 5;
-  const streakActivities = useMemo(() => {
-    // Build a map of dates, preferring "missed" status over "completed"
-    const dateStatusMap = new Map();
-    const dates = Array.isArray(streakData?.dates) ? streakData.dates : [];
-
-    dates.forEach((item) => {
-      if (item?.date) {
-        const key = normalizeDateKey(item.date);
-        if (key) {
-          const currentStatus = dateStatusMap.get(key);
-          // Prefer "missed" status if it exists
-          if (item.status === "missed" || !currentStatus) {
-            dateStatusMap.set(key, item.status);
-          }
-        }
-      }
-    });
-
-    // Only include completed dates
-    const activities = {};
-    dateStatusMap.forEach((status, key) => {
-      if (status === "completed") {
-        activities[key] = true;
-      }
-    });
-    return activities;
-  }, [streakData]);
+  const streakActivities = useMemo(
+    () =>
+      buildStreakActivities(
+        Array.isArray(streakData?.dates) ? streakData.dates : [],
+      ),
+    [streakData],
+  );
   const streakMessage =
     streakCount > 0
       ? `You're on a ${streakCount}-day streak.`

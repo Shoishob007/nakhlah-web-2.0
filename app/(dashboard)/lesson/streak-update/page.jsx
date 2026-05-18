@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchLearnerStreak } from "@/services/api";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
+import { getCurrentStreakCount, getMissedDaysCount } from "@/lib/streakUtils";
 
 export default function StreakUpdate() {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function StreakUpdate() {
 
       const result = await fetchLearnerStreak(token);
       if (result.success) {
-        setCurrentStreak(Number(result.streak?.currentStreak) || 0);
-        setMissedDays(Number(result.streak?.missedDays) || 0);
+        setCurrentStreak(getCurrentStreakCount(result.streak));
+        setMissedDays(getMissedDaysCount(result.streak));
       }
     };
 
