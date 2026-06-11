@@ -196,7 +196,7 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
                 </div>
               ) : null}
             </div>
-            <button className="text-white hover:bg-white/20 p-2 rounded-full">
+            <button className="text-white p-2 rounded-full">
               <FileText className="w-6 h-6" />
             </button>
           </div>
@@ -227,7 +227,7 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
               </div>
             ) : null}
           </div>
-          <button className="text-white hover:bg-white/20 p-2 rounded-full">
+          <button className="text-white p-2 rounded-full">
             <FileText className="w-6 h-6" />
           </button>
         </div>
