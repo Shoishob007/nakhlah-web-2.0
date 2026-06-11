@@ -13,8 +13,17 @@ export default function RefillLivesCard() {
   const { data: session } = useSession();
   const [isRefilling, setIsRefilling] = useState(false);
   const fetchProfile = useProfileStore((state) => state.fetchMyProfile);
+  const profile = useProfileStore((state) => state.profile);
+
+  const palmTreesCount = Number(
+    profile?.gamificationStock?.palm?.palmStock ?? 5,
+  );
 
   const handleRefill = async () => {
+    if (palmTreesCount >= 5) {
+      toast.info("You already have full Palm Trees.");
+      return;
+    }
     if (!isSessionValid(session)) {
       toast.error("Please login to refill Palm Trees.");
       return;
@@ -66,7 +75,7 @@ export default function RefillLivesCard() {
             onClick={handleRefill}
             variant="outline"
             className="w-full"
-            disabled={isRefilling}
+            disabled={isRefilling || palmTreesCount >= 5}
           >
             {isRefilling ? "Refilling..." : "Refill with Dates"}
           </Button>

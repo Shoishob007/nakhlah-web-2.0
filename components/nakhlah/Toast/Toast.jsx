@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, XCircle, Send, MessageCircle, Info } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, X, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Toast({
@@ -26,9 +26,19 @@ export function Toast({
       icon: <XCircle className="w-5 h-5 text-white" />,
       buttonText: "text-rose-600",
     },
+    warning: {
+      bg: "bg-amber-500",
+      icon: <AlertCircle className="w-5 h-5 text-white" />,
+      buttonText: "text-amber-600",
+    },
+    default: {
+      bg: "bg-sky-500",
+      icon: <Info className="w-5 h-5 text-white" />,
+      buttonText: "text-sky-600",
+    },
   };
 
-  const current = variants[variant];
+  const current = variants[variant] || variants.default;
 
   return (
     <AnimatePresence>
@@ -44,13 +54,13 @@ export function Toast({
             // Mobile
             "bottom-0 left-0 right-0 mx-3 mb-3",
             // Desktop
-            "sm:left-auto sm:right-4 sm:bottom-4 sm:w-[360px]"
+            "sm:left-auto sm:right-4 sm:bottom-4 sm:w-[360px]",
           )}
         >
           <div
             className={cn(
-              "rounded-2xl px-4 py-4 shadow-xl text-white",
-              current.bg
+              "relative rounded-md px-4 py-3.5 pr-10 shadow-xl text-white",
+              current.bg,
             )}
           >
             {/* Header */}
@@ -59,14 +69,16 @@ export function Toast({
                 {current.icon}
                 <span className="font-bold text-lg">{title}</span>
               </div>
-
-              {/* Utility icons (visual only) */}
-              <div className="flex items-center gap-3 opacity-90">
-                {/* <Send className="w-4 h-4" />
-                <MessageCircle className="w-4 h-4" /> */}
-                <Info className="w-4 h-4" />
-              </div>
             </div>
+
+            {/* Close button */}
+            <button
+              aria-label="Close"
+              onClick={() => onOpenChange?.(false)}
+              className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-none border-0 bg-transparent p-0 text-white/80 shadow-none transition-opacity hover:bg-transparent hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
 
             {/* Description */}
             {description && (
@@ -82,8 +94,8 @@ export function Toast({
                 onOpenChange?.(false);
               }}
               className={cn(
-                "mt-4 w-full rounded-full py-3 font-bold text-sm bg-white",
-                current.buttonText
+                "mt-4 w-full rounded-md py-3 font-bold text-sm bg-white",
+                current.buttonText,
               )}
             >
               {actionLabel}

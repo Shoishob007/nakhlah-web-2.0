@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchLearnerStreak } from "@/services/api";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
+import { getCurrentStreakCount } from "@/lib/streakUtils";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
@@ -39,7 +40,7 @@ export function Navbar() {
 
       const result = await fetchLearnerStreak(token);
       if (result.success) {
-        setStreakCount(Number(result.streak?.currentStreak) || 0);
+        setStreakCount(getCurrentStreakCount(result.streak));
       }
     };
 

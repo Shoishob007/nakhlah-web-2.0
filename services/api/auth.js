@@ -5,8 +5,9 @@ const withApiUrl = (path) => {
 };
 
 const toErrorMessage = (data, fallback) => {
+    // Prefer plain string responses, then common message keys used by backend
     if (typeof data === "string" && data.trim()) return data;
-    return data?.message || fallback;
+    return data?.message || data?.error || (data?.errors?.message ?? fallback);
 };
 
 export async function refreshAccessToken(currentToken) {
