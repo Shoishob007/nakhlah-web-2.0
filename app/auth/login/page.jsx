@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "@/components/nakhlah/Toast";
+import { queueToastAfterNavigation, toast } from "@/components/nakhlah/Toast";
 import { useProfileStore } from "@/stores/useProfileStore";
 
 export default function Login() {
@@ -47,7 +47,7 @@ export default function Login() {
       }
 
       if (result?.ok) {
-        toast.success("Login successful!");
+        queueToastAfterNavigation("success", "Login successful!");
         clearProfile();
         router.push("/");
         router.refresh();

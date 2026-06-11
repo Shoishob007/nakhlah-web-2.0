@@ -1,2 +1,5 @@
-export { CustomToaster } from './CustomToaster';
+export {
+  CustomToaster,
+  queueToastAfterNavigation,
+} from './CustomToaster';
 export { toast } from 'sonner';

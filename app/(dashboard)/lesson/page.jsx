@@ -777,24 +777,29 @@ export default function LessonPage() {
     }
 
     const title = (currentQuestion?.question_title || "").toString();
-    // Support single underscore placeholders (e.g. "'_'") in addition to older multi-char markers.
-    const match = title.match(/_{1,}|-{3,}|\.{3,}/);
+    // Support single underscore placeholders possibly wrapped in quotes (e.g. "'_'"),
+    // and older multi-char markers. Strip surrounding quotes and normalize display.
+    const match = title.match(/(?:['"]?_+['"]?)|-{3,}|\.{3,}/);
 
     if (!match || match.index === undefined) {
       return {
         before: title,
-        blank: "____",
+        blank: "",
         after: "",
         hasBlank: false,
       };
     }
 
+    const raw = match[0].replace(/^['"]|['"]$/g, "");
     const startIndex = match.index;
     const endIndex = startIndex + match[0].length;
 
+    // Do not render literal underscores or surrounding quotes in the UI — show a normalized blank
+    const displayBlank = /^_+$/.test(raw) ? "" : raw;
+
     return {
       before: title.slice(0, startIndex),
-      blank: match[0],
+      blank: displayBlank,
       after: title.slice(endIndex),
       hasBlank: true,
     };
@@ -1750,34 +1755,37 @@ export default function LessonPage() {
                 </div>
 
                 <div className="bg-card border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-4 sm:mb-6 text-center leading-relaxed">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-4 sm:mb-6 text-center leading-none flex items-center justify-center gap-3">
                     {fillBlankQuestionParts.hasBlank ? (
                       <>
                         {fillBlankQuestionParts.before}
-                        <span className="inline-flex min-w-[110px] sm:min-w-[140px] mx-1 align-middle justify-center border-b-2 border-foreground/40 overflow-hidden leading-none py-1">
+                        <span className="inline-flex w-[140px] sm:w-[180px] h-[1.35em] mx-1 align-middle justify-center items-center border-b-2 border-foreground/40 overflow-hidden leading-none flex-shrink-0">
                           <AnimatePresence mode="wait">
                             {fillBlankAnswer ? (
                               <motion.span
                                 key={fillBlankAnswer}
-                                initial={{ y: 30, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -20, opacity: 0 }}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -6 }}
                                 transition={{
-                                  type: "spring",
-                                  stiffness: 320,
-                                  damping: 28,
+                                  duration: 0.18,
+                                  ease: "easeOut",
                                 }}
-                                className="inline-block text-foreground"
+                                className="inline-block text-foreground truncate leading-none"
                               >
                                 {fillBlankAnswer}
                               </motion.span>
                             ) : (
                               <motion.span
                                 key="blank"
-                                initial={{ opacity: 0.6 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0.6 }}
-                                className="inline-block text-muted-foreground"
+                                initial={{ opacity: 0, y: 6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -4 }}
+                                transition={{
+                                  duration: 0.16,
+                                  ease: "easeOut",
+                                }}
+                                className="inline-block text-muted-foreground leading-none"
                               >
                                 {fillBlankQuestionParts.blank}
                               </motion.span>
@@ -1789,32 +1797,35 @@ export default function LessonPage() {
                     ) : (
                       <>
                         {fillBlankQuestionParts.before}
-                        <span className="inline-flex min-w-[110px] sm:min-w-[140px] mx-1 align-middle justify-center border-b-2 border-foreground/40 overflow-hidden leading-none py-1">
+                        <span className="inline-flex w-[140px] sm:w-[180px] h-[1.35em] mx-1 align-middle justify-center items-center border-b-2 border-foreground/40 overflow-hidden leading-none flex-shrink-0">
                           <AnimatePresence mode="wait">
                             {fillBlankAnswer ? (
                               <motion.span
                                 key={fillBlankAnswer}
-                                initial={{ y: 30, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -20, opacity: 0 }}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -6 }}
                                 transition={{
-                                  type: "spring",
-                                  stiffness: 320,
-                                  damping: 28,
+                                  duration: 0.18,
+                                  ease: "easeOut",
                                 }}
-                                className="inline-block text-foreground"
+                                className="inline-block text-foreground truncate leading-none"
                               >
                                 {fillBlankAnswer}
                               </motion.span>
                             ) : (
                               <motion.span
                                 key="blank-fallback"
-                                initial={{ opacity: 0.6 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0.6 }}
-                                className="inline-block text-muted-foreground"
+                                initial={{ opacity: 0, y: 6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -4 }}
+                                transition={{
+                                  duration: 0.16,
+                                  ease: "easeOut",
+                                }}
+                                className="inline-block text-muted-foreground leading-none"
                               >
-                                ____
+                                {fillBlankQuestionParts.blank || ""}
                               </motion.span>
                             )}
                           </AnimatePresence>
@@ -1872,11 +1883,12 @@ export default function LessonPage() {
                   {questionType === "word_making" ? (
                     selectedTokens.length === 0 ? (
                       <div className="h-full flex items-center justify-center">
+                        {/* Intentionally empty when no tokens selected (no fallback dots) */}
                         <div
                           dir="rtl"
                           className="text-4xl sm:text-5xl font-bold text-foreground leading-tight tracking-normal"
                         >
-                          ...
+                          {/* empty */}
                         </div>
                       </div>
                     ) : (
@@ -1890,7 +1902,7 @@ export default function LessonPage() {
 
                         <div
                           dir="rtl"
-                          className="w-full h-10 flex flex-nowrap gap-2 justify-center items-center overflow-x-auto overflow-y-hidden"
+                          className="w-full min-h-[48px] flex flex-nowrap gap-2 justify-center items-center overflow-x-auto overflow-y-hidden"
                         >
                           {selectedTokens.map((token, index) => (
                             <motion.button
@@ -1899,7 +1911,7 @@ export default function LessonPage() {
                               animate={{ scale: 1 }}
                               onClick={() => handleRemoveToken(index)}
                               disabled={isCorrect !== null}
-                              className="px-3 py-2 shrink-0 bg-accent/15 text-foreground border border-accent/30 rounded-lg font-semibold text-base hover:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="px-3 py-2 shrink-0 bg-accent/15 text-foreground border border-accent/30 rounded-lg font-semibold text-base leading-none hover:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {token}
                             </motion.button>
@@ -1937,7 +1949,7 @@ export default function LessonPage() {
                       transition={{ delay: index * 0.05 }}
                       onClick={() => handleTokenClick(token, index)}
                       disabled={isCorrect !== null}
-                      className="px-4 py-3 bg-card border-2 border-border rounded-xl font-bold text-xl text-foreground hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-3 bg-card border-2 border-border rounded-xl font-bold text-xl leading-none text-foreground hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {token}
                     </motion.button>

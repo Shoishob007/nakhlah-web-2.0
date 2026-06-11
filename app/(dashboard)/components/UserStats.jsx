@@ -133,6 +133,11 @@ export function UserStats() {
   const handleRefillPalmTrees = async () => {
     if (isRefillingPalmTrees) return;
 
+    if (palmTreesCount >= 5) {
+      toast.info("You already have full Palm Trees.");
+      return;
+    }
+
     if (!isSessionValid(session)) {
       toast.error("Please login to refill Palm Trees.");
       return;
@@ -367,11 +372,11 @@ export function UserStats() {
                   </Button>
                   <Button
                     onClick={handleRefillPalmTrees}
-                    disabled={isRefillingPalmTrees}
+                    disabled={isRefillingPalmTrees || palmTreesCount >= 5}
                   >
                     {isRefillingPalmTrees
                       ? "REFILLING..."
-                      : "REFILL PALM TREES (350 dates)"}
+                      : "REFILL PALM TREES"}
                   </Button>
                 </div>
               </HoverCardContent>
@@ -414,11 +419,9 @@ export function UserStats() {
                 <button
                   className="w-full py-2 bg-primary text-primary-foreground rounded-md disabled:opacity-70"
                   onClick={handleRefillPalmTrees}
-                  disabled={isRefillingPalmTrees}
+                  disabled={isRefillingPalmTrees || palmTreesCount >= 5}
                 >
-                  {isRefillingPalmTrees
-                    ? "REFILLING..."
-                    : "REFILL PALM TREES (350 dates)"}
+                  {isRefillingPalmTrees ? "REFILLING..." : "REFILL PALM TREES"}
                 </button>
               </div>
             </div>
