@@ -208,8 +208,11 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
 
   return (
     <div className="relative lg:max-w-lg mx-auto">
+      {/* Mobile mask: hides scrolled content behind the fixed stats + unit headers */}
+      <div className="fixed top-0 left-0 right-0 h-[72px] z-[44] bg-background lg:hidden pointer-events-none" />
+
       {/* Fixed unit header on mobile to avoid sticky jitter while scrolling */}
-      <div className="fixed top-[72px] left-0 right-0 z-[100] bg-background border-b border-border/60 py-2 lg:hidden">
+      <div className="fixed top-[72px] left-0 right-0 z-[45] bg-background border-b border-border/60 py-2 lg:hidden">
         <div className="mx-auto w-full max-w-lg px-4">
           <div
             className={`flex items-center justify-between px-4 py-3 rounded-lg shadow-lg transition-all duration-500 ease-in-out bg-gradient-to-r ${getLevelColor(
@@ -234,14 +237,11 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
         </div>
       </div>
 
-      {/* Mobile mask: keep area above unit header visually clean */}
-      <div className="fixed top-0 left-0 right-0 h-[72px] z-[99] bg-background lg:hidden pointer-events-none" />
-
       {/* Desktop mask to keep whitespace above sticky header clean */}
-      <div className="hidden lg:block sticky top-0 z-[55] h-6 bg-background" />
+      <div className="hidden lg:block sticky top-0 z-[44] h-6 bg-background" />
 
       {/* Sticky unit header on desktop */}
-      <div className="hidden lg:block sticky top-6 z-50 bg-background py-2 lg:py-0">
+      <div className="hidden lg:block sticky top-6 z-[44] bg-background py-2 lg:py-0">
         <div
           className={`flex items-center justify-between px-4 py-3 rounded-lg shadow-lg transition-all duration-500 ease-in-out bg-gradient-to-r ${getLevelColor(
             currentLevel?.colorIndex || 1,

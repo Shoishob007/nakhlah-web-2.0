@@ -18,7 +18,9 @@ export default function MainLayout({ children }) {
     <div className="">
       <main
         className={
-          hideNavbar ? "" : "sm:min-h-[calc(100vh_-_64px)] md:pl-64 pb-20 md:pb-0"
+          hideNavbar
+            ? ""
+            : "sm:min-h-[calc(100vh_-_64px)] lg:pl-64 pb-20 lg:pb-0"
         }
       >
         <ToastProvider />

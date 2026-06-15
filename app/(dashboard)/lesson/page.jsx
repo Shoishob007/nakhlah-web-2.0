@@ -428,7 +428,7 @@ export default function LessonPage() {
   const totalScoredQuestions = questions.filter(isScoredQuestion).length;
   const currentQuestion = questions[currentIndex];
   const progressPercentage =
-    totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
+    totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0;
   const activeUserKey = getUserKey(session);
   const authSessionKey = buildAuthSessionKey(session);
 
@@ -1071,6 +1071,7 @@ export default function LessonPage() {
       const dailyQuestClaims = await claimLessonCompletionDailyQuests(token, {
         accuracyPercentage,
         hasWrongAnswer: hasWrongAnswerToUse,
+        elapsedSeconds,
       });
 
       if (dailyQuestClaims.length > 0) {
