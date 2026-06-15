@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { Trophy } from "@/components/icons/Trophy";
@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import { getUserKey } from "@/lib/userKey";
 import { useLeaderboardStore } from "@/stores/useLeaderboardStore";
+
+const PAGE_SIZE = 10;
 
 export default function Leaderboard({ onViewProfile }) {
   const { data: session, status } = useSession();
@@ -16,6 +18,33 @@ export default function Leaderboard({ onViewProfile }) {
     (state) => state.fetchLeaderboard,
   );
   const clearLeaderboard = useLeaderboardStore((state) => state.clear);
+
+  const restList = leaderboardData.slice(3);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const loadMoreRef = useRef(null);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [leaderboardData]);
+
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && visibleCount < restList.length) {
+          setVisibleCount((prev) =>
+            Math.min(prev + PAGE_SIZE, restList.length),
+          );
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visibleCount, restList.length]);
 
   useEffect(() => {
     const loadLeaderboard = async () => {
@@ -193,51 +222,68 @@ export default function Leaderboard({ onViewProfile }) {
               No leaderboard data available.
             </div>
           ) : (
-            leaderboardData.slice(3).map((user, index) => (
-              <motion.button
-                key={user.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 + index * 0.05 }}
-                onClick={() => onViewProfile(user)}
-                className={`w-full bg-transparent lg:bg-card flex items-center gap-4 px-2 py-4 lg:p-4 rounded-2xl transition-all hover:scale-[1.02] ${
-                  user.isCurrentUser
-                    ? "bg-muted/30 border-2 border-primary lg:shadow-lg"
-                    : "border border-border shadow-md"
-                }`}
-              >
-                <div className="w-8 text-center">
-                  <span className="font-bold text-muted-foreground text-lg">
-                    {user.rank}
-                  </span>
-                </div>
-                <div
-                  className={`w-14 h-14 rounded-full bg-gradient-to-br ${user.color} flex items-center justify-center text-white font-bold text-lg shadow-lg`}
+            <>
+              {restList.slice(0, visibleCount).map((user, index) => (
+                <motion.button
+                  key={user.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 + index * 0.05 }}
+                  onClick={() => onViewProfile(user)}
+                  className={`w-full bg-transparent lg:bg-card flex items-center gap-4 px-2 py-4 lg:p-4 rounded-2xl transition-all hover:scale-[1.02] ${
+                    user.isCurrentUser
+                      ? "bg-muted/30 border-2 border-primary lg:shadow-lg"
+                      : "border border-border shadow-md"
+                  }`}
                 >
-                  {user.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.name}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    user.avatar
-                  )}
-                </div>
-                <div className="flex-1 text-left">
-                  <p
-                    className={`font-bold ${
-                      user.isCurrentUser ? "text-primary" : "text-foreground"
-                    }`}
+                  <div className="w-8 text-center">
+                    <span className="font-bold text-muted-foreground text-lg">
+                      {user.rank}
+                    </span>
+                  </div>
+                  <div
+                    className={`w-14 h-14 rounded-full bg-gradient-to-br ${user.color} flex items-center justify-center text-white font-bold text-lg shadow-lg`}
                   >
-                    {user.name}
-                  </p>
-                  <p className="text-muted-foreground text-sm">
-                    {user.injaz} Injaz
-                  </p>
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      user.avatar
+                    )}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p
+                      className={`font-bold ${
+                        user.isCurrentUser ? "text-primary" : "text-foreground"
+                      }`}
+                    >
+                      {user.name}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {user.injaz} Injaz
+                    </p>
+                  </div>
+                </motion.button>
+              ))}
+
+              {visibleCount < restList.length && (
+                <div ref={loadMoreRef} className="pt-2 flex justify-center">
+                  <button
+                    onClick={() =>
+                      setVisibleCount((prev) =>
+                        Math.min(prev + PAGE_SIZE, restList.length),
+                      )
+                    }
+                    className="px-6 py-2.5 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    Load More
+                  </button>
                 </div>
-              </motion.button>
-            ))
+              )}
+            </>
           )}
         </motion.div>
       </div>
