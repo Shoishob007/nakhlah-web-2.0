@@ -238,10 +238,10 @@ export function ZigzagPath({ lessons, levels, mascots, isLoading = false }) {
       </div>
 
       {/* Desktop mask to keep whitespace above sticky header clean */}
-      <div className="hidden lg:block sticky top-0 z-[55] h-6 bg-background" />
+      <div className="hidden lg:block sticky top-0 z-[44] h-6 bg-background" />
 
       {/* Sticky unit header on desktop */}
-      <div className="hidden lg:block sticky top-6 z-50 bg-background py-2 lg:py-0">
+      <div className="hidden lg:block sticky top-6 z-[44] bg-background py-2 lg:py-0">
         <div
           className={`flex items-center justify-between px-4 py-3 rounded-lg shadow-lg transition-all duration-500 ease-in-out bg-gradient-to-r ${getLevelColor(
             currentLevel?.colorIndex || 1,

@@ -24,11 +24,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSessionToken, isSessionValid } from "@/lib/authUtils";
 import { getUserKey } from "@/lib/userKey";
 import { useDailyQuestStore } from "@/stores/useDailyQuestStore";
-import {
-  fetchCurrentUser,
-  fetchMyProfile,
-  fetchQuestionnaireAchievements,
-} from "@/services/api";
+import { useAchievementsStore } from "@/stores/useAchievementsStore";
+import { fetchCurrentUser, fetchMyProfile } from "@/services/api";
 
 const VALID_VIEWS = new Set([
   "profile",
@@ -56,9 +53,11 @@ function ProfileAndSettingsContent() {
   const [showShareDrawer, setShowShareDrawer] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [profileData, setProfileData] = useState(null);
-  const [achievementsData, setAchievementsData] = useState([]);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const { data: session, status } = useSession();
+  const achievementsData = useAchievementsStore((s) => s.achievements);
+  const fetchAchievements = useAchievementsStore((s) => s.fetchAchievements);
+  const clearAchievements = useAchievementsStore((s) => s.clear);
   const router = useRouter();
   const searchParams = useSearchParams();
   const claimQuestIfAvailable = useDailyQuestStore(
@@ -76,17 +75,18 @@ function ProfileAndSettingsContent() {
     const loadProfile = async () => {
       if (status === "loading") return;
       if (status === "unauthenticated" || !isSessionValid(session)) {
+        clearAchievements();
         setIsProfileLoading(false);
         return;
       }
 
       const token = getSessionToken(session);
+      const userKey = getUserKey(session);
       setIsProfileLoading(true);
 
-      const [meResult, profileResult, achievementsResult] = await Promise.all([
+      const [meResult, profileResult] = await Promise.all([
         fetchCurrentUser(token),
         fetchMyProfile(token),
-        fetchQuestionnaireAchievements(token),
       ]);
 
       if (meResult.success) {
@@ -97,9 +97,7 @@ function ProfileAndSettingsContent() {
         setProfileData(profileResult.profile || null);
       }
 
-      if (achievementsResult.success) {
-        setAchievementsData(achievementsResult.achievements || []);
-      }
+      void fetchAchievements({ token, userKey });
 
       setIsProfileLoading(false);
     };
