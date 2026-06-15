@@ -50,7 +50,7 @@ export function Navbar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <nav className="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 border-r border-border bg-card/95 backdrop-blur-md p-6 overflow-y-auto">
+      <nav className="hidden lg:flex flex-col fixed top-0 left-0 h-full w-64 border-r border-border bg-card/95 backdrop-blur-md p-6 overflow-y-auto">
         <div className="flex flex-col gap-8">
           {/* Logo */}
           <Link href="/" className="flex w-full items-center justify-center">
@@ -105,7 +105,7 @@ export function Navbar() {
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md">
         <div className="flex items-center justify-evenly py-2">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
